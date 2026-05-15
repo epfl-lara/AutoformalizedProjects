@@ -2,6 +2,12 @@
 /.epflemma
 /.artifacts
 
+# Nested Lean/EPFLemma artifacts
+**/.lake
+**/.epflemma
+**/.artifacts
+**/logs
+
 # LaTeX build artifacts
 *.aux
 *.bbl
@@ -11,7 +17,6 @@
 *.fls
 *.log
 *.out
-*.pdf
 *.run.xml
 *.synctex.gz
 *.toc
