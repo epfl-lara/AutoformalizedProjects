@@ -20,7 +20,10 @@ against the archive.
 ## Status
 
 - `lake build Pyth` succeeds.
-- Current active version has source-backed theorem skeletons with `sorry` proof obligations.
+- Current active version is a source-backed theorem skeleton with `sorry` proof
+  obligations.
+- Externally cited or explanatory source claims are recorded in
+  `Pyth/Explanatory.lean` as auxiliary skeletons.
 - It models the paper's rational polynomials as `MvPolynomial (Fin n) ℚ` where appropriate, rather than only as rational-valued functions.
 
 See:

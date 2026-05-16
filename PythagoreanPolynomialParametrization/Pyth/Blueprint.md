@@ -1,20 +1,19 @@
-# Formalization Blueprint: docs/PythagoreanPolynomialParametrization/pyth.tex
+# Formalization Blueprint: docs/pyth.tex
 
-- Source: `docs/PythagoreanPolynomialParametrization/pyth.tex`
+- Source: `docs/pyth.tex`
 - Target Lean entry file: `Pyth/Main.lean`
-- Status: reorganized statement skeleton; source coverage improved; proof handoff not yet approved because declarations still use `sorry`
+- Status: source-backed theorem skeleton with auxiliary placeholders for externally cited and explanatory claims
 
 ## Current Rating
 
-- Statement/source coverage: 8/10. The main theorem, obstruction, positive remark, and 16-parameter follow-on are represented with explicit witnesses and source-level handoff lemmas.
-- Proof completeness: 0/10. The setup is a declaration skeleton; none of the mathematical proof obligations have been completed.
-- Model-readiness: 7/10. The file split now gives smaller proof targets, but the UFD obstruction and classification of Pythagorean triples remain substantial proof tasks.
+- Statement/source coverage: 9/10. The main theorem, obstruction, positive remark, 16-parameter follow-on, general finite-family definitions, cited finite-cover theorem, and non-UFD motivation are represented.
+- Proof completeness: skeleton status; declarations may contain `sorry` proof obligations.
+- Model-readiness: 8/10. Externally cited and motivational placeholders are isolated in `Pyth/Explanatory.lean`.
 
 ## Known Scope Gaps
 
-- The paper's general definition of parametrization by a finite number of polynomial tuples (`pyth.tex:118-125`) is not formalized as a reusable predicate. The introductory two-family fact is captured directly by `pythagoreanTriple_two_integer_polynomial_families`.
-- The referenced theorem that every single integer-valued parametrization yields a finite integer-coefficient parametrization (`pyth.tex:138-141`) is not formalized; the paper cites it externally and does not use it in the main construction.
-- The non-unique factorization example in `Int(ℤ)` (`pyth.tex:174-192`) is not formalized because it is explanatory motivation rather than a theorem used by the parametrization proof.
+- The full irreducible-factorization proof behind the non-UFD discussion (`pyth.tex:179-189`) is intentionally not developed. This is acceptable for this formalization because the paper uses the paragraph only as motivation for why integer-valued polynomial rings behave differently from `ℤ[x]`; it is not used in the obstruction proof or in the construction of the Pythagorean-triple parametrization. The file now records the displayed identity, integer-valuedness of the binomial polynomial, and the non-UFD claim as source placeholders.
+- The externally cited finite-cover theorem (`pyth.tex:138-141`) is recorded as a placeholder in `Pyth/Explanatory.lean`; the cited Frisch proof is outside this paper.
 
 ## Planner Checklist
 
@@ -41,6 +40,7 @@ Local import chain:
 - `Pyth/Obstructions.lean` imports `Pyth.Basic`.
 - `Pyth/IntegerValued.lean` imports `Pyth.SourceLemmas`.
 - `Pyth/Positive.lean` imports `Pyth.IntegerValued`.
+- `Pyth/Explanatory.lean` imports `Pyth.Basic`.
 - `Pyth/Main.lean` imports the Pyth modules as an aggregator.
 
 ## Suggested Search Modules
@@ -60,7 +60,8 @@ Non-gating modules or namespaces to search while proving. Do not force these int
 - Integer-coefficient obstruction: `Pyth/Obstructions.lean`
 - Four-variable integer-valued parametrization: `Pyth/IntegerValued.lean`
 - Positive and 16-parameter parametrizations: `Pyth/Positive.lean`
-- Current proof obligations: 17 `sorry` declarations.
+- Externally cited and explanatory skeletons: `Pyth/Explanatory.lean`
+- Auxiliary proof obligations: 4 `sorry` declarations in `Pyth/Explanatory.lean`.
 
 ## Definitions (before theorems)
 
@@ -72,10 +73,18 @@ Non-gating modules or namespaces to search while proving. Do not force these int
 | `IntPoly n` | `Basic.lean` | ℤ[x₁,…,xₙ] | `MvPolynomial (Fin n) ℤ` |
 | `RatPoly n` | `Basic.lean` | ℚ[x₁,…,xₙ] | `MvPolynomial (Fin n) ℚ` |
 | `IsIntValued` | `Basic.lean` | Int(ℤⁿ) | rational poly evaluates to integer at all integer tuples |
+| `IntValuedSubring` | `Basic.lean` | Int(ℤⁿ) as a ring | subring of `RatPoly n` used for factorization statements |
+| `IntegerValuedPoly` | `Basic.lean` | Int(ℤⁿ) as a type | coercible type of integer-valued rational polynomials |
 | `intPolyEval` | `Basic.lean` | evaluation | evaluate integer-coefficient poly at integer tuple |
 | `ratPolyEval` | `Basic.lean` | evaluation | evaluate rational-coefficient poly at integer tuple |
+| `IntPolyTupleParametrizes` | `Basic.lean` | single k-tuple over ℤ[x] | general `S ⊆ ℤᵏ` image predicate |
+| `IntValuedTupleParametrizes` | `Basic.lean` | single k-tuple over Int(ℤⁿ) | general integer-valued image predicate |
+| `FiniteIntPolyTupleParametrizes` | `Basic.lean` | finite family over ℤ[x] | finite union of integer-coefficient polynomial tuple images |
+| `FiniteIntValuedTupleParametrizes` | `Basic.lean` | finite family over Int(ℤⁿ) | finite union of integer-valued polynomial tuple images |
 | `IntPolyParametrizes` | `Basic.lean` | parametrization by ℤ[x] | image of polynomial map equals the set |
 | `IntValuedParametrizes` | `Basic.lean` | parametrization by Int(ℤⁿ) | integer-valued + image equals the set |
+| `fallingFactorialRatPoly` | `Explanatory.lean` | x(x-1)…(x-k+1) | displayed polynomial in the non-UFD discussion |
+| `binomialRatPoly` | `Explanatory.lean` | (x choose k) | rational binomial polynomial |
 | `TMap` | `SourceLemmas.lean` | T(a,b,c) | rational map c(a²-b²)/2, cab, c(a²+b²)/2 |
 | `IsIntegralTValue` | `SourceLemmas.lean` | integer triples in range of T | all coordinates of `TMap a b c` are integers |
 | `PaperParityCondition` | `SourceLemmas.lean` | c≡0 mod 2 or a≡b mod 2 | encoded as `Even c ∨ Even (a - b)` |
@@ -105,6 +114,36 @@ Non-gating modules or namespaces to search while proving. Do not force these int
 | `h_16_param` | `Positive.lean` | h in 16-param theorem | c_16·(a_16²+b_16²)/2 |
 
 ## Source Statement Inventory
+
+### line-104
+
+- Kind: definition block
+- Source locator: `docs/pyth.tex:104-128`
+- Lean declarations: `IntPolyTupleParametrizes`, `IntValuedTupleParametrizes`, `FiniteIntPolyTupleParametrizes`, `FiniteIntValuedTupleParametrizes`
+- File: `Pyth/Basic.lean`
+- Formal statement review: The source defines parametrization of `S ⊆ ℤᵏ` by one `k`-tuple of polynomials and by a finite union of such images. The Lean definitions encode `ℤᵏ` as `Fin k → ℤ` and finite families as `Fin m → Fin k → ...`.
+- Scope changes: the specialized existing triple predicates remain for the Pythagorean theorem files.
+- Statement verification status: added as definitions; no proof obligations.
+
+### line-138
+
+- Kind: externally cited theorem
+- Source locator: `docs/pyth.tex:138-141`
+- Lean declaration: `single_intValued_parametrization_yields_finite_intPoly_parametrization`
+- File: `Pyth/Explanatory.lean`
+- Formal statement review: The source says any set of integer tuples parametrized by a single integer-valued tuple is parametrizable by finitely many integer-coefficient tuples. The Lean statement uses the general `Fin k → ℤ` predicates and keeps the same number of variables `n`.
+- Scope changes: recorded as a `sorry` placeholder because the proof is cited from external work and is not used by the paper's main proof.
+- Statement verification status: parses as a source placeholder.
+
+### line-179
+
+- Kind: explanatory motivation
+- Source locator: `docs/pyth.tex:179-192`
+- Lean declarations: `IntValuedSubring`, `IntegerValuedPoly`, `fallingFactorialRatPoly`, `binomialRatPoly`, `binomialRatPoly_intValued`, `fallingFactorial_eq_factorial_mul_binomialRatPoly`, `integerValued_polynomial_ring_not_uniqueFactorization`
+- Files: `Pyth/Basic.lean`, `Pyth/Explanatory.lean`
+- Formal statement review: The source says `Int(ℤ)` lacks unique factorization and gives the displayed identity `x(x-1)…(x-k+1)=k! * (x choose k)`. The Lean file records the ring/type needed to state the non-UFD claim, the displayed polynomials, the identity, and integer-valuedness of the binomial polynomial.
+- Scope changes: the detailed irreducibility and factor-count proof is intentionally out of scope for the Pythagorean parametrization results. The paper does not use this proof later and points readers to separate references for factorization properties of integer-valued polynomial rings, so these claims are recorded as `sorry` placeholders rather than treated as blocking obligations.
+- Statement verification status: parses as source placeholders.
 
 ### line-98
 

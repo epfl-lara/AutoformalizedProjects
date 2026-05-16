@@ -3,13 +3,14 @@ import Pyth.SourceLemmas
 import Pyth.Obstructions
 import Pyth.IntegerValued
 import Pyth.Positive
+import Pyth.Explanatory
 
 /-! # Parametrization of Pythagorean Triples by Polynomials
 
 This directory sets up source-backed Lean statements for results from Frisch and
 Vaserstein's paper "Parametrization of Pythagorean triples by a single triple of
-polynomials". The main mathematical proofs are intentionally left as `sorry` proof
-obligations.
+polynomials". Externally cited or explanatory source claims are recorded separately
+as auxiliary `sorry` placeholders.
 
 ## File layout
 
@@ -23,4 +24,6 @@ obligations.
   Pythagorean triples.
 - `Positive`: the positive-triple parametrization and the 16-parameter unrestricted
   variant.
+- `Explanatory`: reusable finite-family parametrization statements, the cited
+  finite-cover theorem, and the integer-valued factorization discussion.
 -/

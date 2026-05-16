@@ -29,6 +29,39 @@ at every integer tuple. -/
 def IsIntValued {n : ℕ} (p : RatPoly n) : Prop :=
   ∀ a : Fin n → ℤ, ∃ k : ℤ, eval (fun i => (a i : ℚ)) p = (k : ℚ)
 
+/-- The paper's ring `Int(ℤⁿ)` of integer-valued rational polynomials, represented as
+a subring of `ℚ[x₁, ..., xₙ]`. -/
+def IntValuedSubring (n : ℕ) : Subring (RatPoly n) where
+  carrier := {p | IsIntValued p}
+  zero_mem' := by
+    intro a
+    use 0
+    simp
+  one_mem' := by
+    intro a
+    use 1
+    simp
+  add_mem' := by
+    intro p q hp hq a
+    rcases hp a with ⟨m, hm⟩
+    rcases hq a with ⟨l, hl⟩
+    use m + l
+    simp [hm, hl]
+  neg_mem' := by
+    intro p hp a
+    rcases hp a with ⟨m, hm⟩
+    use -m
+    simp [hm]
+  mul_mem' := by
+    intro p q hp hq a
+    rcases hp a with ⟨m, hm⟩
+    rcases hq a with ⟨l, hl⟩
+    use m * l
+    simp [hm, hl]
+
+/-- The type of integer-valued rational polynomials in `n` variables. -/
+abbrev IntegerValuedPoly (n : ℕ) : Type := IntValuedSubring n
+
 /-- Evaluate an integer-coefficient polynomial at an integer tuple. -/
 noncomputable def intPolyEval {n : ℕ} (p : IntPoly n) (a : Fin n → ℤ) : ℤ :=
   eval a p
@@ -36,6 +69,34 @@ noncomputable def intPolyEval {n : ℕ} (p : IntPoly n) (a : Fin n → ℤ) : �
 /-- Evaluate a rational-coefficient polynomial at an integer tuple. -/
 noncomputable def ratPolyEval {n : ℕ} (p : RatPoly n) (a : Fin n → ℤ) : ℚ :=
   eval (fun i => (a i : ℚ)) p
+
+/-- General `k`-tuple version of parametrization by one tuple of integer-coefficient
+polynomials, matching `pyth.tex` lines 104--116. -/
+def IntPolyTupleParametrizes {n k : ℕ} (F : Fin k → IntPoly n)
+    (S : Set (Fin k → ℤ)) : Prop :=
+  S = {v | ∃ a : Fin n → ℤ, ∀ i : Fin k, intPolyEval (F i) a = v i}
+
+/-- General `k`-tuple version of parametrization by one tuple of integer-valued
+polynomials, matching `pyth.tex` lines 104--116. -/
+def IntValuedTupleParametrizes {n k : ℕ} (F : Fin k → RatPoly n)
+    (S : Set (Fin k → ℤ)) : Prop :=
+  (∀ i : Fin k, IsIntValued (F i)) ∧
+    S = {v | ∃ a : Fin n → ℤ, ∀ i : Fin k, ratPolyEval (F i) a = (v i : ℚ)}
+
+/-- Parametrization by a finite number of `k`-tuples of integer-coefficient
+polynomials, matching `pyth.tex` lines 118--125. -/
+def FiniteIntPolyTupleParametrizes {m n k : ℕ} (F : Fin m → Fin k → IntPoly n)
+    (S : Set (Fin k → ℤ)) : Prop :=
+  S = {v | ∃ j : Fin m, ∃ a : Fin n → ℤ, ∀ i : Fin k,
+    intPolyEval (F j i) a = v i}
+
+/-- Parametrization by a finite number of `k`-tuples of integer-valued polynomials,
+matching `pyth.tex` lines 118--125. -/
+def FiniteIntValuedTupleParametrizes {m n k : ℕ} (F : Fin m → Fin k → RatPoly n)
+    (S : Set (Fin k → ℤ)) : Prop :=
+  (∀ j : Fin m, ∀ i : Fin k, IsIntValued (F j i)) ∧
+    S = {v | ∃ j : Fin m, ∃ a : Fin n → ℤ, ∀ i : Fin k,
+      ratPolyEval (F j i) a = (v i : ℚ)}
 
 /-- A triple of integer-coefficient polynomials parametrizes a set S ⊆ ℤ³
 if S equals the image of the polynomial map ℤⁿ → ℤ³. -/
