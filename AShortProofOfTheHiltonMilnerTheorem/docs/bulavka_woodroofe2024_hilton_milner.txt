@@ -1,0 +1,248 @@
+                                                   A SHORT PROOF OF THE HILTON-MILNER THEOREM
+
+                                                                    DENYS BULAVKA AND RUSS WOODROOFE
+
+                                                   Abstract. We give a short and relatively elementary proof of the Hilton-Milner
+                                                   Theorem.
+
+
+
+
+arXiv:2411.02513v4 [math.CO] 19 Nov 2025
+                                           The Hilton-Milner Theorem gives the maximum size of a uniform pairwise-intersecting
+                                           family of sets that do not share a common element.
+                                           Theorem 1 (Hilton and Milner 1967 [9]). Let k ≤ n/2. If F is a family   of
+                                                                                                                      pairwise-
+                                                                                                                            
+                                                                                                                n−1
+                                           intersecting k-element subsets of [n], where F ∈F F = ∅, then |F | ≤ k−1 − n−1−k   +1.
+                                                                                       T
+                                                                                                                        k−1
+
+                                             In the current article, we will show Theorem 1 to follow quickly from the following
+                                           theorem, which we believe to be of some independent interest. Two set systems A and
+                                           B are cross-intersecting if for every A ∈ A, B ∈ B, the intersection A ∩ B is nonempty.
+                                           The shadow ∂B of a k-element set B consists of all the (k − 1)-element subsets of B;
+                                           the shadow of a uniform set family is the union of the shadows of its constituent sets,
+                                           thus consists of all (k − 1)-element subsets of constituent sets.
+                                           Theorem 2. Let 2k − 1 ≤ n, let A be a family of (k − 1)-element subsets of [n], and let
+                                           B be a family of k-element subsets of [n]. If A, B are cross-intersecting, B is nonempty,
+                                           and ∂B ⊆ A, then                              !           !
+                                                                                     n         n−k
+                                                                    |A| + |B| ≤            −           + 1.
+                                                                                   k−1         k−1
+                                              Note that the bound of Theorem 1 is attained with a single k-element set B that
+                                           does not contain 1, together with all the k-element sets that contain 1 and intersect B;
+                                           the bound of Theorem 2 is attained with a single k-element set and all (k − 1)-element
+                                           sets that intersect it.
+                                              Our proof of Theorem 1 may be viewed as injective. Other recent proofs of Theorem 1
+                                           were given in [4, 10], but instead of relying on a simple cross-intersecting type theorem,
+                                           both of these proofs rely on a certain “partial complement” operation. In somewhat
+                                           older work [6] (see also [3]), Frankl and Tokushige gave a proof of Hilton-Milner from
+                                           a diﬀerent cross-intersection theorem, but the proof is less elementary than that of
+                                           Theorem 2, requiring the Schützenberger-Kruskal-Katona Theorem. A recent preprint
+                                           of Wu, Li, Feng, Liu and Yu [12] (now published) gives a proof based on still another
+                                           cross-intersecting theorem, but the existing proofs of this underlying result also seem
+                                           to be somewhat more diﬃcult than our approach.
+                                              Work of the ﬁrst author is partially supported by the Israel Science Foundation grant ISF-2480/20
+                                           and the AARMS postdoctoral fellowship. Work of the second author is supported in part by the
+                                           Slovenian Research Agency (research program P1-0285 and research projects J1-9108, J1-2451, J1-
+                                           3003, and J1-50000).
+                                                                                            1
+                   A SHORT PROOF OF THE HILTON-MILNER THEOREM                            2
+
+Shifting. We recall that a system F of subsets of [n] is shifted if for each i < j,
+whenever F ∈ F , j ∈ F and i ∈  / F , then also (F \ j) ∪ i ∈ F . Here, we abuse notation
+to identify i, j with the singleton subsets {i}, {j} where it causes no confusion. The
+(combinatorial) shifting operation Shifti←j is deﬁned as
+            Shifti←j F = {F ∈ F : j ∈
+                                    / F or i ∈ F or (F \ j) ∪ i ∈ F }
+                          ∪ {(F \ j) ∪ i : F ∈ F is such that j ∈ F, i ∈
+                                                                       / F}.
+  It is well-known that repeated applications of Shifti←j over i < j will eventually
+reduce an arbitrary set system to a shifted set system, that the operation preserves the
+cross-intersecting property, and that ∂ Shifti←j F ⊆ Shifti←j ∂F [1, 2, 7, 8].
+
+Proof of Theorem 2. We carry out a straightforward induction on n.
+                                            
+                                           n
+If n = 2k − 1, then the upper bound is k−1    , and the result follows by noticing that if
+a (k − 1)-element set is in A, then its complement cannot be in B (and vice-versa).
+   For the inductive step, we may assume that A and B are shifted; otherwise, shift.
+Let A(¬n), B(¬n) consist of the subsets in A, B (respectively) that do not contain n. It
+is immediate that A(¬n), B(¬n) are shifted, cross-intersecting, and satisfy the shadow
+condition. Let A(n), B(n) be obtained by taking the families consisting of the subsets in
+A, B that contain n, then deleting n from each subset. It follows quickly from deﬁnitions
+that A(n), B(n) are shifted, cross-intersecting, and satisfy the shadow condition.
+   As A and B are shifted, so A(¬n) and B(¬n) are nonempty, and hence by induction
+                                                 !              !
+                                       n−1   n−1−k
+(1)                |A(¬n)| + |B(¬n)| ≤     −       + 1.
+                                       k−1    k−1
+   For A(n), B(n), there are a few easy cases:
+   If A(n) is empty, then (by the shadow condition) also B(n) is empty.
+   If B(n) is empty, then since B is nonempty and shifted, we have {1, . . . , k} ∈ B.
+Since
+          setin A(n) intersects with {1, . . . , k}, we get |A(n)| + |B(n)| = |A(n)| ≤
+       every
+ n−1
+  k−2
+        − n−1−k
+            k−2
+                 .
+   If B(n) is nonempty, then by induction it holds that
+                                            !                       !
+                                   n−1   n − 1 − (k − 1)
+                 |A(n)| + |B(n)| ≤     −                 +1
+                                   k−2        k−2
+                                            !               !
+                                    n−1   n−1−k
+(2)                               ≤     −       .
+                                    k−2    k−2
+The result now follows from (1), the bound on |A(n)|+|B(n)|, and the Pascal’s Triangle
+identity.                                                                           
+
+Proof of Theorem 1. We will use the following lemma of Frankl and Füredi:
+Lemma 3 (essentially Frankl and Füredi [5]). If F is a pairwise-intersecting family of
+k-element subsets of [n] with F ∈F F = ∅, then there is a shifted family F ′ satisfying
+                             T
+
+the same properties and with |F ′| ≥ |F |.
+                    A SHORT PROOF OF THE HILTON-MILNER THEOREM                                3
+
+Given the lemma, the proof of Theorem 1 is nearly immediate. Let F be a shifted
+family satisfying the conditions of the theorem. Deﬁne
+                             A = {F \ 1 : F ∈ F with 1 ∈ F }
+                             B = {F       : F ∈ F with 1 ∈
+                                                         / F }.
+Since F is shifted, if F ∈ F does not have 1, then (F \ i) ∪ 1 ∈ F for each i ∈ F . It
+follows that ∂B ⊆ A. Since F is intersecting, also A, B are cross-intersecting systems
+of subsets of {2, . . . , n}. Since F has empty intersection, both of A, B are nonempty.
+The desired bound is now immediate from Theorem 2.                                    
+Remark 4. This proof requires only the special case of Theorem 2 where the set systems
+are shifted.
+Proof of Lemma 3. For completeness, we also prove the lemma.
+Given F as in Theorem 1, apply shifting operations Shifti←j . Each such operation
+preserves the pairwise-intersecting property and cardinality, but may or may not result
+in a system with a common element of intersection.
+   If a sequence of shifting operations ends in a shifted system with empty intersection,
+then we are certainly done.
+   Otherwise, some Shifti0 ←j0 results in a system where every set contains i0 . Thus,
+before this step, we have a system F where every set contains either i0 or j0 . Relabel
+i0 to 1 and j0 to 2, and continue applying Shifti←j operations over all 3 ≤ i < j. Thus,
+after these additional shift operations, we have {1, 3, . . . , k + 1} and {2, 3, . . . , k + 1}
+in the system. Without loss of generality (since every set in F contains 1 or 2), we
+also have all k-element subsets containing {1, 2}; otherwise, add them. Thus, we have
+∂ {1, . . . , k + 1} contained in our system. As ∂ {1, . . . , k + 1} has empty intersection and
+is preserved under all further shift operations (over 1 ≤ i < j), the result follows. 
+Discussion. In addition to being short and direct, our proof is relatively elementary,
+using only shifting theory. Indeed, we recover a completely elementary proof of the
+restriction of the Hilton-Milner Theorem to shifted systems.
+   A main diﬃculty in proofs of Hilton-Milner and/or Erdős-Ko-Rado type results is re-
+lating systems of (k −1)-element subsets to systems of k-element subsets. Our approach
+handles this with the shadow containment condition of Theorem 2.
+   Our motivation here comes partly from combinatorial algebraic topology. In par-
+ticular, the simplicial complex generated by a shifted family of k-element sets has
+homology with generators in B (using notation as in the proof of Theorem 1). Thus,
+Lemma 3 transforms the combinatorial property of empty intersection into a homolog-
+ical property. Kalai comments on similar connections between intersection theorems
+and homology in [11, Section 6.4].
+   The approach also gives a uniﬁed proof of the well-known Erdős-Ko-Rado Theorem.
+More concretely, if we relax the hypothesis
+                                            of Theorem 2 to allow B to be empty, then the
+corresponding bound is |A| + |B| ≤ n−1  k−1
+                                             . Erdős-Ko-Rado now follows from replacing
+Theorem 2 with the relaxed cross-intersection theorem in the proof of Theorem 1. The
+proof is similar to (and only slightly more complicated than) the standard inductive
+proof of Erdős-Ko-Rado for shifted systems.
+                    A SHORT PROOF OF THE HILTON-MILNER THEOREM                                  4
+
+   The approach also recovers uniqueness of the largest family for Theorem 1 when
+n/2 > k ≥ 4. Here, we strengthen the hypothesis of Theorem 2 to require B to have at
+least two elements. We discuss the details in the following section.
+Uniqueness of the Hilton-Milner family. As mentioned in the discussion, the same
+techniques give uniqueness of the maximum family in Theorem 1. We prove:
+Theorem 5. In the situation of Theorem 1, if 4 ≤ k < n/2 and |F | achieves the upper
+bound, then there is some k-set B and i ∈ / B so that F consists of B together with all
+k-sets that both contain i and intersect B.
+  We require k ≥ 4 in order to avoid some technicalities. In particular, there is another
+family achieving the bound for k = 3. See [10] for more details and a diﬀerent argument.
+  As in the proof of Theorem 1, we reduce to a shifted family, and prove for a shifted
+family.
+  The proof for a shifted family requires a completely straightforward modiﬁcation of
+Theorem 2. We obviously require k ≥ 4. We also strengthen the hypothesis to require
+|B| ≥ 2, replacing the condition that |B| ≥ 1; with the strengthened hypothesis, the
+inequality is strict. Then in the proof, we may have |B(n)| empty or nonempty. If
+empty, then since B has at least two elements, so A(n) is strictly smaller than the given
+bound. If nonempty, then the bound in (2) is already strict so long as k ≥ 4. In either
+case, the induction step yields a strict inequality.
+  Theorem 5 follows for shifted families by applying the variant of Theorem 2 with
+|B| ≥ 2 to the same families as in the proof of Theorem 1.
+  It remains only to reduce to shifted families. This reduction requires a bit of care.
+We did not ﬁnd the following lemma in the literature, although we believe it to be
+known to experts in the ﬁeld.
+Lemma 6. Let F be a family of pairwise-intersecting k-element subsets of [n] with the
+additional property that for any F0 ∈ F , the intersection F\{F0 } F is empty. Then
+                                                              T
+
+there is a shifted family F ′ satisfying the same properties and with |F ′| ≥ |F |.
+Proof. By the standard family, we mean the shifted family with A = {2, . . . , k + 1},
+A′ = {2, . . . , k, k + 2}, and all k-element sets that both contain 1 and intersect A and
+A′ . It is obvious that the standard family is at least as large as any family where all
+but two sets contain 1.
+   Given F , we perform a sequence of shifts. If these terminate in a shifted family with
+the desired properties, then we are done. Otherwise, an operation results in a family
+without the additional property. Stopping just before this operation and relabeling
+elements, we have a family containing sets with 1 and not 2, with 2 and not 1, with
+both 1 and 2, and possibly the set B = {3, . . . , k + 2}.
+   We may assume without loss of generality that we have all sets containing both 1, 2
+and intersecting with B. Since these sets do not have any common intersection other
+than 1, 2, the operations Shifti←j over all 3 ≤ i < j preserve the additional property.
+   After shifting over 3 ≤ i < j, if we have only one set with 1 and not 2, or only one
+set with 2 and not 1, then we replace with the standard family. Otherwise, we have
+in the family {a, 3, . . . , k + 1} and {a, 3, . . . , k, k + 2} for a = 1, 2, along with all sets
+                     A SHORT PROOF OF THE HILTON-MILNER THEOREM                                      5
+
+containing {1, 2} and intersecting B. In particular, the family contains as subfamilies
+both ∂ {1, . . . , k + 1} and ∂ {1, . . . , k, k + 2}. Both subfamilies have empty intersection
+and are preserved under all shift operations, so we can now shift until the system
+stabilizes.                                                                                   
+Acknowledgements. We particularly thank Dániel Gerbner for several helpful com-
+ments about preprints of the paper. We also thank Peter Frankl, Balázs Patkós, John
+Shareshian, and Tamás Szőnyi.
+                                           References
+ [1] Peter Frankl, The shifting technique in extremal set theory, Surveys in combinatorics 1987 (New
+     Cross, 1987), London Math. Soc. Lecture Note Ser., vol. 123, Cambridge Univ. Press, Cambridge,
+     1987, pp. 81–110.
+ [2]         , Shadows and shifting, Graphs Combin. 7 (1991), no. 1, 23–29.
+ [3]         , New inequalities for cross-intersecting families, Mosc. J. Comb. Number Theory 6 (2016),
+     no. 4, 27–32.
+ [4]         , A simple proof of the Hilton-Milner theorem, Mosc. J. Comb. Number Theory 8 (2019),
+     no. 2, 97–101.
+ [5] Peter Frankl and Zoltán Füredi, Nontrivial intersecting families, J. Combin. Theory Ser. A 41
+     (1986), no. 1, 150–153.
+ [6] Peter Frankl and Norihide Tokushige, Some best possible inequalities concerning cross-intersecting
+     families, J. Combin. Theory Ser. A 61 (1992), no. 1, 87–97.
+ [7] Dániel Gerbner and Balázs Patkós, Extremal ﬁnite set theory, Discrete Mathematics and its Ap-
+     plications (Boca Raton), CRC Press, Boca Raton, FL, 2019.
+ [8] Jürgen Herzog and Takayuki Hibi, Monomial ideals, Graduate Texts in Mathematics, vol. 260,
+     Springer-Verlag London Ltd., London, 2011.
+ [9] A. J. W. Hilton and E. C. Milner, Some intersection theorems for systems of ﬁnite sets, Quart.
+     J. Math. Oxford Ser. (2) 18 (1967), 369–384.
+[10] Glenn Hurlbert and Vikram Kamat, New injective proofs of the Erdős-Ko-Rado and Hilton-Milner
+     theorems, Discrete Math. 341 (2018), no. 6, 1749–1754, arXiv:1609.04714.
+[11] Gil Kalai, Algebraic shifting, Computational commutative algebra and combinatorics (Osaka,
+     1999), Adv. Stud. Pure Math., vol. 33, Math. Soc. Japan, Tokyo, 2002, pp. 121–163.
+[12] Yongjiang Wu, Yongtao Li, Lihua Feng, Jiuqiang Liu, and Guihai Yu, Maximal intersecting
+     families revisited, Discrete Math. 349 (2026), no. 1, Paper No. 114654, 18, arXiv:2411.03674.
+
+  Einstein Institute of Mathematics, Hebrew University, Jerusalem 91904, Israel
+  Current address: Department of Mathematics & Statistics, Dalhousie University, 6297 Castine Way,
+PO BOX 15000, Halifax, NS, Canada, B3H 4R2
+  Email address: denys.bulavka@dal.ca
+  URL: https://kam.mff.cuni.cz/∼dbulavka/
+
+  Univerza na Primorskem, Glagoljaška 8, 6000 Koper, Slovenia
+  Email address: russ.woodroofe@famnit.upr.si
+  URL: https://osebje.famnit.upr.si/∼russ.woodroofe/
+

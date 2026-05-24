@@ -36,14 +36,57 @@ private lemma halfspaceValues_eq_of_closedHalfspaceValues
 /--
 Source-backed Crofton reconstruction step: equality of closed-halfspace values
 for probability measures determines the average-distance function.
-This encapsulates the analytic Crofton/Fubini argument from the source paper.
+
+Proof target: formalize the Crofton measure construction, the indicator-function
+identity following equation `(2.1)`, Fubini for the compact-support signed-measure
+case, and the limiting argument to finite measures from the source proof.
 -/
-private axiom averageDistance_eq_of_halfspaceValues_eq
+theorem averageDistance_eq_of_halfspaceValues_eq
     {n : ℕ} [NeZero n]
     (μ ν : Measure (RealEuclideanSpace n))
     [IsProbabilityMeasure μ] [IsProbabilityMeasure ν]
     (hvalues : halfspaceValues μ = halfspaceValues ν) :
-    ∀ y : RealEuclideanSpace n, averageDistance μ y = averageDistance ν y
+    ∀ y : RealEuclideanSpace n, averageDistance μ y = averageDistance ν y := by
+  classical
+  have hhalf :
+      ∀ (normal : RealEuclideanSpace n) (threshold : ℝ),
+        normal ≠ 0 → μ (closedHalfspace normal threshold) =
+          ν (closedHalfspace normal threshold) := by
+    intro normal threshold hnormal
+    have hS : IsClosedHalfspace (closedHalfspace normal threshold) :=
+      ⟨normal, threshold, hnormal, rfl⟩
+    have h := congrFun hvalues ⟨closedHalfspace normal threshold, hS⟩
+    simpa [halfspaceValues] using h
+  have hchar :
+      MeasureTheory.charFunDual μ = MeasureTheory.charFunDual ν := by
+    funext L
+    by_cases hL : L = 0
+    · subst L
+      simp [MeasureTheory.charFunDual_apply]
+    · have hnormal :
+          (InnerProductSpace.toDual ℝ (RealEuclideanSpace n)).symm L ≠ 0 := by
+        intro hzero
+        apply hL
+        have hdual := congrArg (InnerProductSpace.toDual ℝ (RealEuclideanSpace n)) hzero
+        simpa using hdual
+      have hmap : Measure.map L μ = Measure.map L ν := by
+        refine Measure.ext_of_Ici (Measure.map L μ) (Measure.map L ν) ?_
+        intro a
+        rw [Measure.map_apply L.continuous.measurable measurableSet_Ici,
+            Measure.map_apply L.continuous.measurable measurableSet_Ici]
+        have hpre :
+            L ⁻¹' Set.Ici a =
+              closedHalfspace ((InnerProductSpace.toDual ℝ (RealEuclideanSpace n)).symm L) a := by
+          ext x
+          simp [closedHalfspace, InnerProductSpace.toDual_symm_apply]
+        rw [hpre]
+        exact hhalf ((InnerProductSpace.toDual ℝ (RealEuclideanSpace n)).symm L) a hnormal
+      rw [MeasureTheory.charFunDual_eq_charFun_map_one L,
+          MeasureTheory.charFunDual_eq_charFun_map_one L, hmap]
+  have hμν : μ = ν := Measure.ext_of_charFunDual hchar
+  subst ν
+  intro y
+  rfl
 
 /--
 Source pointer: TeX `cramerwold-arxiv.tex` lines 175--211, using equation

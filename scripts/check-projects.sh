@@ -10,9 +10,12 @@ check_project() {
   echo "==> ${project}"
   (
     cd "${ROOT}/${project}"
+    lake exe cache get
     lake build "${target}"
   )
 }
 
 check_project PythagoreanPolynomialParametrization Pyth
 check_project QuantizingPythagoreanTriples Pythagore2
+check_project AShortProofOfTheHiltonMilnerTheorem AShortProofOfTheHiltonMilnerTheorem
+check_project CramerWoldTheorem CramerWoldTheorem

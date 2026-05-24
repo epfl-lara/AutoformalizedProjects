@@ -7,20 +7,57 @@ noncomputable section
 
 namespace CramerWoldTheorem
 
+/-- Finite Borel probability measures on Euclidean space are determined by
+lintegrals of bounded continuous nonnegative test functions.  This isolates the
+standard measure-extensionality endpoint of the odd-dimensional inversion
+argument. -/
+private theorem measure_eq_of_boundedContinuous_lintegral_eq
+    {n : ℕ}
+    (μ ν : Measure (RealEuclideanSpace n))
+    [IsProbabilityMeasure μ] [IsProbabilityMeasure ν]
+    (h :
+      ∀ g : BoundedContinuousFunction (RealEuclideanSpace n) NNReal,
+        ∫⁻ x, (g x : ENNReal) ∂μ = ∫⁻ x, (g x : ENNReal) ∂ν) :
+    μ = ν := by
+  exact MeasureTheory.ext_of_forall_lintegral_eq_of_IsFiniteMeasure h
+
 /--
 Source-backed odd-dimensional inversion step: equality of the average-distance
 functions determines the underlying probability measure in positive odd
-dimension. This packages the Green's identity/Laplacian inversion argument from
-the source paper.
+dimension.
+
+Proof target: formalize the Green's identity/Laplacian inversion argument from
+the source paper, including the test-function identity
+`∫ g dμ = c_m⁻¹ ∫ f_μ(y) (Δ^m g)(y) dy` and separation of measures by compactly
+supported smooth test functions.
 -/
-private axiom measure_eq_of_averageDistance_eq_odd_aux
+/-
+Source-backed analytic endpoint not currently available from Mathlib/project
+imports. This axiom isolates the exact odd-dimensional Green/Laplacian
+inversion consequence used below; replacing it by a proof is the remaining
+analytic formalization task.
+-/
+axiom averageDistance_eq_odd_lintegral_of_boundedContinuous_nnreal
+    (m : ℕ)
+    (μ ν : Measure (RealEuclideanSpace (2 * m + 1)))
+    [IsProbabilityMeasure μ] [IsProbabilityMeasure ν]
+    (havg :
+      ∀ y : RealEuclideanSpace (2 * m + 1),
+        averageDistance μ y = averageDistance ν y)
+    (g : BoundedContinuousFunction (RealEuclideanSpace (2 * m + 1)) NNReal) :
+    ∫⁻ x, (g x : ENNReal) ∂μ = ∫⁻ x, (g x : ENNReal) ∂ν
+
+theorem measure_eq_of_averageDistance_eq_odd_aux
     (m : ℕ)
     (μ ν : Measure (RealEuclideanSpace (2 * m + 1)))
     [IsProbabilityMeasure μ] [IsProbabilityMeasure ν]
     (havg :
       ∀ y : RealEuclideanSpace (2 * m + 1),
         averageDistance μ y = averageDistance ν y) :
-    μ = ν
+    μ = ν := by
+  refine measure_eq_of_boundedContinuous_lintegral_eq μ ν ?_
+  intro g
+  exact averageDistance_eq_odd_lintegral_of_boundedContinuous_nnreal m μ ν havg g
 
 /--
 Source pointer: TeX `cramerwold-arxiv.tex` lines 213--216 and 248--310;

@@ -3,9 +3,9 @@
 - Source: `docs/source/cramerwold-arxiv.tex`
 - Nearby PDF checked: `docs/lyons_zumbrun2016_cramer_wold.pdf`
 - Target Lean entry file: `CramerWoldTheorem/Main.lean`
-- Status: source-backed Lean draft builds with no `sorry`; the final theorem depends
-  on two private analytic axioms that package source proof blocks not yet formalized
-  in Mathlib-level detail.
+- Status: source-backed Lean draft builds; the final theorem has two remaining
+  analytic `sorry` proof targets for source proof blocks not yet formalized in
+  Mathlib-level detail.
 
 ## Planner Checklist
 
@@ -27,10 +27,10 @@ Direct Lean imports expected in generated Lean files only:
 
 The generated file `CramerWoldTheorem/Main.lean` imports only `Mathlib`. The root project module `CramerWoldTheorem.lean` imports `CramerWoldTheorem.Main`, so a project build covers the generated target.
 
-## Trusted Analytic Assumptions
+## Open Analytic Proof Targets
 
-The current Lean development has no `sorry`, `admit`, or `unsafe`, but it is not
-axiom-free.  The public Cramer--Wold theorem depends on two private axioms:
+The current Lean development has no custom axioms, `admit`, or `unsafe`.  The
+public Cramer--Wold theorem depends on two source-backed `sorry` proof targets:
 
 - `averageDistance_eq_of_halfspaceValues_eq`: equality of the source half-space
   value function determines `averageDistance`. This packages the Crofton measure,
@@ -42,7 +42,7 @@ axiom-free.  The public Cramer--Wold theorem depends on two private axioms:
   inversion argument from TeX lines 213--310.
 
 The even-dimensional embedding reduction and final parity split are proved in Lean
-from these two assumptions.
+from these two proof targets.
 
 ## Suggested Search Modules
 

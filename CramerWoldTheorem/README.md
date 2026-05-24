@@ -18,13 +18,13 @@ The Lean declarations are split by proof role:
 ## Status
 
 - `lake build CramerWoldTheorem` succeeds.
-- Current version has no `sorry` proof obligations, but the final theorem depends on
-  two private source-backed analytic axioms.
+- Current version has no custom axioms, `admit`, or `unsafe`; it has two
+  source-backed analytic `sorry` proof obligations.
 - The formalization records closed half-spaces, half-space values, average-distance
   functions, the odd-dimensional inversion step, the even-to-odd reduction, and the
   final Cramer-Wold statement.
 
-The trusted analytic axioms are:
+The remaining analytic proof targets are:
 
 - `averageDistance_eq_of_halfspaceValues_eq`: packages the Crofton/Fubini argument
   showing that closed-halfspace values determine the average-distance function.
@@ -34,7 +34,7 @@ The trusted analytic axioms are:
 
 These correspond to the two hard analytic proof blocks in the source paper. The
 even-dimensional embedding step and the final parity split are proved in Lean from
-these assumptions.
+these proof targets.
 
 This is a substantially harder proof-completion target than the finite combinatorics
 paper because the source proof uses signed measures, Crofton measure, Green's identity,
