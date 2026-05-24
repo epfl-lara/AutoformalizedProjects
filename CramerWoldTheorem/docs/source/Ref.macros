@@ -1,0 +1,1836 @@
+%  Referenceable numbering for books and articles in Plain TeX.
+%  Code from an article by James Nearing, TUGboat 10(1989), pages 82-88.
+%  Added to by Michael Lacey. Modified and added to by Russell Lyons.
+%  Added to by Oded Schramm.  Now it is mostly due to Lyons.
+%  See Ref.doc for documentation. E-mail: rdlyons@indiana.edu.
+
+%  Note: if you use math.macros, input it *before* this file, since
+%  Ref.macros redefines \Qed so as to work in all situations.
+
+\expandafter\ifx\csname Ref.macros\endcsname\relax
+  \expandafter\gdef\csname Ref.macros\endcsname{}
+  \message{(Version of Ref.macros dated 3 Nov. 2016)}%
+\else \message{Ref.macros already loaded}\endinput\fi
+
+\expandafter\chardef\csname saveatsymbolcode\endcsname=\the\catcode`\@
+\catcode`@=11 % use the @ symbol for two reasons: 1. avoid conflicts with
+              % used-defined macros; 2. shorten names of internal macros
+              % to avoid overloading pool size of TeX (because of reason 1)
+%
+
+\def\ifundefined#1{\expandafter\ifx\csname#1\endcsname\relax}
+       %% Do not use this in conditional text: see. p. 308 of the TeXbook.
+       %% Instead, use \expandafter\ifx\csname ... \endcsname\relax
+
+%\newread\labelfile
+\newwrite\labelfile   % Use \newwrite rather than \newread since eplain
+                      % assigns using \newwrite.
+\newwrite\solnfile   
+\newwrite\laterexerfile   
+\newwrite\textexerfile   
+\newwrite\crffile   % This will conflict with eplain, which assigns output
+            % stream 0 to \jobname.aux, under the macro \auxfile
+%\let\crffile=\auxfile
+\newwrite\bibliofile
+\newwrite\reflistfile    % for list of references
+
+\newif\iflefteqnumbers
+\lefteqnumbersfalse
+
+\newif\ifnobracketcit   % true => citations are without brackets
+\nobracketcitfalse  
+\newif\ifbibparen       % true for parentheses around year in bib citation
+                        % (internal switch)
+\newif\ifapalike        % switch used to define \RefLabel properly
+\newif\ifbibnames       % switch used to define \RefLabel properly
+
+\newif\ifproofmode          % true=> eqn. labels shown; date in headline
+\proofmodefalse    
+
+\newif\ifhypers			% true => include hyperlinks in \special{}'s
+\hypersfalse
+
+\newif\ifdvipdfm         % true means will use dvipdfm to produce output,
+\dvipdfmfalse            %  which means the pdf specials will be used
+
+\newif\ifforwardreference      % true=> allow reference to an 
+\forwardreferencefalse            % equation that appears later
+
+\newif\ifcheckdefinedreference     % true => if \jobname.lbl is non-empty,
+\checkdefinedreferencefalse        % then warn about all undefined references
+
+\newif\ifreportundefref           % Internal flag: true => report all
+\reportundefreffalse              %  undefined references
+
+\newif\iflblnonempty         % Internal flag tells if \jobname.lbl is
+\lblnonemptyfalse            %     non-empty
+
+\newif\ifwarnifredefined         % true => warn if a label is being redefined
+\warnifredefinedfalse
+
+%
+% the macro \label is to be used in math mode,  which is to say in 
+% $$...$$ and $$\eqalign{....}$$.  Placing equation numbers is
+% different in both modes, hence the \newif below.
+%
+
+
+
+\newif\ifmultilinedisplay  % Internal switch.
+\multilinedisplayfalse
+
+%% In the following, we cannot use a \newif since when it appears in
+%% a \mark, it causes trouble. Also, \def causes trouble in a \mark.
+\newcount\equationparen     % an internal switch for putting ( ) around
+\equationparen=0        % equation numbers
+
+
+
+
+\newif\ifchaprefwordy       % true => (3.7) of Chapter II
+\chaprefwordyfalse          % false => (II.3.7)
+
+\newif\ifchapallnum       % true => all items are numbered by the chapter in
+                          % which they appear, regardless of the location
+\chapallnumfalse          
+
+\newif\ifchapnumroman       % true => Chapter II
+\chapnumromanfalse          % false => Chapter 2
+
+\newif\ifsectionnumbers      % true => equation labeled as e.g.
+\sectionnumbersfalse              % (3.7) instead of (7)
+
+\newif\ifcontinuousnumbering    % true => don't reset numbering of
+\continuousnumberingfalse         % equations in each section.
+
+\newif\iffiguresectionnumbers  % true => figures labeled as e.g.
+\figuresectionnumbersfalse          % (3.7) instead of (7)
+
+\newif\ifcontinuousfigurenumbering   % true => don't reset
+                               % numbering of figures in each section 
+\continuousfigurenumberingfalse
+
+\newif\iftheoremcounting
+\theoremcountingfalse
+
+\newif\ifleftsectionhead
+\leftsectionheadfalse
+
+\font\chapfont=cmbx10 scaled \magstep2     % for chapter titles
+\font\itchapfont=cmti10 scaled \magstep1     % for the word "Chapter" and
+                                          % its number in chapter titles
+\font\eqtwelverm=cmr12
+\font\marginstyle=cmtt8      % This is for the labels in proofmode.
+
+%% The following is in order to print any symbol in a label other than
+%% {, }, #, or %.
+\def\marginstyleverbatim#1{\def\next{#1}%
+  {\marginstyle\frenchspacing\expandafter\stripverbatim\meaning\next}}
+\def\stripverbatim#1>{}
+
+
+\font\headfont=cmtt8 % This is for the headline in proofmode.
+\ifx\eightpoint\relax\def\eightpoint{\headfont}\fi
+
+%\font\sc=cmcsc10
+
+
+
+\def\proctitlefont{\sc}    % The font to use for "Theorem", etc., in \procl.
+\def\procbodyfont{\it}     % The font to use in the body of theorems, etc.
+\def\procnumberfont{\rm}   % The font to use for numbering thms, etc.
+\def\procnamefont{\sc}    % The font to use in \procname.
+\def\exertitlefont{\sc}    % The font to use for "Exercise" in \exer.
+\def\exernumberfont{\rm}    % The font to use for number in \exer.
+\def\laterexernumberfont{\ninerm}    % The font to use for number in
+                           % \laterexer and in collected text exercises.
+  %% The reason this is used is that when collecting text exercises,
+  %% \exernumberfont is inserted; this gets interpreted by the family at 
+  %% that time, but what we want is the family in use later when typeset.
+\def\exnamefont{\sc}    % The font to use in \exname.
+
+
+\newtoks\sectionletter    % for appendices
+\newcount\sectionno          % section numbers
+\newcount\eqlabelno    % equation numbers
+\newcount\figureno      % figure numbers
+\newcount\theoremlabelno % theorem, lemma, etc. numbers
+\newcount\chapno         % chapter numbers
+
+\newif\ifchapters        % Are there chapters?
+\chaptersfalse
+
+\newif\iftocgeneration   % Want to generate table(s) of contents (t.o.c.)?
+\tocgenerationfalse
+
+\newif\ifcitationgeneration 	% Put list of citations in aux file
+\citationgenerationfalse	% to be used by bibtex, for example?
+
+\newif\ifsolutions          %% Want a solution file?
+\solutionsfalse
+
+\newif\iflaterexers       %% Want to collect exercises for later?
+\laterexersfalse
+
+\newif\iftextexeradd    %% were there text exercises?
+\textexeraddtrue
+
+\newif\iftextexers       %% Want to collect text exercises to duplicate
+                         %% later?
+\textexersfalse
+
+\newif\iftextcollect   % if exercises are being collected now
+\textcollectfalse
+
+\newif\ifreflist           % make list of refs?
+\reflistfalse
+
+%
+% Utilities for use by other macros
+%
+
+\def\CHP#1{\csname C@#1\endcsname}
+\def\SEC#1{\csname S@#1\endcsname}
+\def\ITM#1{\csname I@#1\endcsname}
+
+%
+% Initialize counters.
+%
+
+\sectionno=0
+\eqlabelno=0
+\figureno=0
+\theoremlabelno=0
+\chapno=0
+
+
+%
+% This returns the current chapter number in roman or arabic.
+%
+
+\def\chapfolio{\ifchapnumroman\uppercase\expandafter{\romannumeral\the\chapno}%
+                \else \the\chapno \fi}
+
+\def\bumpchapno{\global\advance\chapno by 1 \global\sectionno=0
+                \global\eqlabelno=0 \global\figureno=0
+                \global\theoremlabelno=0}
+
+%
+% Produces either roman or arabic number depending on chapnumroman.
+%
+
+\def\chapshow#1{{\chapno=#1 \chapfolio}}  %% N.B.: the \chapno change is
+                                            %%              local.
+
+%
+% This returns either a number of a letter depending on the sign
+% of \sectionno.  It uses the current value of \sectionno.  Typically
+% used only by other macros.  The user may, however, want to place the
+% section number (or letter) into the headline; then \sectionfolio
+% should be used.
+%
+
+\def\sectionfolio{\ifnum \sectionno>0 \the \sectionno \else
+                           \the\sectionletter \fi}
+
+%
+% This increments \sectionno in the correct direction (more positive
+% OR more negative). If, as is normal, there is NO continuous
+% numbering of equation and figures, those variables are reset.  
+% It is typically used only by the other macros, not directly 
+% by the user. 
+%
+
+\def\bumpsectionno{\ifnum\sectionno>-1 \global\advance\sectionno by 1
+        \else\global\advance\sectionno by -1 \setletter\sectionno\fi
+        \ifcontinuousnumbering\else\global\eqlabelno =0
+                                 \global\theoremlabelno=0 \fi
+        \ifcontinuousfigurenumbering\else\global\figureno=0 \fi}
+
+%
+% This is a very awkward way to turn a number into a letter, but
+% some difficulty with simpler methods occurs in the \write
+% routines.
+%
+
+
+
+\def\setletter#1{\ifcase-#1 {}\or{}    \or\global\sectionletter={A}
+      \or\global\sectionletter={B} \or\global\sectionletter={C}
+      \or\global\sectionletter={D} \or\global\sectionletter={E}
+      \or\global\sectionletter={F} \or\global\sectionletter={G}
+      \or\global\sectionletter={H} \or\global\sectionletter={I}
+      \or\global\sectionletter={J} \or\global\sectionletter={K}
+      \or\global\sectionletter={L} \or\global\sectionletter={M}
+      \or\global\sectionletter={N} \or\global\sectionletter={O}
+      \or\global\sectionletter={P} \or\global\sectionletter={Q}
+      \or\global\sectionletter={R} \or\global\sectionletter={S}
+      \or\global\sectionletter={T} \or\global\sectionletter={U}
+      \or\global\sectionletter={V} \or\global\sectionletter={W}
+      \or\global\sectionletter={X} \or\global\sectionletter={Y}
+      \or\global\sectionletter={Z} \fi}
+
+%
+% And a non-global version of the above:
+%
+
+
+\def\tempsetletter#1{\ifcase-#1 {}\or{} \or\sectionletter={A}
+      \or\sectionletter={B} \or\sectionletter={C}
+      \or\sectionletter={D} \or\sectionletter={E}
+      \or\sectionletter={F} \or\sectionletter={G}
+      \or\sectionletter={H} \or\sectionletter={I}
+      \or\sectionletter={J} \or\sectionletter={K}
+      \or\sectionletter={L} \or\sectionletter={M}
+      \or\sectionletter={N} \or\sectionletter={O}
+      \or\sectionletter={P} \or\sectionletter={Q}
+      \or\sectionletter={R} \or\sectionletter={S}
+      \or\sectionletter={T} \or\sectionletter={U}
+      \or\sectionletter={V} \or\sectionletter={W}
+      \or\sectionletter={X} \or\sectionletter={Y}
+      \or\sectionletter={Z} \fi}
+
+
+
+%
+% A utility: it produces a number or a letter, depending on the
+% sign of the argument.  Used by other macros for appendices.
+% (It is like \sectionfolio, but need not refer to the current
+% section.)
+%
+
+\def\sectionshow#1{\ifnum#1>0 #1%    %% The % at the end prevents a space
+                                     %% from being inserted.
+        \else{\tempsetletter{\number#1}\the\sectionletter}\fi}
+        %\else{\tempsetletter{\number#1}\sectionno=#1\sectionfolio}\fi}
+
+%
+% Show various parts of a label. If equationparen=1, parentheses are
+% inserted.
+%
+
+\def\chapsecshow#1#2{\ifchaprefwordy\sectionshow{#2} of
+                    Chapter~\chapshow{#1}%
+          \else\chapshow{#1}.\sectionshow{#2}\fi}
+
+%% Now for items (thms, defs, etc.) other than eqns and figures.
+
+\def\chapsecitemshow#1#2#3{\ifchaprefwordy\ifodd\equationparen
+                    (\fi\sectionshow{#2}.{#3}\ifodd\equationparen)\fi\ of
+                    Chapter~\chapshow{#1}%
+          \else\ifodd\equationparen(\fi\chapshow{#1}.\sectionshow{#2}.{#3}%
+                 \ifodd\equationparen)\fi\fi}
+
+\def\secitemshow#1#2{\ifodd\equationparen(\fi\sectionshow{#1}.{#2}%
+                     \ifodd\equationparen)\fi}
+
+\def\chapitemshow#1#2{%
+      \ifchaprefwordy
+          \ifodd\equationparen(\fi#2%
+          \ifodd\equationparen)\fi\ of Chapter~\chapshow{#1}%
+      \else\ifodd\equationparen(\fi\chapshow{#1}.{#2}%
+           \ifodd\equationparen)\fi
+      \fi}
+
+\def\itemshow#1{\ifodd\equationparen(\fi#1\ifodd\equationparen)\fi}
+
+
+
+
+%
+% In proofmode, it is useful to put today's date on each output
+% page.
+%
+
+\def\today{\number\day\ \ifcase\month\or
+    January\or February\or March\or April\or May\or June\or
+    July\or August\or September\or October\or November\or December\fi
+    \ \number\year}
+
+%
+% The following converts the time in minutes to usual 12-hour format.
+% It is taken from eplain.tex.
+%
+
+\def\timestring{\begingroup
+   \count0 = \time
+   \divide\count0 by 60
+   \count2 = \count0   % The hour, from zero to 23.
+   \count4 = \time
+   \multiply\count0 by 60
+   \advance\count4 by -\count0   % The minute, from zero to 59.
+   \ifnum\count4<10
+      \toks1 = {0}%
+   \else
+      \toks1 = {}%
+   \fi
+   \ifnum\count2<12
+      \toks0 = {a.m.}%
+   \else
+      \toks0 = {p.m.}%
+      \advance\count2 by -12
+   \fi
+   \ifnum\count2=0
+      \count2 = 12
+   \fi
+   \number\count2:\the\toks1 \number\count4 \thinspace \the\toks0
+\endgroup}%
+
+
+%
+% The initialization procedure. 
+%
+
+% Defaults:
+
+\def\sectionspace{.15 \vsize}
+\def\sectionindent{\centerline}
+\def\sectionskip{\smallskip\noindent}
+
+%%%
+
+\newif\ifinitdone  % if initialization has been done
+\initdonefalse
+
+\input ifpdf.sty  % this defines \ifpdf so that pdfTeX can be detected; it
+      % is automatically loaded by eplain, but sometimes we don't use eplain
+
+\def\initialeqmacro{%
+\initdonetrue%
+  \ifproofmode  
+      \headline{\eightpoint\headfont\underbar{\raise2pt
+           \line{\hskip0pt minus 1fil
+                 \llap{(\timestring )\ }\today\ \hfil
+       \ifnum\chapno>0 Chap.~\chapfolio \ (\chapnamefolio ),
+       \fi 
+                  \botmark \hfil
+                   \ \jobname\rlap{\ (draft)}\hskip0pt minus 1fil}}}
+                           %% Normally, the surrounding infinitely
+                           %% shrinkable glue isn't necessary, but a
+                           %% long section name requires it.
+  \fi
+  \openin\labelfile=\jobname.lbl
+  \ifeof\labelfile \lblnonemptyfalse   %% The space after
+                                       %% "\labelfile" is important.
+  \else\lblnonemptytrue
+  \immediate\closein\labelfile 
+  \fi
+  \iflblnonempty \input \jobname.lbl   %% We input whenever the file is there 
+                   %%  so that when done writing, we need not rewrite.
+  \fi
+  \ifforwardreference 
+      \immediate\openout\labelfile=\jobname.lbl
+  \fi
+  \ifcitationgeneration
+	\immediate\openout\crffile=\jobname.aux
+	\immediate\write\crffile{\noexpand\relax}
+   \openin\bibliofile=\jobname.bbl  %% This is merely so that there is a file
+                                     %% the first time and so TeX will not
+                                     %% complain.
+   \ifeof\bibliofile 
+      \immediate\closein\bibliofile 
+	   \immediate\openout\bibliofile=\jobname.bbl  
+      \immediate\write\bibliofile{\noexpand\relax}
+      \immediate\closeout\bibliofile 
+   \fi
+  \fi
+  \ifcheckdefinedreference\iflblnonempty\reportundefreftrue
+                          \else\reportundefreffalse
+                          \fi
+  \else\ifforwardreference\reportundefreffalse
+       \fi
+  \fi
+  \ifleftsectionhead \def\sectionspace{.1 \vsize}
+                 \def\sectionindent{\noindent}
+                 \def\sectionskip{\enspace\enspace}
+  \else \def\sectionspace{.15 \vsize}
+                 \def\sectionindent{\centerline}
+                 \def\sectionskip{\smallskip\noindent}
+  \fi
+  \ifsolutions \immediate\openout\solnfile=\jobname.sln
+  \fi
+  \iflaterexers \immediate\openout\laterexerfile=\jobname.exr
+  \fi
+  \iftextexers \immediate\openout\textexerfile=\jobname.txr
+  \fi
+  \ifreflist \immediate\openout\reflistfile=\jobname.lst
+  \fi
+  % This works from eplain if enough of eplain has been input:
+  \ifx\eplain\undefined\else
+   \ifdvipdfm
+      \enablehyperlinks[idxexact,dvipdfm]
+      \hlopts{bwidth=0}  %  This is for the hyperlinks.
+      \def\htmlanchor##1##2{\hldest{}{}{##1}##2}
+      \def\htmllocref##1##2{\hlstart{}{}{##1}##2\hlend}
+      \def\htmlref##1##2{\href{##1}{##2}}
+   \else
+      \ifpdf   % this is automatically set by eplain
+               % when using pdfTeX with pdf output
+         \enablehyperlinks[idxexact,pdftex]
+         \hlopts{bwidth=0}  %  This is for the hyperlinks.
+         \input navigator
+         %\def\outlinehtmlanchor##1##2##3{\outline{##3}[##1]{##2} ##2}
+         \def\htmlanchor##1##2{\hldest{}{}{##1}##2}
+         \def\htmllocref##1##2{\hlstart{}{}{##1}##2\hlend}
+         \def\htmlref##1##2{\href{##1}{##2}}
+         \else
+         \enablehyperlinks[idxexact] 
+      \fi
+   \fi
+  \fi
+  }
+
+\def\initialeqmacros{\initialeqmacro}   % For either spelling.
+
+\def\firstheader{\hfil}     %% This is what should be the headline on the
+                            %% first page of an article.
+                            %% Here is an example of its use in the file:
+                            %% In this example, \versiondate is set in the
+                            %% first line of the file to be the date of last
+                            %% modification.
+
+% \def\firstheader{\eightpoint\ss\underbar{\raise2pt\line 
+%     {To appear in {\it Ann.\ Probab.}
+%     \hfil Version of \versiondate}}}
+
+
+\def\beginniceheadline{%
+  \ifproofmode
+  \else
+    \ifchapters
+      \nopagenumbers
+      \headline={\tenpoint\hss
+                 \ifodd \pageno \else \bf \folio \hfill \fi
+                 \sc
+                 \if \chapbegin\firstmark
+                 \else
+                     \ifodd \pageno \botmark
+                      \else Chap.~\chapfolio:\enspace \chapnamefolio
+                      \fi
+                 \fi
+                 \ifodd \pageno \hfill\bf \folio \hss\fi}%
+    \else
+      \footline={\ifnum\pageno=1 \tenpoint\hss\bf\folio\hss
+                 \else\hfil
+                 \fi}%
+       \headline={\ifnum\pageno=1 \firstheader
+                  \else\tenpoint\hss\sc \botmark \hfill\bf \folio \hss
+                  \fi}%
+    \fi
+  \fi}
+
+
+%% The following is so that the overall warning comes at the end of the run
+%% instead of at the beginning. If this did not check whether it was
+%% already defined and were input more than once, it would make an
+%% endless loop.
+
+\ifundefined{END}\let\END=\end 
+  \def\end{\ifforwardreference\iflblnonempty
+                   \immediate\write16{ *** If you have made
+                              changes to the labels, you may need}
+                   \immediate\write16{     to rerun TeX to get the
+                              crossreferences correct. *** }
+                 \else\immediate\write16{ *** Rerun TeX
+                              to get the crossreferences correct. *** }
+                   \fi
+           \fi 
+           \ifpdf \finishpdffile \fi
+           \END}
+\fi
+
+
+%%%%%%%%%%%%%%%%%
+% For general-purpose pdf bookmarks.
+
+\ifdvipdfm
+\special{pdf: docview << /PageMode /UseOutlines >>}  % This makes the
+               % pdf open with the bookmarks, which Adobe calls "outlines".
+\fi
+
+\def\pdfbookmark#1#2{%
+    \ifdvipdfm
+    \special{pdf: out #1  << /Title (#2) 
+    %/Dest [ @thispage /XYZ 0 @ypos 0 ] >>}%
+    /Dest [ @thispage /XYZ 0 ] >>}%
+    \fi }
+
+%%%%%%%%%%%%%%%%%%
+
+%
+% Labelling and referring to a chapter.
+%
+
+\def\chaplabel#1{\bumpchapno
+    \ifforwardreference
+      \immediate\write\labelfile{\noexpand\expandafter\noexpand\def
+      \noexpand\csname C@#1\endcsname{\the\chapno}}%
+    \fi
+    \global\expandafter\edef\csname C@#1\endcsname {\the\chapno}}
+
+\def\chapref#1{%
+        \ifundefined{C@#1}Chapter ??
+             \ifreportundefref 
+                \write16{ ***Undefined Chapter Reference #1*** }
+             \fi
+        \else Chapter~\htmllocref{#1}{\chapshow{\CHP{#1}}}%
+        \fi}
+
+
+\def\briefchapref#1{%
+        \ifundefined{C@#1}Chapter ??
+             \ifreportundefref 
+                \write16{ ***Undefined Chapter Reference #1*** }
+             \fi
+        \else\htmllocref{#1}{\chapshow{\CHP{#1}}}%
+        \fi}
+
+%
+% Labelling and referring to a section.
+%
+
+\def\sectionlabel#1{\bumpsectionno
+    \ifforwardreference
+      \immediate\write\labelfile{\noexpand\expandafter\noexpand\def
+      \noexpand\csname C@#1\endcsname{\the\chapno}
+      \noexpand\expandafter\noexpand\def
+      \noexpand\csname S@#1\endcsname{\the\sectionno}}%
+    \fi
+    \global\expandafter\edef\csname C@#1\endcsname {\the\chapno}%
+    \global\expandafter\edef\csname S@#1\endcsname {\the\sectionno}}
+
+\def\sectionref#1{%
+       \ifundefined{S@#1}Section ??
+             \ifreportundefref 
+                \write16{ ***Undefined Section Reference #1*** }
+             \fi
+       \else
+            \ifnum\SEC{#1}>-1 Section~\else Appendix~%
+            \fi
+	 \htmllocref{#1}{%
+            \ifchapallnum\chapsecshow{\CHP{#1}}{\SEC{#1}}%
+            \else
+               \ifnum\CHP{#1}=\chapno \sectionshow{\SEC{#1}}%
+               \else\chapsecshow{\CHP{#1}}{\SEC{#1}}%
+               \fi
+            \fi}%
+       \fi}
+
+
+\def\briefsectionref#1{%
+         \ifundefined{S@#1}Section ??
+            \ifreportundefref 
+               \write16{ ***Undefined Section Reference #1*** }
+             \fi
+          \else
+	 \htmllocref{#1}{%
+            \ifchapallnum\chapsecshow{\CHP{#1}}{\SEC{#1}}%
+            \else
+               \ifnum\CHP{#1}=\chapno \sectionshow{\SEC{#1}}%
+               \else\chapsecshow{\CHP{#1}}{\SEC{#1}}%
+               \fi
+            \fi}%
+          \fi}
+
+%
+% For referring to labelled items and equations.
+%
+
+\def\itemref#1{\ifundefined{I@#1}--?--
+         \ifreportundefref
+          \write16{ ***Undefined Item Reference #1*** }
+         \fi
+      \else 
+	 \htmllocref{#1}{%
+         \ifchapallnum
+            \ifsectionnumbers\chapsecitemshow{\CHP{#1}}{\SEC{#1}}{\ITM{#1}}%
+            \else\ifcontinuousnumbering\chapitemshow{\CHP{#1}}{\ITM{#1}}%
+                 \else\chapsecitemshow{\CHP{#1}}{\SEC{#1}}{\ITM{#1}}%
+                 \fi%
+            \fi%
+         \else
+            \ifnum\CHP{#1}=\chapno%
+               \ifsectionnumbers\secitemshow{\SEC{#1}}{\ITM{#1}}%
+               \else\ifnum \SEC{#1}=\sectionno \itemshow{\ITM{#1}}%
+                    \else\ifcontinuousnumbering\itemshow{\ITM{#1}}%
+                         \else\secitemshow{\SEC{#1}}{\ITM{#1}}%
+                         \fi%
+                    \fi%
+               \fi%
+            \else
+               \ifsectionnumbers\chapsecitemshow{\CHP{#1}}{\SEC{#1}}{\ITM{#1}}%
+               \else\ifcontinuousnumbering\chapitemshow{\CHP{#1}}{\ITM{#1}}%
+                    \else\chapsecitemshow{\CHP{#1}}{\SEC{#1}}{\ITM{#1}}%
+                    \fi%
+               \fi%
+            \fi
+         \fi}%
+      \fi}
+
+% 
+% For checking if a label is being redefined
+%
+
+\def\checkdefined#1{%
+   \ifwarnifredefined
+      \expandafter
+      \ifx\csname D@#1\endcsname\relax
+         \global\expandafter\edef\csname D@#1\endcsname {yes}%
+      \else\immediate\write16{ *** Warning:
+                  Label #1 is being redefined *** }%
+      %% Remark: without this "\immediate", there could be an extra blank line
+      %% in the output. (!)
+      \fi
+   \fi}
+
+%
+% These are analogous to \createlabel and \itemref. They will automatically
+% generate figure numbers and accept your label for later reference.
+%
+
+\def\figlabel#1{\global\advance\figureno by 1 \relax
+      \checkdefined{f.#1}%
+      \ifforwardreference
+         \immediate \write\labelfile{\noexpand\expandafter\noexpand\def
+         \noexpand\csname C@f.#1\endcsname{\the\chapno}%
+         \noexpand\expandafter\noexpand\def
+         \noexpand\csname S@f.#1\endcsname{\the\sectionno}%
+         \noexpand\expandafter\noexpand\def
+         \noexpand\csname I@f.#1\endcsname{\the\figureno}}%
+      \fi
+      \global\expandafter\edef\csname C@f.#1\endcsname {\the\chapno}%
+      \global\expandafter\edef\csname S@f.#1\endcsname {\the\sectionno}%
+      \global\expandafter\edef\csname I@f.#1\endcsname {\the\figureno}%
+      \ifproofmode\llap{\hbox{\marginstyleverbatim{#1}\ }}\relax
+      \fi
+      {\bf Figure
+	\htmlanchor{f.#1}{%
+         \ifchapallnum \chapfolio.\fi
+         \iffiguresectionnumbers\sectionfolio.\fi\the\figureno}.}}
+
+\def\fignumbernoprintlabel#1{\global\advance\figureno by 1 \relax
+      \checkdefined{f.#1}%
+      \ifforwardreference
+         \immediate \write\labelfile{\noexpand\expandafter\noexpand\def
+         \noexpand\csname C@f.#1\endcsname{\the\chapno}%
+         \noexpand\expandafter\noexpand\def
+         \noexpand\csname S@f.#1\endcsname{\the\sectionno}%
+         \noexpand\expandafter\noexpand\def
+         \noexpand\csname I@f.#1\endcsname{\the\figureno}}%
+      \fi
+      \global\expandafter\edef\csname C@f.#1\endcsname {\the\chapno}%
+      \global\expandafter\edef\csname S@f.#1\endcsname {\the\sectionno}%
+      \global\expandafter\edef\csname I@f.#1\endcsname {\the\figureno}%
+      }
+
+\def\figref#1{%
+       \ifundefined{C@f.#1}!!!!
+          \ifreportundefref
+             \write16{ ***Undefined Figure Reference #1*** }
+          \fi
+       \else 
+	\htmllocref{f.#1}{%
+         \ifchapallnum
+            \ifsectionnumbers%
+               \chapsecitemshow{\CHP{f.#1}}{\SEC{f.#1}}{\ITM{f.#1}}%
+            \else%
+                \ifcontinuousfigurenumbering%
+                  \chapitemshow{\CHP{f.#1}}{\ITM{f.#1}}%
+                \else\chapsecitemshow%
+                             {\CHP{f.#1}}{\SEC{f.#1}}{\ITM{f.#1}}%
+                \fi%
+            \fi%
+         \else
+            \ifnum\CHP{f.#1}=\chapno%
+               \iffiguresectionnumbers\secitemshow{\SEC{f.#1}}{\ITM{f.#1}}%
+               \else\ifnum \SEC{f.#1}=\sectionno \itemshow{\ITM{f.#1}}%
+                    \else\ifcontinuousfigurenumbering\itemshow{\ITM{f.#1}}%
+                         \else\secitemshow{\SEC{f.#1}}{\ITM{f.#1}}%
+                         \fi%
+                    \fi%
+              \fi%
+            \else\ifsectionnumbers%
+                    \chapsecitemshow{\CHP{f.#1}}{\SEC{f.#1}}{\ITM{f.#1}}%
+                 \else%
+                    \ifcontinuousfigurenumbering%
+                       \chapitemshow{\CHP{f.#1}}{\ITM{f.#1}}%
+                    \else\chapsecitemshow%
+                             {\CHP{f.#1}}{\SEC{f.#1}}{\ITM{f.#1}}%
+                    \fi%
+                 \fi%
+            \fi
+         \fi}%
+       \fi}%
+
+
+
+%
+%  A useful LaTeX macro.
+%
+
+\def\lefteqn#1{\hbox to 0pt{$\displaystyle #1$\hss}}
+
+
+
+%
+% To label a chapter, type \bchap{chapname}{C.chaplabel} (Actually, the
+%  C. is optional.)
+%
+
+\def\chapbegin{,}
+\def\bchap#1#2{\chapterstrue \vfill\supereject\vglue30pt%
+               \checkdefined{#2}
+               \chaplabel{#2}\xdef\chapnamefolio{#1}\mark{\chapbegin}%
+               \mark{Chap.~\chapfolio:\enspace \chapnamefolio}%
+    \ifdvipdfm
+    \special{pdf: out 1  << /Title (Chapter \chapfolio:
+      #1) /Dest [ @thispage /XYZ 0 @ypos 0 ] >>}%
+    \fi  
+                \centerline{\ifproofmode
+                               \llap{\marginstyleverbatim{#2}\hskip10pt}%
+                            \fi
+                {\itchapfont Chapter~\chapfolio}}\vskip 12pt %no stretch
+               \centerline{\htmlanchor{#2}{\chapfont #1}}%
+               \edef\currentchapnumber{\chapfolio}\iftocgeneration
+          \writenumberedtocentry
+                  {chapter}{\htmllocref{#2}{#1}}{\currentchapnumber}\fi
+               \vskip30pt}
+
+
+%
+% A macro for starting Sections.  The format is 
+% \bsection{sectionname}{s.sectionlabel} (Actually, the s. is optional.)
+% (Compare the \beginsection macro of the TeXbook, p. 355.)
+%
+
+% What about subsections?
+
+\def\bsection#1#2 {\vskip0pt plus \sectionspace \penalty -250
+                \vskip0pt plus -\sectionspace \bigskip\bigskip \vskip \parskip
+    \checkdefined{#2}
+    \sectionlabel{#2}%
+    \iftocgeneration
+      \edef\currentsectionnumber{\sectionfolio}\writenumberedtocentry
+          {section}{\htmllocref{#2}{#1}}{\currentsectionnumber}%
+    \fi
+    %\mark{\S \sectionfolio.\enspace #1}%
+    \ifdvipdfm
+    \special{pdf: out \ifchapters 2 \else 1 \fi
+      << /Title (\ifnum\sectionno>-1 Section 
+      \ifchapallnum \chapfolio.\fi\the\sectionno%
+      \else Appendix \the\sectionletter\fi:
+      %#1) /Dest [ @thispage /FitH @ypos ] >>}%This is to force horiz fit.
+      #1) /Dest [ @thispage /XYZ 0 @ypos 0 ] >>}%
+    \fi
+    \ifpdf
+      \outline{2}{\ifnum\SEC{#2}>-1 Section \else Appendix \fi
+            \ifchapallnum \CHP{#2}.\SEC{#2}: #1%
+               \else \SEC{#2}: #1%
+            \fi}
+      %\outline{2}{Section \SEC{#2}: #1}
+    \fi
+    \sectionindent{%
+    \ifproofmode \llap{\marginstyleverbatim{#2}\hskip10pt}%
+    \fi
+    \bf
+    \htmlanchor{#2}{%
+    \ifnum\sectionno>-1 \S\ifchapallnum \chapfolio.\fi\the\sectionno.\enspace
+    \else Appendix \the\sectionletter:\enspace
+    \fi #1.}}\nobreak 
+    \mark{\S \sectionfolio.\enspace #1}%
+    \sectionskip
+    }
+
+% For section titles that have math that does not display in a pdf
+% bookmark, use the following command instead, where #1 is the pdf
+% alternative, #2 is the usual TeX title, and #3 is the usual section
+% label.
+
+\def\bsectionpdfalt#1#2#3 {\vskip0pt plus \sectionspace \penalty -250
+                \vskip0pt plus -\sectionspace \bigskip\bigskip \vskip \parskip
+    \checkdefined{#3}
+    \sectionlabel{#3}%
+    \iftocgeneration
+      \edef\currentsectionnumber{\sectionfolio}\writenumberedtocentry
+          {section}{\htmllocref{#3}{#2}}{\currentsectionnumber}%
+    \fi
+    %\mark{\S \sectionfolio.\enspace #3}%
+    \ifdvipdfm
+    \special{pdf: out \ifchapters 2 \else 1 \fi
+      << /Title (\ifnum\sectionno>-1 Section 
+      \ifchapallnum \chapfolio.\fi\the\sectionno%
+      \else Appendix \the\sectionletter\fi:
+      %#1) /Dest [ @thispage /FitH @ypos ] >>}%This is to force horiz fit.
+      #1) /Dest [ @thispage /XYZ 0 @ypos 0 ] >>}%
+    \fi
+    \sectionindent{%
+    \ifproofmode \llap{\marginstyleverbatim{#3}\hskip10pt}%
+    \fi
+    \bf
+    \htmlanchor{#3}{%
+    \ifnum\sectionno>-1 \S\ifchapallnum \chapfolio.\fi\the\sectionno.\enspace
+    \else Appendix \the\sectionletter:\enspace
+    \fi #2.}}\nobreak 
+    \mark{\S \sectionfolio.\enspace #2}%
+    \sectionskip
+    }
+
+%
+% The macro for creating labels for equations.
+% It will also be called up when labeling Theorems, Lemmas,
+% and other proclamations in a text if \theoremcounting is false.
+%
+
+\def\createlabel#1{\global\advance\eqlabelno by 1 
+      \ifforwardreference\immediate\write\labelfile{\noexpand\expandafter
+        \noexpand\def \noexpand\csname C@#1\endcsname{\the\chapno}
+        \noexpand\expandafter
+        \noexpand\def \noexpand\csname S@#1\endcsname{\the\sectionno}
+        \noexpand\expandafter
+        \noexpand\def \noexpand\csname I@#1\endcsname{\the\eqlabelno}}%
+      \fi
+      \global\expandafter\edef\csname C@#1\endcsname{\the \chapno}%
+      \global\expandafter\edef\csname S@#1\endcsname{\the\sectionno}%
+      \global\expandafter\edef\csname I@#1\endcsname{\the\eqlabelno}}
+
+%
+% The next macro will be called if \theoremcounting is true.  It
+% creates the labels for theorems, lemmas,
+% propositions, corollaries, conjectures, definitions, and
+% remarks. 
+%
+
+\def\createthmlabel#1{\global\advance\theoremlabelno by 1
+      \ifforwardreference\immediate\write\labelfile{\noexpand\expandafter
+        \noexpand\def \noexpand\csname C@#1\endcsname{\the\chapno}
+        \noexpand\expandafter
+        \noexpand\def \noexpand\csname S@#1\endcsname{\the\sectionno}
+        \noexpand\expandafter
+        \noexpand\def \noexpand\csname I@#1\endcsname
+                                       {\the\theoremlabelno}}%
+      \fi
+      \global\expandafter\edef\csname C@#1\endcsname{\the\chapno}%
+      \global\expandafter\edef\csname S@#1\endcsname{\the\sectionno}%
+      \global\expandafter\edef\csname I@#1\endcsname{\the\theoremlabelno}}
+
+%
+% And now for displays .... We need to tell our macros when we are
+% starting an eqalign, and when we are ending it.  
+%
+
+%Option 1:
+\def\eqaln#1{\multilinedisplaytrue
+ \iflefteqnumbers \leqalignno{#1}
+      \else \eqalignno{#1} \fi\multilinedisplayfalse}
+
+%Option 2:
+\def\begineqalno#1\endeqalno{\multilinedisplaytrue
+ \iflefteqnumbers $$\leqalignno{#1}$$ 
+      \else $$\eqalignno{#1}$$ \fi\multilinedisplayfalse}
+\def\endeqalno{}
+
+%%
+ 
+\def\label #1 {%
+      \iftextcollect\eqno {\ref #1/}\else  % if during collection, refer
+      \checkdefined{#1}
+      \createlabel{#1}
+      \ifmultilinedisplay & \fi
+         \iflefteqnumbers \ifmultilinedisplay\else\leqno\fi
+             \ifproofmode\llap{\marginstyleverbatim {#1}\hskip 1em}%
+             \fi 
+         \else \ifmultilinedisplay\else\eqno\fi \fi
+    \htmlanchor{#1}{(\ifchapallnum \chapfolio.\fi
+                     \ifsectionnumbers\sectionfolio.\fi\the\eqlabelno)}%
+      \ifproofmode \iflefteqnumbers \relax
+                    \else \rlap{\ \marginstyleverbatim{#1}}%
+                     \fi
+         \fi\fi}
+
+% To label a theorem, lemma, corollary, proposition, remark, definition,
+% example, or conjecture, type \procl @.labelname, where @ is t, l, c,
+% etc.: the first letter of the object labelled.
+% End the statement of the theorem, etc. with \endprocl.
+% The macro \proclaim is still available for use when numbering is not
+% desired or when something fancy is desired: e.g., if t.thm1 gets the label
+% Theorem 3.4 and we desire to label another theorem Theorem 3.4$'$, simply
+% use \proclaim \ref t.thm1/$'$.
+
+\def\procl#1.#2 {%
+      \checkdefined{#1.#2}
+      \iftheoremcounting
+             \createthmlabel{#1.#2}%
+      \else \createlabel{#1.#2}%
+      \fi
+    \medbreak \noindent
+    \ifproofmode
+          \llap{\marginstyleverbatim{#1.#2}\hskip 1em}%
+    \fi
+    \htmlanchor{#1.#2}{%
+    \begingroup
+    \proctitlefont 
+       {\ifx#1t\hbox{Theorem}\fi    \ifx#1l\hbox{Lemma}\fi
+       \ifx#1c\hbox{Corollary}\fi   \ifx#1p\hbox{Proposition}\fi
+       \ifx#1r\hbox{Remark}\fi      \ifx#1d\hbox{Definition}\fi
+       \ifx#1x\hbox{Example}\fi     \ifx#1g\hbox{Conjecture}\fi
+       \ifx#1q\hbox{Question}\fi}
+    \endgroup
+    \begingroup
+    \procnumberfont
+    \ifchapallnum \chapfolio.%
+    \fi
+    \ifsectionnumbers\sectionfolio.%
+    \fi
+    \iftheoremcounting\the\theoremlabelno.\enspace
+    \else\the\eqlabelno.\enspace
+    \fi
+    \endgroup}%
+    \begingroup
+    \ifx #1t\procbodyfont \fi       \ifx #1l\procbodyfont \fi
+    \ifx #1c\procbodyfont \fi       \ifx #1p\procbodyfont \fi 
+    \ifx #1g\procbodyfont \fi}
+
+\def\endprocl{\par \endgroup \ifdim \lastskip <\medskipamount \removelastskip
+  \penalty 55 \medskip \fi}
+
+%
+% To include a name after the proclamation, use \procname{name}.
+%
+% \enspace is \kern.5em; since that appears before \procname is used,
+% we remove it and put a normal space in its place.
+%
+
+\def\procname#1{\kern-.5em\ {\procnamefont (#1)}\enspace}
+
+
+\def\proof{\medbreak\noindent{\it Proof.\enspace}}
+
+\def\proofof #1.#2 {\medbreak\noindent
+     {\it Proof of 
+       {\ifx #1tTheorem\fi
+        \ifx #1lLemma\fi 
+        \ifx #1cCorollary\fi 
+        \ifx #1pProposition\fi}
+       \itemref {#1.#2}.}\enspace}
+
+\def\qed{\hfill \vrule height7.5pt width4.17pt depth0pt}
+\def\Qed{\relax \ifmmode  \ifmultilinedisplay & \else  \eqno \fi
+          \qed \else \hglue3pt \qed \medbreak \fi}
+      %% This works with \begineqalno. 
+      %% See p. 240 of the TeXBook for this use of \relax.
+
+
+%
+%  Here is a uniform way to reference our labels.
+%
+
+\def\ref#1.#2/{%
+	\ifx #1fFigure~\figref{#2}%
+	\else
+	  \ifx #1b\bibparentrue\crf{#2}%
+	  \else
+	    \ifx #1B\bibparenfalse\crf{#2}%
+	    \else
+	       \ifx #1s\sectionref{#1.#2}%
+               \else
+                   \ifx #1C\chapref{#1.#2}%
+                   \else
+                      \ifx #1tTheorem~\fi  
+                      \ifx #1lLemma~\fi 
+                      \ifx #1cCorollary~\fi 
+                      \ifx #1pProposition~\fi 
+                      \ifx #1rRemark~\fi 
+                      \ifx #1dDefinition~\fi
+                      \ifx #1xExample~\fi 
+                      \ifx #1gConjecture~\fi 
+                      \ifx #1qQuestion~\fi 
+                      \ifx #1e\global\equationparen=1 \fi
+                               %% The space after "1" is crucial!! 
+                               %% See p. 208 of the TeXbook.
+                     \itemref{#1.#2}\global\equationparen=0
+                   \fi%
+               \fi%
+	    \fi%
+	  \fi%
+	\fi%
+   \ifreflist \ifx #1b\relax\else\ifx #1B\relax\else
+            \ifnum\chapno=18\immediate\write\reflistfile{\the\savechapno,
+            \CHP{#1.#2}}%
+            \else
+            \immediate\write\reflistfile{\the\chapno, \CHP{#1.#2}}%
+   \fi\fi\fi\fi}
+
+%
+% For references without their names (i.e., ``Theorem'', etc.), suitable
+% for referring to several at once, use \briefref.
+%
+
+\def\briefref#1.#2/{%
+   \ifx #1s\briefsectionref{#1.#2}%
+   \else
+  	   \ifx #1C\briefchapref{#1.#2}%
+      \else
+	      \ifx #1f\figref{#2}%
+         \else
+            \ifx #1e\global\equationparen=1
+		      \fi
+         \itemref{#1.#2}\global\equationparen=0
+	      \fi
+     	\fi
+   \fi
+   \ifreflist \immediate\write\reflistfile{\the\chapno, \CHP{#1.#2}}%
+   \fi}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Hyperlinks stuff
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% From hyperbasics.tex :
+%%%%%%%%%%%%%%%%%%%%%%
+%
+% Define a convenient macro to hold the character #
+%
+\edef\freehash{\catcode`\noexpand\#=\the\catcode`\#}%
+\catcode`\#=12
+\def\ourhash{#}%
+\freehash
+\let\freehash=\relax
+%%%%%%%%%%%%%%%%%%%%%%
+
+\def\puthtml#1{\ifhypers\special{html:#1}\fi}
+\def\outlinehtmlanchor#1#2#3{\htmlanchor{#1}{#2}}
+\def\htmlanchor#1#2{\puthtml{<a name="#1">}#2\puthtml{</a>}}
+\def\htmllocref#1#2{\puthtml{<a href="\ourhash#1">}#2\puthtml{</a>}}
+\def\htmlref#1#2{\puthtml{<a href="#1">}#2\puthtml{</a>}}
+\def\email#1{%
+  \par\htmlref{mailto:#1}{{\tt #1}}\smallskip}
+\def\emailwww#1#2{%
+  \par\htmlref{mailto:#1}{{\tt #1}}
+  \par\htmlref{#2}{{\tt #2}}\smallskip}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Page number referencing
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Note: to avoid an extra space, use \pagelabel{...}% with the % at the
+% end.
+\def\pagelabel#1{\htmlanchor{pagelabel-#1}\relax
+         \write\labelfile{\noexpand\expandafter\noexpand\def
+         % Note: not \immediate\write, or the page number might be off.
+         \noexpand\csname pagelabel-#1\endcsname{\folio}}}
+      %\expandafter\gdef\csname pagelabel-#1\endcsname{\folio}
+      % Note that \edef will not extend past the file for some reason.
+      % Also, not using \write is not guaranteed to get the correct number.
+      
+\def\pageref#1{p.~\htmllocref{pagelabel-#1}{\csname pagelabel-#1\endcsname
+   \relax}%
+   \ifundefined{pagelabel-#1} ??
+             \ifreportundefref 
+                \write16{ ***Undefined Page Reference #1*** }
+             \fi
+   \fi
+   }
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Stuff for bibliography and bibliography citations
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%
+\def\bold#1{{\bf #1}}   %% for boldface in bibtex entries
+%%%%%
+
+
+\def\bibkey#1 #2 {\expandafter\def\csname BK@#1\endcsname{#2}\expandafter
+                  \def\csname BL@#2\endcsname{#1}}
+\def\bibcode#1{\expandafter\ifx\csname BK@#1\endcsname\relax 
+                              \ifreportundefref 
+                \write16{ ***Undefined Section Reference #1*** }
+                              \else\relax\fi
+                    \expandafter\else \csname BK@#1\endcsname%
+                    \fi}
+
+
+\def\citeinc#1{\expandafter\@citeinc{\changebibkey{#1}}}
+\def\@citeinc#1{\ifcitationgeneration%
+     \immediate\write\crffile{\string\citation{#1}}\fi}
+\def\citbracket#1{\ifnobracketcit#1\else[#1]\fi}  
+%\def\changebibkey#1{#1}
+\def\changebibkey#1{\expandafter\ifx\csname BK@#1\endcsname\relax #1%
+                    \expandafter\else \csname BK@#1\endcsname%
+                    \fi}
+\def\crf#1{\edef\temp{\changebibkey{#1}}\expandafter\@crf\temp/}
+%\def\crf#1{\tracingmacros=2 \tracingcommands=2\expandafter\@crf\expandafter{\changebibkey{#1}}\tracingmacros=0 \tracingcommands=0}
+%\def\crf#1{\expandafter\@crf{\changebibkey{#1}}}
+\def\@crf#1/{\ifbibnames\@refbauthor{#1}/$^{\citbracket{\citemref{#1}}}$\else
+         \citbracket{\citemref{#1}}\@citeinc{#1}\fi}
+%\def\@crf#1{\ifbibnames\@refbauthor{#1}$^{\citbracket{\citemref{#1}}}$\else
+         %\citbracket{\citemref{#1}}\@citeinc{#1}\fi}
+\def\crfl#1#2{\citbracket{\citemref{#1}, #2}\citeinc{#1}}  %% This is in
+%% case you use brackets and want to include something else inside the
+%% brackets. It happens not to be integrated with the other macros, however.
+\def\linkit#1{\htmllocref{#1}{\ITMBIB{#1}}}
+\def\linkyear#1{\@refbauthor{#1}/\ifbibparen\relax\else,\fi\ 
+         \ifbibparen(\fi\@refbyear{#1}/\ifbibparen)\fi}
+\def\citemref#1{\ifundefined{B@#1}[#1???]%
+         \ifreportundefref%
+          \write16{ ***Undefined Item Reference b.#1*** }%
+         \fi%
+      \else\linkit{#1}%
+      \fi}%
+\def\ITMBIB#1{\csname B@#1\endcsname}
+
+\def\preprintref#1{\htmlref{#1}{{\tt #1}}}
+%\def\arXiv#1{\preprintref{http://www.arxiv.org/abs/#1}}
+% The following works if eplain has been input, together with the url
+% package:
+%\def\arXiv#1{\url{http://www.arxiv.org/abs/#1}}
+\def\arXiv#1{\ifundefined{url}\preprintref{http://www.arxiv.org/abs/#1}%
+              \else\url{http://www.arxiv.org/abs/#1}\fi}
+\def\doi#1{\ifundefined{url}\preprintref{http://dx.doi.org/#1}%
+              \else\url{http://dx.doi.org/#1}\fi}
+\def\MRstrip #1#2#3{\ifx#1M\ifx#2R#3\else #1#2#3\fi \else #1#2#3\fi}
+\def\MRclean #1 (#2\relax{#1}  % gobble anything between ( and \relax
+\def\MRcleanedref#1#2{\ifundefined{url}\htmlref
+      {http://www.ams.org/mathscinet-getitem?mr=#1}{{\tt MR: #2}}%
+              \else\href
+       {http://www.ams.org/mathscinet-getitem?mr=#1}{{\tt MR: #2}}\fi}
+%\def\MRref#1{\MRcleanedref {\MRclean #1 ()\relax}{\MRstrip #1}}
+\def\MRref#1{\MRcleanedref {\MRclean #1 ()\relax}{\expandafter\MRstrip
+   \MRclean#1 ()\relax}}
+
+%%%%%
+%% The following is defined in case BibTeX includes an entry that does
+%% not appear in \jobname.aux because it had the min number of crossrefs.
+%%%%%
+
+\def\cite#1{\immediate\write16
+            { *** Warning: BibTeX generated a new entry #1*** }%
+            \crf{#1}}
+
+%%%%%
+
+\def\bibfile#1{%
+	\ifinitdone%
+		\ifcitationgeneration%
+			\immediate\write\crffile{\string\bibdata{#1}}%
+		\fi
+     	\else\write16{Error: *** "\string\bibfile"  should
+          not be called before "\string\initialeqmacro" *** }%
+ 	\fi}
+\def\bibsty#1{%
+	\ifinitdone%
+		\ifcitationgeneration%
+     			\immediate\write\crffile{\string\bibstyle{#1}}%
+		\fi
+     \else\write16{Error: *** "\string\bibsty" should
+          not be called before "\string\initialeqmacro" *** }%
+     \fi}
+
+\def\etal{et~al.}
+
+%% These are the default settings for the entries of the section titles
+%% and page numbers. They are reset for articles in \articletoc.
+
+\def\tocleftspace{\qquad}   
+\def\tocrightspace{\relax}
+\def\tocsecfont{\relax}
+\def\tocmiscskip{\bigskip}
+\def\tocmiscleftspace{\relax}
+\def\tocmiscfont{\bf}
+\def\tocmiscrightspace{\relax}
+
+%%%
+
+%% Here are the basic toc macros that do not involve writing to a file.
+%% These macros are not used by the user, but are written in \jobname.toc.
+
+\def\tocchapterentry#1#2#3{\vskip0pt plus 4\baselineskip \penalty -250
+                \vskip0pt plus -4\baselineskip \bigskip
+      \line{\bf Chapter #2:\enspace #1 \hfill\ #3}\medskip}%
+\def\tocsectionentry#1#2#3{\line{\tocleftspace
+     \llap{\tocsecfont #2.}\enspace #1 \hfill\ \rm #3\tocrightspace}}%
+\def\tocmiscentry#1#2{\tocmiscskip\line{\tocmiscleftspace
+     \tocmiscfont #1 \hfill\ #2\tocmiscrightspace}}%
+
+%%%
+
+\def\booktoc{\chapterstrue\vglue1truein
+       \centerline{\chapfont Table of Contents}
+       \mark{\chapbegin}%
+       \mark{Contents}%
+       \bigskip\bigskip
+       \begingroup\baselineskip=12pt
+       \multiply\baselineskip by \baselineskipmultiplier
+         \readtocfile
+       \endgroup
+       \vfill\eject}
+
+\def\articletoc{\def\tocleftspace{\qquad\qquad}
+       \def\tocrightspace{\qquad}
+       \def\tocsecfont{\bf}
+       \def\tocmiscskip{\relax}
+       \def\tocmiscleftspace{\tocleftspace\enspace}
+       \def\tocmiscfont{\rm}
+       \def\tocmiscrightspace{\tocrightspace}
+       \bigbreak\begingroup\ninepoint
+       \centerline{\bf Contents}
+       \bigskip
+       %\baselineskip=12pt
+       \iftocgeneration  
+         \readtocfile
+         \else
+         \input \jobname.toc
+       \fi
+       \endgroup
+       \bigbreak}
+  
+
+%%%% Macros for handling the bibliography itself and the toc:
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% The following code is taken from eplain.tex by Karl Berry. It contains
+%% only those parts needed for implementing TOC referencing. The
+%% longest part, however, is due to allowing optional arguments to macros. I
+%% did not modify these since they are used in the macros that are necessary
+%% for the TOC. It would not be hard to eliminate this need.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chardef\letter = 11
+\catcode`@ = \letter
+\def\@gobblemeaning#1:->{}%
+\def\sanitize{\expandafter\@gobblemeaning\meaning}%
+\def\ece#1#2{\expandafter#1\csname#2\endcsname}%
+\def\@innerdef#1#2{\edef#1{\expandafter\noexpand\csname #2\endcsname}}%
+\@innerdef\@innernewif{newif}%
+\@innerdef\@innernewwrite{newwrite}%
+\def\@gobble#1{}%
+\def\@futurenonspacelet#1{\def\cs{#1}%
+   \afterassignment\@stepone\let\@nexttoken=
+}%
+\begingroup % The grouping here avoids stepping on an outside use of `\\'.
+\def\\{\global\let\@stoken= }%
+\\ % now \@stoken is a space token (\\ is a control symbol, so that
+\endgroup
+\def\@stepone{\expandafter\futurelet\cs\@steptwo}%
+\def\@steptwo{\expandafter\ifx\cs\@stoken\let\@@next=\@stepthree
+   \else\let\@@next=\@nexttoken\fi \@@next}%
+\def\@stepthree{\afterassignment\@stepone\let\@@next= }%
+\def\@getoptionalarg#1{%
+   \let\@optionaltemp = #1%
+   \let\@optionalnext = \relax
+   \@futurenonspacelet\@optionalnext\@bracketcheck
+}%
+\def\@bracketcheck{%
+   \ifx [\@optionalnext
+      \expandafter\@@getoptionalarg
+   \else
+      \let\@optionalarg = \empty
+      \expandafter\@optionaltemp
+   \fi
+}%
+\def\@@getoptionalarg[#1]{%
+   \def\@optionalarg{#1}%
+   \@optionaltemp
+}%
+\def\@nnil{\@nil}%
+\def\@fornoop#1\@@#2#3{}%
+\def\@for#1:=#2\do#3{%
+   \edef\@fortmp{#2}%
+   \ifx\@fortmp\empty \else
+      \expandafter\@forloop#2,\@nil,\@nil\@@#1{#3}%
+   \fi
+}%
+\def\@forloop#1,#2,#3\@@#4#5{\def#4{#1}\ifx #4\@nnil \else
+       #5\def#4{#2}\ifx #4\@nnil \else#5\@iforloop #3\@@#4{#5}\fi\fi
+}%
+\def\@iforloop#1,#2\@@#3#4{\def#3{#1}\ifx #3\@nnil
+       \let\@nextwhile=\@fornoop \else
+      #4\relax\let\@nextwhile=\@iforloop\fi\@nextwhile#2\@@#3{#4}%
+}%
+\@innernewif\if@fileexists
+\def\@testfileexistence{\@getoptionalarg\@finishtestfileexistence}%
+\def\@finishtestfileexistence#1{%
+   \begingroup
+      \def\extension{#1}%
+      \immediate\openin0 =
+         \ifx\@optionalarg\empty\jobname\else\@optionalarg\fi
+         \ifx\extension\empty \else .#1\fi
+         \space
+      \ifeof 0
+         \global\@fileexistsfalse
+      \else
+         \global\@fileexiststrue
+      \fi
+      \immediate\closein0
+   \endgroup
+}%
+\let\for = \@for
+\let\futurenonspacelet = \@futurenonspacelet
+\def\iffileexists{\if@fileexists}%
+\let\innerdef = \@innerdef
+\let\innernewif = \@innernewif
+\let\innernewwrite = \@innernewwrite
+\let\testfileexistence = \@testfileexistence
+
+\def\definecontentsfile#1{%
+  \ece\innernewwrite{#1file}%
+  \ece\innernewif{if@#1fileopened}%
+  \ece\let{#1filebasename} = \jobname
+  \ece\def{open#1file}{\opencontentsfile{#1}}%
+  \ece\def{write#1entry}{\writecontentsentry{#1}}%
+  \ece\def{writenumbered#1entry}{\writenumberedcontentsentry{#1}}%
+  \ece\innernewif{ifrewrite#1file} \csname rewrite#1filetrue\endcsname
+  \ece\def{read#1file}{\readcontentsfile{#1}}%
+}%
+\definecontentsfile{toc}%
+\def\opencontentsfile#1{%
+  \csname if@#1fileopened\endcsname \else
+     \ece{\immediate\openout}{#1file} = \csname #1filebasename\endcsname.#1
+     \ece\global{@#1fileopenedtrue}%
+  \fi
+}%
+\def\writecontentsentry#1#2#3{\writenumberedcontentsentry{#1}{#2}{#3}{}}%
+\def\writenumberedcontentsentry#1#2#3#4{%
+  \csname ifrewrite#1file\endcsname
+    \csname open#1file\endcsname
+    \toks0 = {\expandafter\noexpand \csname #1#2entry\endcsname}%
+    \def\temp{#3}%
+    \toks2 = \expandafter{#4}%
+    \edef\cs{\the\toks2}%
+    \edef\@wr{%
+      \write\csname #1file\endcsname{%
+        \the\toks0 % the \toc...entry control sequence
+        {\sanitize\temp}% the text
+        \ifx\empty\cs\else {\sanitize\cs}\fi % A secondary number, or nothing:
+        {\noexpand\folio}% the page number
+      }%
+    }%
+    \@wr
+  \fi
+  \ignorespaces
+}%
+\def\readcontentsfile#1{%
+   \edef\temp{%
+     \noexpand\testfileexistence[\csname #1filebasename\endcsname]{toc}%
+   }\temp
+   \if@fileexists
+      \input \csname #1filebasename\endcsname.#1\relax
+      \csname ifrewrite#1file\endcsname \csname open#1file\endcsname \endif
+   \fi
+}%
+\def\endif{\fi}%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
+
+%%
+\def\@nil{\relax} % initial definition so it doesn't complain 
+
+%%%%
+
+\def\urlref#1{\hfill\break\hbox{\tt \htmlref{#1}{#1}}}
+\def\changebiblabel#1{\expandafter\ifx\csname BL@#1\endcsname\relax
+                      #1\else\csname BL@#1\endcsname\fi}
+\def\RefLabel#1[#2]{\ifproofmode 
+   \edef\temp{\changebiblabel{#1}} \expandafter\hack\expandafter{\temp}\fi
+%\def\RefLabel#1[#2]{\ifproofmode \hack{#1}\fi
+      \def\temp{\expandafter\def \csname B@#1\endcsname{#2}}%
+      \ifcitationgeneration
+         \immediate\write\labelfile
+         {\sanitize\temp}\ifapalike\setauthoryear{#1}[#2]\fi
+      \fi}
+      %\ifbibnames\setauthor{#1}[#2]\fi}
+\ifbibnames\input \jobname.nam \fi
+\def\setauthoryear#1[#2 (#3)]{\def\temp{\expandafter\def
+      \csname BA@#1\endcsname{#2}}%
+      \ifcitationgeneration
+         \immediate\write\labelfile
+         {\sanitize\temp}%
+         \immediate\write\labelfile{\noexpand\expandafter\noexpand\def
+         \noexpand\csname BY@#1\endcsname{#3}}%
+      \fi
+}
+\def\@refbauthor#1/{\ifundefined{BA@#1}[#1(author)???]%
+         \ifreportundefref%
+          \write16{ ***Undefined Author Reference #1*** }%
+         \fi%
+      \else \csname BA@#1\endcsname
+      \fi\citeinc{#1}}%
+\def\refbauthor#1{\edef\temp{\changebibkey{#1}}\expandafter\@refbauthor\temp/}
+%\def\refbauthor#1{\expandafter\@refbauthor{\changebibkey{#1}}}
+\def\@refbyear#1/{\ifundefined{BY@#1}[#1(year)???]%
+         \ifreportundefref%
+          \write16{ ***Undefined Year Reference #1*** }%
+         \fi%
+      \else\htmllocref{#1}{\csname BY@#1\endcsname}%
+      \fi\citeinc{#1}}%
+\def\refbyear#1{\edef\temp{\changebibkey{#1}}\expandafter\@refbyear\temp/}
+%\def\refbyear#1{\expandafter\@refbyear{\changebibkey{#1}}}
+
+%% In order to create output like "Author (year1, year2)", type
+%% "\refbmulti{key1,key2}". Any number of keys can be accommodated, as a
+%% comma-separated list without spaces.
+
+\newcount\countauthors
+\newcount\countauthorstot
+\def\multiauthor{\relax} % initial definition so it doesn't complain
+\def\refbmulti#1{\countauthors=1\countauthorstot=0%
+      \for\multiauthor:=#1\do{\global\advance
+         \countauthorstot by 1 \citeinc{\multiauthor}}%
+      %\phantom{\hbox to 0pt{\hss\for\multiauthor:=#1\do{\global\advance
+         %\countauthorstot by 1 \ref b.\multiauthor/}}}%
+         %% This phantom makes extra space or even a line at the beginning of
+         %a paragraph!
+      \for\multiauthor:=#1\do{\ifnum\countauthors=1
+      \refbauthor{\multiauthor} \fi\advance \countauthors by 1 }%
+      \countauthors=1
+      \ifbibnames
+      \for\multiauthor:=#1\do{\ifnum\countauthors=\countauthorstot
+         \ref b.\multiauthor/ \else \ref b.\multiauthor/, \fi
+         \advance \countauthors by 1 }\else
+      (\for\multiauthor:=#1\do{\ifnum\countauthors=\countauthorstot
+         \refbyear{\multiauthor})\else 
+         \refbyear{\multiauthor}, \fi
+         \advance \countauthors by 1 }\fi}
+
+\def\bibliographytitle{%
+   \centerline{\bf\htmlanchor{REFanchor}{REFERENCES}}
+   \iftocgeneration\writetocentry{misc}{\htmllocref{REFanchor}{References}}
+   \fi\mark{References}}
+\def\startbib{
+  \def\em{\it}
+  \def\newblock{\hskip .11em plus.33em minus.07em}
+  \vskip0pt plus.3\vsize \penalty -150 \vskip0pt
+   plus-.3\vsize \bigskip\bigskip \vskip \parskip
+   \begingroup
+	\baselineskip=12pt
+   \multiply\normalbaselineskip by \baselineskipmultiplier
+	\frenchspacing\bibliographytitle
+	\parskip=0.2cm
+     \def\and{{\rm and }}
+\def\bibitem[##1]##2
+{\htmlanchor{##2}{\item{[##1]}}\RefLabel{##2}[##1]}
+  }
+\def\endbib{\bigskip\bigskip\endgroup}
+
+%  Restore the catcode value for @ that was previously saved.
+\catcode`\@=\csname saveatsymbolcode\endcsname
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Macros for exercises and solutions.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcount\exernumber
+\newcount\solnchapno   % The chapter number of the last solution.
+\newcount\exerchapno   % The chapter number of the last exercise.
+\newcount\savechapno   % The chapter number of the current solution.
+                       % This is used only for tracking crossrefs.
+\newcount\totalexers   % The total number of exercises.
+
+\def\strip#1>{}  % See p. 382 of the TeXbook: it is applied before \meaning
+
+\expandafter\ifx\csname usetimesfonts\endcsname\relax % if want times font
+\let\exerindent=\parindent
+\else
+\def\exerindent{3em}
+\fi
+
+%\def\noparitem{\hang\textindent} % same as \item but w/o the preceding \par
+\def\noparitem#1{% same as \item but w/o the preceding \par
+   \noindent \hbox to 3em 
+   {\hfil \hbox to \intextexeritemwidth {\hfil #1\hfil}}%
+   \enspace\ignorespaces}
+
+\newdimen\intextexeritemwidth 
+\setbox0=\hbox{\bf (d)}
+\intextexeritemwidth=\wd0 
+\def\intextexeritem#1{\par %\hangindent 1em \hangafter=1 
+   \noindent \hbox to 3em 
+   {\hfil \hbox to \intextexeritemwidth {\hfil #1\hfil}}%
+   \enspace\ignorespaces}
+\let\olditem\item
+
+\def\exer#1\endexer{\bigbreak
+      \global\advance\totalexers by 1
+      \ifnum\chapno=\exerchapno\global\advance\exernumber by 1
+       \else\exerchapno=\chapno \exernumber=1 
+        \fi
+      %%\begingroup\ninepoint\narrower\noindent
+      %\begingroup\it\noindent
+      %{\bf Exercise \the\chapno.\the\exernumber.}\enspace}
+      \begingroup\noindent
+      \parindent=\exerindent
+      \def\item{\intextexeritem}%
+      \def\beginitems{\begingroup}%
+      \def\itemrm##1{\olditem{{\rm ##1}}}%
+      %\llap{$\blacktriangleright\;$}%
+      \llap{\ifundefined{Solution\currentchapnumber.\the\exernumber}%
+            $\vartriangleright\;$% this was \triangleright if not for Times
+            \else\htmllocref{Solution\currentchapnumber.\the\exernumber}%
+            {$\vartriangleright\;$}% ditto
+            \fi}%
+      \htmlanchor{Exercise\the\chapno.\the\exernumber}{%
+      {\exertitlefont Exercise \exernumberfont
+      \the\chapno.\the\exernumber.}}\par\nobreak\noindent #1\endexer
+      \iftextexers\immediate\write\textexerfile{\noexpand\noindent
+        \noexpand\htmllocref{Exercise\the\chapno.\the\exernumber}{%
+        \hbox to 3em 
+        {\hfil\laterexernumberfont \the\chapno.\the\exernumber.}}\noexpand\enspace
+        \noexpand\begingroup\noexpand\textcollecttrue}%
+        \def\exertext{#1}%
+        \immediate\write\textexerfile{\expandafter\strip\meaning\exertext
+           \noexpand\laterendexer} 
+        % For the above, see p. 382 of the TeXbook. It is not guaranteed to
+        % work in all situations, but it seems to do fine for exercises.
+        \immediate\write\textexerfile{}\noexpand\textcollectfalse
+      \fi
+             }
+
+\def\endexer{\bigbreak\endgroup}
+\def\saveendexer{\bigbreak\endgroup}  % not used
+\def\laterendexer{\medbreak\endgroup}
+\def\exname#1{{\exnamefont (#1)}\enspace}
+
+
+%% Define a general-purpose marginal hack (see Exercise 14.28 of the
+%% TeXBook):
+\def\strutdepth{\dp\strutbox}
+\def\hack#1{\strut\vadjust{\kern-\strutdepth\vtop to \strutdepth{%
+            \baselineskip\strutdepth\vss\llap{\marginstyleverbatim{#1} }\null}}}
+
+\def\exlabel#1 {%
+     \iftextcollect\relax\else   % if this appears because it is being
+                               % collected, then ignore it
+     \checkdefined{ex.#1}%
+     \ifproofmode \hack{#1}%
+     \fi
+     \ifforwardreference\immediate\write\labelfile{%
+       \noexpand\expandafter
+       \noexpand\def \noexpand\csname C@ex.#1\endcsname{\the\chapno}%
+       \noexpand\expandafter
+       \noexpand\def \noexpand\csname
+       I@ex.#1\endcsname{\the\exernumber}}%
+     \fi
+     \htmlanchor{ex.#1}{%
+     \global\expandafter\edef\csname C@ex.#1\endcsname{\the\chapno}%
+     \global\expandafter\edef\csname
+     I@ex.#1\endcsname{\the\exernumber}}\fi}%
+
+\def\exref#1/{%
+      \ifundefined{I@ex.#1}Exercise --?--
+         \ifreportundefref
+         \write16{ ***Undefined Exercise Reference #1*** }
+         \fi
+	   \else Exercise~\htmllocref{ex.#1}{%
+          \CHP{ex.#1}.\ITM{ex.#1}}%
+      \fi}
+
+\def\briefexref#1/{%
+      \ifundefined{I@ex.#1}Exercise --?--
+         \ifreportundefref
+         \write16{ ***Undefined Exercise Reference #1*** }
+         \fi
+	   \else \htmllocref{ex.#1}{%
+          \CHP{ex.#1}.\ITM{ex.#1}}%
+      \fi}
+
+%% The following is modified from the TeXbook.
+\def\copysolntoblankline{\begingroup\setupcopysoln\copysoln}
+\def\setupcopysoln{\def\do##1{\catcode`##1=\other}\dospecials
+  \catcode`\|=\other \obeylines}
+{\obeylines \gdef\copysoln#1
+  {\def\next{#1}%
+  \ifx\next\empty\let\next=\endgroup %
+  \immediate\write\solnfile{ }%% Blank line
+  \else\immediate\write\solnfile{\next} \let\next=\copysoln\fi\next}}
+
+\def\copyexertoblankline{\begingroup\setupcopyexer\copyexer}
+\def\setupcopyexer{\def\do##1{\catcode`##1=\other}\dospecials
+  \catcode`\|=\other \obeylines}
+{\obeylines \gdef\copyexer#1
+  {\def\next{#1}%
+  \ifx\next\empty\let\next=\endgroup %
+  \immediate\write\laterexerfile{ }%% Blank line
+  \else\immediate\write\laterexerfile{\next} \let\next=\copyexer\fi\next}}
+
+%
+% Use \soln as
+%
+% \soln The solution is this.
+%
+% Note that argument to \soln must begin on the same line as \soln.
+
+\def\soln{\ifnum\chapno=\solnchapno\relax
+          \else\solnchapno=\chapno
+                  \edef\currentchapnumber{\chapfolio}
+                  %% Likely, it is not necessary to do it that way.
+             \immediate\write\solnfile{%
+               \noexpand\vskip0pt plus .1\noexpand\vsize
+               \noexpand\penalty -250\noexpand\vskip0pt plus -.1\noexpand\vsize
+               \noexpand\bigskip\noexpand\noindent
+               {{\noexpand\bf Chapter \currentchapnumber}}
+               %We will have a new chapter number for the solns.
+               %\noexpand\chapno=\the\chapno 
+               \savechapno=\the\chapno
+               \noexpand\par}
+          \fi
+          \edef\solnref{Solution\currentchapnumber.\the\exernumber}
+    \ifforwardreference
+      \immediate\write\labelfile{\noexpand\expandafter\noexpand\edef
+      \noexpand\csname \solnref\endcsname{\solnref}}%
+    \fi
+   \immediate\write\solnfile{\noexpand\smallbreak
+       \noexpand\item{%
+       \noexpand\htmllocref{Exercise\the\chapno.\the\exernumber}{%
+       \noexpand\bf 
+            \ifchapallnum \currentchapnumber.%
+            \fi%
+            \the\exernumber.}}%
+       \noexpand\htmlanchor{\solnref}{}\relax}%
+       %% The above \relax prevents an unwanted space from creeping in.
+             \copysolntoblankline
+          }
+
+\def\laterexer{\immediate\write\laterexerfile{\noexpand\briefexer }
+             \copyexertoblankline
+             }
+
+%% Again, the argument to \laterexer must begin on the same line since
+%% a blank line signals the end.
+
+
+\def\briefexer{\medbreak
+      \global\advance\totalexers by 1
+      \ifnum\chapno=\exerchapno\global\advance\exernumber by 1
+      \else\exerchapno=\chapno \exernumber=1 
+      \fi
+      \begingroup\rm\noindent
+      \htmlanchor{Exercise\the\chapno.\the\exernumber}{%
+      \ifundefined{Solution\currentchapnumber.\the\exernumber}%
+      \hbox to 3em {\hfil\bf \the\chapno.\the\exernumber.}%
+      \else\htmllocref{Solution\currentchapnumber.\the\exernumber}%
+      {\hbox to 3em {\hfil\bf \the\chapno.\the\exernumber.}}%
+      \fi}%
+      \enspace}
+
+% To format an exercise, putting material ahead of the exercise number, use
+% these:
+
+\def\laterexernobreak{\immediate\write\laterexerfile{\noexpand\briefexernobreak }
+             \copyexertoblankline
+             }
+
+\def\briefexernobreak{\global\advance\totalexers by 1
+      \ifnum\chapno=\exerchapno\global\advance\exernumber by 1
+      \else\exerchapno=\chapno \exernumber=1 
+      \fi
+      \begingroup\rm\noindent
+      \parindent=\exerindent
+      \htmlanchor{Exercise\the\chapno.\the\exernumber}{%
+      \ifundefined{Solution\currentchapnumber.\the\exernumber}%
+      \hbox to 3em {\hfil\bf \the\chapno.\the\exernumber.}%
+      %{\bf \the\chapno.\the\exernumber.}%
+      \else\htmllocref{Solution\currentchapnumber.\the\exernumber}%
+      {\hbox to 3em {\hfil\bf \the\chapno.\the\exernumber.}}%
+      %{{\bf \the\chapno.\the\exernumber.}}%
+      \fi}%
+      \enspace}
+
+\def\copyexertoblanklinenobreak{\begingroup\setupcopyexernobreak\copyexernobreak}
+\def\setupcopyexernobreak{\def\do##1{\catcode`##1=\other}\dospecials
+  \catcode`\|=\other \obeylines}
+{\obeylines \gdef\copyexernobreak#1
+  {\def\next{#1}%
+  \ifx\next\empty\let\next=\endgroup %
+  \else\immediate\write\laterexerfile{\next} \let\next=\copyexernobreak\fi\next}}
+
+\def\laterexerinsertnobreak{\immediate\write\laterexerfile{\noexpand \medbreak}\copyexertoblanklinenobreak}
+
+\def\laterexerinsert{\immediate\write\laterexerfile{ }\copyexertoblankline}
+
+\newdimen\exeritemwidth 
+\setbox0=\hbox{\ninebf (d)}
+\exeritemwidth=\wd0 
+%\newdimen\periodwidth
+%\setbox0=\hbox{\ninebf .}
+%\periodwidth=\wd0
+\def\exeritem#1{\par %\hangindent 1em \hangafter=1 
+   \noindent \hbox to 3em 
+   {\hfil \hbox to \exeritemwidth {\hfil #1\hfil}}%
+   \enspace\ignorespaces}
+   %\hfil}\kern\periodwidth}\enspace\ignorespaces}
+%\let\olditem\item
+
+\def\hereexer#1{\immediate\closeout\laterexerfile 
+         \openin\laterexerfile=\jobname.exr
+         \ifeof\laterexerfile\relax
+         \else
+         \iftextexeradd
+            \bsection{Additional Exercises}{s.exers-#1}
+            \else
+            \bsection{Exercises}{s.exers-#1}
+         \fi
+         %\bigskip
+         \begingroup\ninepoint
+         \def\endexer{\laterendexer}
+         \parindent=\exerindent
+         \def\item{\exeritem}%
+         \def\beginitems{\begingroup}%
+         \def\itemrm##1{\olditem{{\rm ##1}}}%
+         \input \jobname.exr
+         \endgroup
+         \bigbreak
+         \fi
+         \immediate\closein\laterexerfile
+         \immediate\openout\laterexerfile=\jobname.exr %% For the next batch.
+         }
+
+\def\heretextexer#1{\immediate\closeout\textexerfile 
+         \openin\textexerfile=\jobname.txr
+         \ifeof\textexerfile\relax
+         \else
+         \bsection{Collected In-Text Exercises}{s.textexers-#1}
+         %\bigskip
+         \begingroup\ninepoint
+         \parindent=\exerindent
+         \def\item{\exeritem}%
+         \def\beginitems{\begingroup}%
+         \def\itemrm##1{\olditem{{\rm ##1}}}%
+         %\def\noparitem{\hangindent=\exerindent \hangafter=1}
+         \def\noparitem##1{{##1}\enspace\ignorespaces}
+         \input \jobname.txr
+         \endgroup
+         \bigbreak
+         \fi
+         \immediate\closein\textexerfile
+         \immediate\openout\textexerfile=\jobname.txr %% For the next batch.
+         }
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% To begin a notes section:
+
+\def\beginnotes#1{\bsection{Notes}{s.notes-#1} \begingroup\ninepoint}
+\def\endnotes{\endgroup}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Macros that used to be used, kept for historical reasons only.
+
+\def\inviscite#1{\citeinc{#1}}  %% to have the ref put in
+   %% the refs.
+   %% This is here only for compatibility.
+
+
+%
+% older bib macros:
+% 
+\def\beginreferences{\vskip0pt plus.3\vsize \penalty -150 \vskip0pt
+ plus-.3\vsize \bigskip\bigskip \vskip \parskip
+ \begingroup\baselineskip=12pt\frenchspacing
+       \multiply\normalbaselineskip by \baselineskipmultiplier  % OK?
+   \bibliographytitle
+   \vskip12pt\parindent=0pt
+   \def\and{{\rm and }}
+   \def\rrf##1 (##2){{\sc ##1}\ (##2).}
+   \everypar={\hangindent=.8cm\hangafter=1\rrf }}
+\def\endreferences{\bigskip\bigskip\endgroup}

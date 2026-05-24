@@ -1,0 +1,10 @@
+page   num  type   width height color comp bpc  enc interp  object ID x-ppi y-ppi size ratio
+--------------------------------------------------------------------------------------------
+   1     0 stencil     1     1  -       1   1  image  no   [inline]   0.154   150    1B   - 
+   1     1 stencil     1     1  -       1   1  image  no   [inline]      16   150    1B   - 
+   1     2 stencil     1     1  -       1   1  image  no   [inline]   0.439   150    1B   - 
+   3     3 stencil     1     1  -       1   1  image  no   [inline]       9   150    1B   - 
+   3     4 stencil     1     1  -       1   1  image  no   [inline]       3   150    1B   - 
+   3     5 stencil     1     1  -       1   1  image  no   [inline]      15     8    1B   - 
+   4     6 stencil     1     1  -       1   1  image  no   [inline]      16   150    1B   - 
+   4     7 stencil     1     1  -       1   1  image  no   [inline]       2   150    1B   - 

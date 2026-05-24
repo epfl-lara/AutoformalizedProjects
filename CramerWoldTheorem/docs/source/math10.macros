@@ -1,0 +1,1227 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% This file of macros is designed for math papers in Plain TeX.
+%% Contents:
+%% 1. overall formatting
+%% 2. font environments
+%% 3. automatic footnote numbering
+%% 4. input AMS symbol macros
+%% 5. some big fonts
+%% 6. some formatting macros
+%% 7. abbreviations for common math items
+%% 8. some math symbols.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\message{(Version of math.macros dated 11 July 2016)}
+
+%\magnification=1200
+\baselineskip=15pt %The default is 12pt, but for mathematics, this is too
+                     %close together.
+\overfullrule=0pt
+
+\expandafter\ifx \csname baselineskipmultiplier \endcsname \relax
+\def\baselineskipmultiplier{1} 
+\else
+\def\baselineskipmultiplier{\csname baselineskipmultiplier \endcsname } 
+\fi
+
+\multiply\baselineskip by \baselineskipmultiplier
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%         font environments (from TeXbook macros, manmac.tex)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\expandafter\chardef\csname saveatsymbolcode\endcsname=\the\catcode`\@
+\catcode`@=11 % borrow the private macros of PLAIN (with care)
+
+\font\tentex=cmtex10
+
+\font\inchhigh=cminch
+%\font\titlefont=cmssdc10 at 40pt
+
+% roman
+
+\font\twelverm=cmr10 at 12pt
+\font\elevenrm=cmr10 at 11pt
+\font\ninerm=cmr9
+\font\eightrm=cmr8
+\font\sixrm=cmr6
+
+% math italic
+
+\font\twelvei=cmmi10 at 12pt
+\font\eleveni=cmmi10 at 11pt
+\font\ninei=cmmi9
+\font\eighti=cmmi8
+\font\sixi=cmmi6
+\skewchar\ninei='177 \skewchar\eighti='177 \skewchar\sixi='177
+
+% math symbol (this includes calligraphic)
+
+\font\twelvesy=cmsy10 at 12pt
+\font\elevensy=cmsy10 at 11pt
+\font\ninesy=cmsy9
+\font\eightsy=cmsy8
+\font\sixsy=cmsy6
+\skewchar\ninesy='60 \skewchar\eightsy='60 \skewchar\sixsy='60
+
+% text bold
+
+\font\twelvebf=cmbx10 at 12pt
+\font\elevenbf=cmbx10 at 11pt
+\font\ninebf=cmbx9
+\font\eightbf=cmbx8
+\font\sixbf=cmbx6
+
+% typewriter
+
+\font\twelvett=cmtt10 at 12pt
+\font\eleventt=cmtt10 at 11pt
+\font\ninett=cmtt9
+\font\eighttt=cmtt8
+
+% slant 
+
+\font\thirteensl=cmsl10 at 13pt
+\font\twelvesl=cmsl10 at 12pt
+\font\elevensl=cmsl10 at 11pt
+\font\ninesl=cmsl9
+\font\eightsl=cmsl8
+
+% text italic
+
+\font\twelveit=cmti10 at 12pt
+\font\elevenit=cmti10 at 11pt
+\font\nineit=cmti9
+\font\eightit=cmti8
+
+\font\tenu=cmu10 % unslanted text italic
+
+%% The following have been added for math extension fonts.
+\font\twelveex=cmex10 at 12pt
+\font\elevenex=cmex10 at 11pt
+\font\nineex=cmex9
+\font\eightex=cmex8
+\font\sevenex=cmex7
+\font\sixex=cmex7 at 6pt
+\font\fiveex=cmex7 at 5pt
+%%
+
+%% The following are for sans serif fonts.
+\font\twelvess=cmss10 at 12pt
+\font\elevenss=cmss10 at 11pt
+\font\tenss=cmss10
+\font\niness=cmss9
+\font\eightss=cmss8
+\font\sevenss=cmss8 at 7pt
+\font\sixss=cmss8 at 6pt
+\font\fivess=cmss8 at 5pt
+\newfam\ssfam
+\textfont\ssfam=\tenss \scriptfont\ssfam=\sevenss
+ \scriptscriptfont\ssfam=\fivess
+\let\sz=\ss  %% Save the German character
+\def\ss{\fam\ssfam \tenss}%
+%%
+
+%% The following are for math symbol bold (i.e., blackboard bold) fonts.
+%% They add to the fonts in amssym.def.
+\font\twelvemsb=msbm10 at 12pt
+\font\tenmsb=msbm10
+\font\ninemsb=msbm9
+\font\eightmsb=msbm8
+\font\sevenmsb=msbm7
+\font\sixmsb=msbm6
+\font\fivemsb=msbm5
+%% The following are already in amssym.def.
+%\newfam\msbfam
+%\textfont\msbfam=\tenmsb \scriptfont\msbfam=\sevenmsb
+ %\scriptscriptfont\msbfam=\fivemsb
+%\def\Bbb#1{{\fam\msbfam\relax#1}}
+\def\msb{\fam\msbfam \tenmsb}
+\font\twelvebb=msbm10 at 12pt
+\font\elevenbb=msbm10 at 11pt
+\font\tenbb=msbm10
+\font\ninebb=msbm9
+\font\eightbb=msbm8
+\font\sevenbb=msbm7
+\font\sixbb=msbm6
+\font\fivebb=msbm5
+\def\bbbfam{\msbfam}
+%%
+
+%% The following are for small caps.
+\font\twelvesc=cmcsc10 at 12pt
+\font\elevensc=cmcsc10 at 11pt
+\font\tensc=cmcsc10
+\font\ninesc=cmcsc9
+\font\eightsc=cmcsc8
+\font\sevensc=cmcsc8 at 7pt
+\font\sixsc=cmcsc8 at 6pt
+\font\fivesc=cmcsc8 at 5pt
+\newfam\scfam
+\textfont\scfam=\tensc \scriptfont\scfam=\sevensc
+ \scriptscriptfont\scfam=\fivesc
+\def\sc{\fam\scfam \tensc}%
+%%
+
+%% the following implements the rsfs fonts (from Paul Vojta and added to)
+% They are slightly too large, so I shrunk them.
+\font\elevenscr=rsfs10 
+\font\tenscr=rsfs10 at 9pt
+\font\ninescr=rsfs10 at 8pt
+\font\eightscr=rsfs7
+\font\sevenscr=rsfs7 at 6pt
+\font\sixscr=rsfs5
+\font\fivescr=rsfs5 at 4pt
+\skewchar\tenscr='177 \skewchar\sevenscr='177 \skewchar\fivescr='177
+\newfam\scrfam \textfont\scrfam=\tenscr \scriptfont\scrfam=\sevenscr
+\scriptscriptfont\scrfam=\fivescr
+\def\scr#1{{\fam\scrfam#1}}   % default definition
+%
+
+%% the following is for bold text italic
+\font\twelvebi=cmbxti10 at 12pt
+\font\elevenbi=cmbxti10 at 11pt
+\font\tenbi=cmbxti10
+\font\ninebi=cmbxti10 at 9pt
+\font\eightbi=cmbxti10 at 8pt
+\font\sevenbi=cmbxti10 at 7pt
+\font\sixbi=cmbxti10 at 6pt
+\font\fivebi=cmbxti10 at 5pt
+\newfam\bifam
+\textfont\bifam=\tenbi \scriptfont\bifam=\sevenbi
+ \scriptscriptfont\bifam=\fivebi
+\def\bfi{\fam\bifam \tenbi}%
+%\def\bfi{\tenbi}%
+%
+
+% the following are from amssym.def for math symbols
+\font\msamxiii=msam10 at 13pt
+\font\msamxii=msam10 at 12pt
+\font\msamxi=msam10 at 11pt
+\font\msamx=msam10
+\font\msamix=msam9
+\font\msamviii=msam8
+\font\msamvii=msam7
+\font\msamvi=msam6
+\font\msamv=msam5
+\font\msamiv=msam5 at 4pt
+\font\msamiii=msam5 at 3pt
+\font\msamii=msam5 at 2pt
+\font\msami=msam5 at 1pt
+%\newfam\msafam
+%\textfont\msafam=\tenmsa
+%\scriptfont\msafam=\sevenmsa
+%\scriptscriptfont\msafam=\fivemsa
+%\edef\msafam@{\hexnumber@\msafam}
+
+% fraktur, defined by amssym.def
+% They are slightly too large, so I shrunk them.
+
+\font\thirteeneufm=eufm10 at 12pt
+\font\twelveeufm=eufm10 at 11pt
+\font\eleveneufm=eufm10 
+\font\teneufm=eufm9
+\font\nineeufm=eufm8
+\font\eighteufm=eufm7
+\font\seveneufm=eufm6
+\font\sixeufm=eufm5
+\font\fiveeufm=eufm5
+%\newfam\eufmfam
+%\textfont\eufmfam=\teneufm
+%\scriptfont\eufmfam=\seveneufm
+%\scriptscriptfont\eufmfam=\fiveeufm
+%\def\frak#1{{\fam\eufmfam\relax#1}}
+
+
+\newcount\currenttextsize  % keep track of current size in order to change
+\currenttextsize=10  % default
+\newcount\currentscriptsize 
+\currentscriptsize=7
+\newcount\currentscriptscriptsize  
+\currentscriptscriptsize=5
+\def\smallersize{\ifcase \currenttextsize 
+   \relax \or  %0
+   \relax \or  %1
+   \relax \or  %2
+   \relax \or  %3
+   \relax \or  %4
+   \relax \or  %5
+   \relax \or  %6
+   \relax \or  %7
+   \relax \or  %8
+   \eightpoint \or  %9
+   \ninepoint \or  %10
+   \tenpoint \or  %11
+   \elevenpoint \or  %12
+   \advance \currenttextsize by -1 \or  %13
+   \advance \currenttextsize by -1 \else  %14
+   \relax \fi } 
+\def\biggersize{\ifcase \currenttextsize 
+   \relax \or  %0
+   \relax \or  %1
+   \relax \or  %2
+   \relax \or  %3
+   \relax \or  %4
+   \relax \or  %5
+   \relax \or  %6
+   \eightpoint \or  %7
+   \ninepoint \or  %8
+   \tenpoint \or  %9
+   \elevenpoint \or  %10
+   \twelvepoint \or  %11
+   \thirteenpoint \or  %12
+   \advance \currenttextsize by 1 \or  %13
+   \advance \currenttextsize by 1 \else  %14
+   \relax \fi } 
+
+\def\Biggersize{\ifcase \currenttextsize 
+   \relax \or  %0
+   \relax \or  %1
+   \relax \or  %2
+   \relax \or  %3
+   \relax \or  %4
+   \relax \or  %5
+   \relax \or  %6
+   \ninepoint \or  %7
+   \tenpoint \or  %8
+   \elevenpoint \or  %9
+   \twelvepoint \or  %10
+   \thirteenpoint \or  %11
+   \advance \currenttextsize by 1 \or  %12
+   \advance \currenttextsize by 1 \else  %13
+   \relax \fi } 
+
+
+% We will use family 15 for "scratch" fonts, i.e., fonts that will be used
+% for exceptions and be redefined every time it is used.
+% This works only for symbols that can be put in an \hbox (it excludes
+% \int) if it is used twice in the same formula.
+% Initially it is null.
+
+\newcount\fontcounter
+\def\scratchdefine{\expandafter \def\csname scratch\romannumeral
+      \fontcounter\endcsname {\nullfont }}
+
+%We define \scratchv through \scratchxix
+\fontcounter=5
+\loop 
+   \scratchdefine 
+   \advance \fontcounter by 1 
+   \ifnum\fontcounter<20
+\repeat
+\def\textscratchselect{\textfont15=\csname scratch\romannumeral
+\currenttextsize\endcsname }
+\def\scriptscratchselect{\scriptfont15=\csname scratch\romannumeral \currentscriptsize\endcsname }
+\def\scriptscriptscratchselect{\scriptscriptfont15=\csname scratch\romannumeral \currentscriptscriptsize\endcsname }
+\def\scratchselect{\textscratchselect
+   \scriptscratchselect \scriptscriptscratchselect }
+\scratchselect   
+%\textfont15=\scratchx \scriptfont15=\scratchvii \scriptscriptfont15=\scratchv
+
+\newskip\ttglue
+
+\normallineskiplimit=0pt
+\normallineskip=1pt 
+
+% Note that \fam0 is the same as \fam=0.
+
+\def\thirteenpoint{\def\rm{\fam0\thirteenrm}%
+  \textfont0=\thirteenrm \scriptfont0=\tenrm \scriptscriptfont0=\eightrm
+  \textfont1=\thirteeni \scriptfont1=\teni \scriptscriptfont1=\eighti
+  \textfont2=\thirteensy \scriptfont2=\tensy \scriptscriptfont2=\eightsy
+  \textfont3=\thirteenex \scriptfont3=\tenex \scriptscriptfont3=\eightex
+  \currenttextsize=13
+  \currentscriptsize=10
+  \currentscriptscriptsize=8
+  \def\it{\fam\itfam\thirteenit}%
+  \textfont\itfam=\thirteenit
+  \def\sl{\fam\slfam\thirteensl}%
+  \textfont\slfam=\thirteensl
+  \def\bf{\fam\bffam\thirteenbf}%
+  \textfont\bffam=\thirteenbf \scriptfont\bffam=\tenbf
+   \scriptscriptfont\bffam=\eightbf
+  \def\tt{\fam\ttfam\thirteentt}%
+  \textfont\ttfam=\thirteentt
+  \tt \ttglue=.5em plus.25em minus.15em
+  \def\ss{\fam\ssfam\thirteenss}%
+  \textfont\ssfam=\thirteenss \scriptfont\ssfam=\tenss
+            \scriptscriptfont\ssfam=\eightss
+  \def\bbb{\fam\bbbfam \thirteenbb}%
+  \textfont\bbbfam=\thirteenbb \scriptfont\bbbfam=\tenbb
+            \scriptscriptfont\bbbfam=\eightbb
+  \textfont\msafam=\msamxiii \scriptfont\msafam=\msamx
+            \scriptscriptfont\msafam=\msamix
+  \def\sc{\fam\scfam \thirteensc}%
+  \textfont\scfam=\thirteensc \scriptfont\scfam=\tensc
+   \scriptscriptfont\scfam=\eightsc
+  \def\scr{\fam\scrfam \thirteenscr}%
+   \textfont\scrfam=\tenscr \scriptfont\scrfam=\tenscr
+   \scriptscriptfont\scrfam=\eightscr
+  \def\bfi{\fam\bifam \thirteenbi}%
+  \textfont\bifam=\tenbi \scriptfont\bifam=\tenbi
+   \scriptscriptfont\bifam=\eightbi
+  \textfont\eufmfam=\thirteeneufm \scriptfont\eufmfam=\teneufm
+  \scriptscriptfont\eufmfam=\eighteufm
+  \textscratchselect \scriptscratchselect \scriptscriptscratchselect
+  %\textfont15=\scratchxiii \scriptfont15=\scratchx
+  \scriptscriptfont15=\scratchix
+  \normalbaselineskip=14pt
+  \multiply\normalbaselineskip by \baselineskipmultiplier
+  %\let\big=\thirteenbig \let\Big=\thirteenBig
+  %\let\bigg=\thirteenbigg \let\Bigg=\thirteenBigg
+  \setbox\strutbox=\hbox{\vrule height11.05pt depth4.55pt width\z@}%
+  \normalbaselines\rm}
+
+\def\twelvepoint{\def\rm{\fam0\twelverm}%
+  \textfont0=\twelverm \scriptfont0=\ninerm \scriptscriptfont0=\sevenrm
+  \textfont1=\twelvei \scriptfont1=\ninei \scriptscriptfont1=\seveni
+  \textfont2=\twelvesy \scriptfont2=\ninesy \scriptscriptfont2=\sevensy
+  \textfont3=\twelveex \scriptfont3=\nineex \scriptscriptfont3=\sevenex
+  \currenttextsize=12
+  \currentscriptsize=9
+  \currentscriptscriptsize=7
+  \def\it{\fam\itfam\twelveit}%
+  \textfont\itfam=\twelveit
+  \def\sl{\fam\slfam\twelvesl}%
+  \textfont\slfam=\twelvesl
+  \def\bf{\fam\bffam\twelvebf}%
+  \textfont\bffam=\twelvebf \scriptfont\bffam=\ninebf
+   \scriptscriptfont\bffam=\sevenbf
+  \def\tt{\fam\ttfam\twelvett}%
+  \textfont\ttfam=\twelvett
+  \tt \ttglue=.5em plus.25em minus.15em
+  \def\ss{\fam\ssfam\twelvess}%
+  \textfont\ssfam=\twelvess \scriptfont\ssfam=\niness
+            \scriptscriptfont\ssfam=\sevenss
+  \def\bbb{\fam\bbbfam \twelvebb}%
+  \textfont\bbbfam=\twelvebb \scriptfont\bbbfam=\ninebb
+            \scriptscriptfont\bbbfam=\sevenbb
+  \textfont\msafam=\msamxii \scriptfont\msafam=\msamix
+            \scriptscriptfont\msafam=\msamvii
+  \def\sc{\fam\scfam \twelvesc}%
+  \textfont\scfam=\twelvesc \scriptfont\scfam=\ninesc
+   \scriptscriptfont\scfam=\sevensc
+  \def\scr{\fam\scrfam \twelvescr}%
+   \textfont\scrfam=\tenscr \scriptfont\scrfam=\ninescr
+   \scriptscriptfont\scrfam=\sevenscr
+  \def\bfi{\fam\bifam \twelvebi}%
+  \textfont\bifam=\tenbi \scriptfont\bifam=\ninebi
+   \scriptscriptfont\bifam=\sevenbi
+  \textfont\eufmfam=\twelveeufm \scriptfont\eufmfam=\nineeufm
+  \scriptscriptfont\eufmfam=\seveneufm
+  \textscratchselect \scriptscratchselect \scriptscriptscratchselect
+  %\textfont15=\scratchxii \scriptfont15=\scratchix
+  \scriptscriptfont15=\scratchvii
+  \normalbaselineskip=12pt
+  \multiply\normalbaselineskip by \baselineskipmultiplier
+  %\let\big=\twelvebig \let\Big=\twelveBig
+  %\let\bigg=\twelvebigg \let\Bigg=\twelveBigg
+  \setbox\strutbox=\hbox{\vrule height10.2pt depth4.2pt width\z@}%
+  \normalbaselines\rm}
+
+\def\elevenpoint{\def\rm{\fam0\elevenrm}%
+  \textfont0=\elevenrm \scriptfont0=\eightrm \scriptscriptfont0=\sixrm
+  \textfont1=\eleveni \scriptfont1=\eighti \scriptscriptfont1=\sixi
+  \textfont2=\elevensy \scriptfont2=\eightsy \scriptscriptfont2=\sixsy
+  \textfont3=\elevenex \scriptfont3=\eightex \scriptscriptfont3=\sixex
+  \currenttextsize=11
+  \currentscriptsize=8
+  \currentscriptscriptsize=6
+  \def\it{\fam\itfam\elevenit}%
+  \textfont\itfam=\elevenit
+  \def\sl{\fam\slfam\elevensl}%
+  \textfont\slfam=\elevensl
+  \def\bf{\fam\bffam\elevenbf}%
+  \textfont\bffam=\elevenbf \scriptfont\bffam=\eightbf
+   \scriptscriptfont\bffam=\sixbf
+  \def\tt{\fam\ttfam\eleventt}%
+  \textfont\ttfam=\eleventt
+  \tt \ttglue=.5em plus.25em minus.15em
+  \def\ss{\fam\ssfam\elevenss}%
+  \textfont\ssfam=\elevenss \scriptfont\ssfam=\eightss
+            \scriptscriptfont\ssfam=\sixss
+  \def\msb{\fam\msbfam \elevenmsb}%
+  \textfont\bbbfam=\elevenbb \scriptfont\bbbfam=\eightbb
+            \scriptscriptfont\bbbfam=\sixbb
+  \textfont\msafam=\msamx \scriptfont\msafam=\msamvii
+            \scriptscriptfont\msafam=\msamv
+  \def\sc{\fam\scfam \elevensc}%
+  \textfont\scfam=\elevensc \scriptfont\scfam=\eightsc
+   \scriptscriptfont\scfam=\sixsc
+  \def\scr{\fam\scrfam \elevenscr}%
+   \textfont\scrfam=\elevenscr \scriptfont\scrfam=\eightscr
+   \scriptscriptfont\scrfam=\sixscr
+  %\def\bfi{\elevenbi}%
+  \def\bfi{\fam\bifam \elevenbi}%
+  \textfont\bifam=\elevenbi \scriptfont\bifam=\eightbi
+   \scriptscriptfont\bifam=\sixbi
+  \textfont\eufmfam=\eleveneufm \scriptfont\eufmfam=\eighteufm
+  \scriptscriptfont\eufmfam=\sixeufm
+  \textscratchselect \scriptscratchselect \scriptscriptscratchselect
+  %\textfont15=\scratchx \scriptfont15=\scratchvii \scriptscriptfont15=\scratchv
+  \normalbaselineskip=12pt
+  \multiply\normalbaselineskip by \baselineskipmultiplier
+  %\let\big=\elevenbig \let\Big=\elevenBig
+  %\let\bigg=\elevenbigg \let\Bigg=\elevenBigg
+  \let\medbigp=\elevenmedbigp
+  \setbox\strutbox=\hbox{\vrule height9.35pt depth3.85pt width\z@}%
+  \normalbaselines\rm}
+
+\def\tenpoint{\def\rm{\fam0\tenrm}%
+  \textfont0=\tenrm \scriptfont0=\sevenrm \scriptscriptfont0=\fiverm
+  \textfont1=\teni \scriptfont1=\seveni \scriptscriptfont1=\fivei
+  \textfont2=\tensy \scriptfont2=\sevensy \scriptscriptfont2=\fivesy
+  \textfont3=\tenex \scriptfont3=\sevenex \scriptscriptfont3=\fiveex
+  \currenttextsize=10
+  \currentscriptsize=7
+  \currentscriptscriptsize=5
+  \def\it{\fam\itfam\tenit}%
+  \textfont\itfam=\tenit
+  \def\sl{\fam\slfam\tensl}%
+  \textfont\slfam=\tensl
+  \def\bf{\fam\bffam\tenbf}%
+  \textfont\bffam=\tenbf \scriptfont\bffam=\sevenbf
+   \scriptscriptfont\bffam=\fivebf
+  \def\tt{\fam\ttfam\tentt}%
+  \textfont\ttfam=\tentt
+  \tt \ttglue=.5em plus.25em minus.15em
+  \def\ss{\fam\ssfam\tenss}%
+  \textfont\ssfam=\tenss \scriptfont\ssfam=\sevenss
+            \scriptscriptfont\ssfam=\fivess
+  \def\msb{\fam\msbfam \tenmsb}%
+  \textfont\bbbfam=\tenbb \scriptfont\bbbfam=\sevenbb
+            \scriptscriptfont\bbbfam=\fivebb
+  \textfont\msafam=\msamx \scriptfont\msafam=\msamvii
+            \scriptscriptfont\msafam=\msamv
+  \def\sc{\fam\scfam \tensc}%
+  \textfont\scfam=\tensc \scriptfont\scfam=\sevensc
+   \scriptscriptfont\scfam=\fivesc
+  \def\scr{\fam\scrfam \tenscr}%
+   \textfont\scrfam=\tenscr \scriptfont\scrfam=\sevenscr
+   \scriptscriptfont\scrfam=\fivescr
+  %\def\bfi{\tenbi}%
+  \def\bfi{\fam\bifam \tenbi}%
+  \textfont\bifam=\tenbi \scriptfont\bifam=\sevenbi
+   \scriptscriptfont\bifam=\fivebi
+  \textfont\eufmfam=\teneufm \scriptfont\eufmfam=\seveneufm
+  \scriptscriptfont\eufmfam=\fiveeufm
+  \textscratchselect \scriptscratchselect \scriptscriptscratchselect
+  %\textfont15=\scratchx \scriptfont15=\scratchvii \scriptscriptfont15=\scratchv
+  \normalbaselineskip=12pt
+  \multiply\normalbaselineskip by \baselineskipmultiplier
+  %\let\big=\tenbig \let\Big=\tenBig
+  %\let\bigg=\tenbigg \let\Bigg=\tenBigg
+  \let\medbigp=\tenmedbigp
+  \setbox\strutbox=\hbox{\vrule height8.5pt depth3.5pt width\z@}%
+  \normalbaselines\rm}
+
+\def\ninepoint{\def\rm{\fam0\ninerm}%
+  \textfont0=\ninerm \scriptfont0=\sixrm \scriptscriptfont0=\fiverm
+  \textfont1=\ninei \scriptfont1=\sixi \scriptscriptfont1=\fivei
+  \textfont2=\ninesy \scriptfont2=\sixsy \scriptscriptfont2=\fivesy
+  \textfont3=\nineex \scriptfont3=\sixex \scriptscriptfont3=\fiveex
+  \currenttextsize=9
+  \currentscriptsize=6
+  \currentscriptscriptsize=5
+  \def\it{\fam\itfam\nineit}%
+  \textfont\itfam=\nineit
+  \def\sl{\fam\slfam\ninesl}%
+  \textfont\slfam=\ninesl
+  \def\bf{\fam\bffam\ninebf}%
+  \textfont\bffam=\ninebf \scriptfont\bffam=\sixbf
+   \scriptscriptfont\bffam=\fivebf
+  \def\tt{\fam\ttfam\ninett}%
+  \textfont\ttfam=\ninett
+  \tt \ttglue=.5em plus.25em minus.15em
+  \def\ss{\fam\ssfam\niness}%
+  \textfont\ssfam=\niness \scriptfont\ssfam=\sixss
+            \scriptscriptfont\ssfam=\fivess
+  \def\msb{\fam\msbfam \ninemsb}%
+  \textfont\msbfam=\ninemsb \scriptfont\msbfam=\sixmsb
+            \scriptscriptfont\msbfam=\fivemsb
+  \textfont\msafam=\msamix \scriptfont\msafam=\msamvi
+            \scriptscriptfont\msafam=\msamv
+  \textfont\bbbfam\ninebb \scriptfont\bbbfam\sixbb
+            \scriptscriptfont\bbbfam\fivebb
+  \def\sc{\fam\scfam \ninesc}%
+  \textfont\scfam=\ninesc \scriptfont\scfam=\sixsc
+   \scriptscriptfont\scfam=\fivesc
+  \def\scr{\fam\scrfam \ninescr}%
+  \textfont\scrfam=\ninescr \scriptfont\scrfam=\sixscr
+   \scriptscriptfont\scrfam=\fivescr
+  %\def\bfi{\ninebi}%
+  \def\bfi{\fam\bifam \ninebi}%
+  \textfont\bifam=\ninebi \scriptfont\bifam=\sixbi
+   \scriptscriptfont\bifam=\fivebi
+  \textfont\eufmfam=\nineeufm \scriptfont\eufmfam=\sixeufm
+  \scriptscriptfont\eufmfam=\fiveeufm
+  \textscratchselect \scriptscratchselect \scriptscriptscratchselect
+  %\textfont15=\scratchix \scriptfont15=\scratchvi \scriptscriptfont15=\scratchv
+  \normalbaselineskip=11pt
+  \multiply\normalbaselineskip by \baselineskipmultiplier
+  %\let\big=\ninebig \let\Big=\nineBig
+  %\let\bigg=\ninebigg \let\Bigg=\nineBigg
+  \let\medbigp=\ninemedbigp 
+  \setbox\strutbox=\hbox{\vrule height8pt depth3pt width\z@}%
+  \normalbaselines\rm}
+
+\def\eightpoint{\def\rm{\fam0\eightrm}%
+  \textfont0=\eightrm \scriptfont0=\sixrm \scriptscriptfont0=\fiverm
+  \textfont1=\eighti \scriptfont1=\sixi \scriptscriptfont1=\fivei
+  \textfont2=\eightsy \scriptfont2=\sixsy \scriptscriptfont2=\fivesy
+  \textfont3=\eightex \scriptfont3=\sixex \scriptscriptfont3=\fiveex
+  \currenttextsize=8
+  \currentscriptsize=6
+  \currentscriptscriptsize=5
+  \def\it{\fam\itfam\eightit}%
+  \textfont\itfam=\eightit
+  \def\sl{\fam\slfam\eightsl}%
+  \textfont\slfam=\eightsl
+  \def\bf{\fam\bffam\eightbf}%
+  \textfont\bffam=\eightbf \scriptfont\bffam=\sixbf
+   \scriptscriptfont\bffam=\fivebf
+  \def\tt{\fam\ttfam\eighttt}%
+  \textfont\ttfam=\eighttt
+  \tt \ttglue=.5em plus.25em minus.15em
+  \def\ss{\fam\ssfam\eightss}%
+  \textfont\ssfam=\eightss \scriptfont\ssfam=\sixss
+            \scriptscriptfont\ssfam=\fivess
+  \def\msb{\fam\msbfam \eightmsb}%
+  \textfont\msbfam=\eightmsb \scriptfont\msbfam=\sixmsb
+            \scriptscriptfont\msbfam=\fivemsb
+  \textfont\msafam=\msamviii \scriptfont\msafam=\msamvi
+            \scriptscriptfont\msafam=\msamv
+  \textfont\bbbfam\eightbb \scriptfont\bbbfam\sixbb
+            \scriptscriptfont\bbbfam\fivebb
+  \def\sc{\fam\scfam \eightsc}%
+  \textfont\scfam=\eightsc \scriptfont\scfam=\sixsc
+   \scriptscriptfont\scfam=\fivesc
+  \def\scr{\fam\scrfam \eightscr}%
+  \textfont\scrfam=\eightscr \scriptfont\scrfam=\sixscr
+   \scriptscriptfont\scrfam=\fivescr
+  %\def\bfi{\eightbi}%
+  \def\bfi{\fam\bifam \eightbi}%
+  \textfont\bifam=\eightbi \scriptfont\bifam=\sixbi
+   \scriptscriptfont\bifam=\fivebi
+  \textfont\eufmfam=\eighteufm \scriptfont\eufmfam=\sixeufm
+  \scriptscriptfont\eufmfam=\fiveeufm
+  \textscratchselect \scriptscratchselect \scriptscriptscratchselect
+  %\textfont15=\scratchvii \scriptfont15=\scratchvi \scriptscriptfont15=\scratchv
+  \normalbaselineskip=9pt
+  \multiply\normalbaselineskip by \baselineskipmultiplier
+  %\let\big=\eightbig \let\Big=\eightBig
+  %\let\bigg=\eightbigg \let\Bigg=\eightBigg
+  \let\medbigp=\eightmedbigp 
+  \setbox\strutbox=\hbox{\vrule height7pt depth2pt width\z@}%
+  \normalbaselines\rm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% The following are used above.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\frtnbig#1{{\hbox{$\left#1\vbox to11.9pt{}\right.\n@space$}}}
+   %This should probably be larger, as frtn is 1440, not 1400.
+\def\thirteenbig#1{{\hbox{$\left#1\vbox to11.05pt{}\right.\n@space$}}}
+\def\twelvebig#1{{\hbox{$\left#1\vbox to10.2pt{}\right.\n@space$}}}
+\def\elevenbig#1{{\hbox{$\left#1\vbox to9.35pt{}\right.\n@space$}}}
+\def\tenbig#1{{\hbox{$\left#1\vbox to8.5pt{}\right.\n@space$}}}
+\def\ninebig#1{{\hbox{$\left#1\vbox to7.65pt{}\right.\n@space$}}}
+%\def\ninebig#1{{\hbox{$\textfont0=\tenrm\textfont2=\tensy
+  %\left#1\vbox to7.25pt{}\right.\n@space$}}}
+\def\eightbig#1{{\hbox{$\left#1\vbox to6.8pt{}\right.\n@space$}}}
+%\def\eightbig#1{{\hbox{$\textfont0=\ninerm\textfont2=\ninesy
+  %\left#1\vbox to6.5pt{}\right.\n@space$}}}
+\def\thirteenBig#1{{\hbox{$\left#1\vbox to 14.95pt{}\right.\n@space$}}}
+\def\twelveBig#1{{\hbox{$\left#1\vbox to 13.8pt{}\right.\n@space$}}}
+\def\elevenBig#1{{\hbox{$\left#1\vbox to 12.65pt{}\right.\n@space$}}}
+\def\tenBig#1{{\hbox{$\left#1\vbox to 11.5pt{}\right.\n@space$}}}
+\def\nineBig#1{{\hbox{$\left#1\vbox to 10.35pt{}\right.\n@space$}}}
+\def\eightBig#1{{\hbox{$\left#1\vbox to 9.2pt{}\right.\n@space$}}}
+\def\thirteenbigg#1{{\hbox{$\left#1\vbox to 18.85pt{}\right.\n@space$}}}
+\def\twelvebigg#1{{\hbox{$\left#1\vbox to 17.4pt{}\right.\n@space$}}}
+\def\elevenbigg#1{{\hbox{$\left#1\vbox to 15.95pt{}\right.\n@space$}}}
+\def\tenbigg#1{{\hbox{$\left#1\vbox to 14.5pt{}\right.\n@space$}}}
+\def\ninebigg#1{{\hbox{$\left#1\vbox to 13pt{}\right.\n@space$}}}
+\def\eightbigg#1{{\hbox{$\left#1\vbox to 11.6pt{}\right.\n@space$}}}
+\def\thirteenBigg#1{{\hbox{$\left#1\vbox to 22.75pt{}\right.\n@space$}}}
+\def\twelveBigg#1{{\hbox{$\left#1\vbox to 21pt{}\right.\n@space$}}}
+\def\elevenBigg#1{{\hbox{$\left#1\vbox to 19.25pt{}\right.\n@space$}}}
+\def\tenBigg#1{{\hbox{$\left#1\vbox to 17.5pt{}\right.\n@space$}}}
+\def\nineBigg#1{{\hbox{$\left#1\vbox to 15.75pt{}\right.\n@space$}}}
+\def\eightBigg#1{{\hbox{$\left#1\vbox to 14pt{}\right.\n@space$}}}
+%\def\twelvemedbig#1{{\hbox{$\textfont0=\frtnrm\textfont2=\frtnsy #1$}}}
+%\def\tenmedbig#1{{\hbox{$\textfont0=\elevenrm\textfont2=\elevensy #1$}}}
+%\def\ninemedbig#1{{\hbox{$\textfont0=\tenrm\textfont2=\tensy #1$}}}
+%\def\eightmedbig#1{{\hbox{$\textfont0=\ninerm\textfont2=\ninesy #1$}}}
+\def\medbigl{\mathopen\medbig}
+\def\medbigr{\mathclose\medbig}
+\def\medbigm{\mathrel\medbig}
+\def\meddbigl{\mathopen\meddbig}
+\def\meddbigr{\mathclose\meddbig}
+\def\meddbigm{\mathrel\meddbig}
+% The following are for slightly larger parentheses in text.
+\def\tenmedbigp#1{{\elevenrm(}#1{\elevenrm)}}
+\def\ninemedbigp#1{{\tenrm(}#1{\tenrm)}}
+\def\eightmedbigp#1{{\ninerm(}#1{\ninerm)}}
+\let\medbigp=\tenmedbigp  % default
+
+% Define parameters, the proper sizes over 10 for 10pt, to be multiplied by
+% the current relevant size.
+\newdimen\big@size
+\newdimen\Big@size
+\newdimen\bigg@size
+\newdimen\Bigg@size
+% The following are for CM fonts.
+\big@size=.85pt   
+\Big@size=1.15pt
+\bigg@size=1.45pt
+\Bigg@size=1.75pt
+
+\def\bBig@it#1#2{\hbox{$#1 \left#2\vbox to \dimen0 {}\right.\n@space$}}
+
+\def\make@big#1#2{{\dimen0=#1 \mathchoice 
+   {\multiply\dimen0 by \currenttextsize 
+   \bBig@it\displaystyle #2}
+   {\multiply\dimen0 by \currenttextsize 
+   \bBig@it\textstyle #2}
+   {\multiply\dimen0 by \currentscriptsize 
+   \bBig@it\scriptstyle #2}
+   {\multiply\dimen0 by \currentscriptscriptsize \scriptscriptstyle
+   \bBig@it\scriptstyle #2}}}
+   % Note that extra grouping is needed so that when TeX wants a delimiter,
+   % it will evaluate the whole group and won't first see the statement
+   % \dimen0=
+
+\def\big#1{\make@big\big@size{#1}}
+\def\Big#1{\make@big\Big@size{#1}}
+\def\bigg#1{\make@big\bigg@size{#1}}
+\def\Bigg#1{\make@big\Bigg@size{#1}}
+
+\def\vcenterbox#1#2{\vcenter{\hbox{$#1#2$}}}
+\def\onebig#1{{\mathpalette{\biggersize \vcenterbox}{#1}}}
+\def\onebigl{\mathopen\onebig}
+\def\onebigr{\mathclose\onebig}
+\def\onebigm{\mathrel\onebig}
+
+
+
+\def\spellnm#1{\ifcase#1 zero\or one\or two\or three\or four\or five\or
+   six\or seven\or eight\or nine\or ten\or eleven\or twelve\or thirteen\else
+   frtn\fi}
+\def\medbig#1{{\advance\currenttextsize by 1 \advance\currentscriptsize by 1
+   \advance\currentscriptscriptsize by 1
+   \def\currentrm{\csname \spellnm\currenttextsize rm\endcsname }
+   \def\currentsy{\csname \spellnm\currenttextsize sy\endcsname }
+   \def\currenteufm{\csname \spellnm\currenttextsize eufm\endcsname }
+   \def\currentscriptrm{\csname \spellnm\currentscriptsize rm\endcsname }
+   \def\currentscriptsy{\csname \spellnm\currentscriptsize sy\endcsname }
+   \def\currentscripteufm{\csname \spellnm\currentscriptsize eufm\endcsname }
+   \def\currentscriptscriptrm{\csname \spellnm\currentscriptscriptsize rm\endcsname }
+   \def\currentscriptscriptsy{\csname \spellnm\currentscriptscriptsize sy\endcsname }
+   \def\currentscriptscripteufm{\csname \spellnm\currentscriptscriptsize
+   eufm\endcsname }
+   \mathchoice
+      {\hbox{$\textfont0=\currentrm \textfont2=\currentsy
+      \textfont\eufmfam=\currenteufm #1$}}
+      {\hbox{$\textfont0=\currentrm \textfont2=\currentsy
+      \textfont\eufmfam=\currenteufm #1$}}
+      {\hbox{$\textfont0=\currentscriptrm
+        \textfont2=\currentscriptsy \textfont\eufmfam=\currentscripteufm #1$}}
+      {\hbox{$\textfont0=\currentscriptscriptrm
+        \textfont2=\currentscriptscriptsy
+        \textfont\eufmfam=\currentscriptscripteufm #1$}}
+        }}
+\def\meddbig#1{{\advance\currenttextsize by 2 \advance\currentscriptsize by 2
+   \advance\currentscriptscriptsize by 2
+   \def\currentrm{\csname \spellnm\currenttextsize rm\endcsname }
+   \def\currentsy{\csname \spellnm\currenttextsize sy\endcsname }
+   \def\currenteufm{\csname \spellnm\currenttextsize eufm\endcsname }
+   \def\currentscriptrm{\csname \spellnm\currentscriptsize rm\endcsname }
+   \def\currentscriptsy{\csname \spellnm\currentscriptsize sy\endcsname }
+   \def\currentscripteufm{\csname \spellnm\currentscriptsize eufm\endcsname }
+   \def\currentscriptscriptrm{\csname \spellnm\currentscriptscriptsize rm\endcsname }
+   \def\currentscriptscriptsy{\csname \spellnm\currentscriptscriptsize sy\endcsname }
+   \def\currentscriptscripteufm{\csname \spellnm\currentscriptscriptsize
+   eufm\endcsname }
+   \mathchoice
+      {\hbox{$\textfont0=\currentrm \textfont2=\currentsy
+      \textfont\eufmfam=\currenteufm #1$}}
+      {\hbox{$\textfont0=\currentrm \textfont2=\currentsy
+      \textfont\eufmfam=\currenteufm #1$}}
+      {\hbox{$\textfont0=\currentscriptrm
+        \textfont2=\currentscriptsy \textfont\eufmfam=\currentscripteufm #1$}}
+      {\hbox{$\textfont0=\currentscriptscriptrm
+        \textfont2=\currentscriptscriptsy
+        \textfont\eufmfam=\currentscriptscripteufm #1$}}
+        }}
+
+% The following will give superscripts that are too high, so are best not
+% used when scripts are used.  
+\def\vcenterbox#1#2{\vcenter{\hbox{$#1#2$}}}
+\def\medbig#1{{\mathpalette{\biggersize \vcenterbox}{#1}}}
+\def\meddbig#1{{\mathpalette{\Biggersize \vcenterbox}{#1}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%   Another font environment (for titles): fourteen-point bold.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\fourteenpointbold{\def\rm{\fam0\frtnb}%
+  \textfont0=\frtnb \scriptfont0=\tenbf \scriptscriptfont0=\sevenbf
+  \textfont1=\frtnbmi \scriptfont1=\tenbmi \scriptscriptfont1=\sevenbmi
+  \textfont2=\frtnbsy \scriptfont2=\tenbsy \scriptscriptfont2=\sevenbsy
+  \textfont3=\frtnex \scriptfont3=\tenex \scriptscriptfont3=\sevenex
+  \currenttextsize=14
+  \def\it{\fam\itfam\frtnbit}%
+  \textfont\itfam=\frtnbit
+  \def\sl{\fam\slfam\frtnbsl}%
+  \textfont\slfam=\frtnbsl
+  \def\bf{\fam\bffam\frtnrm}%   %% Since this environment is bf, \bf should
+                                %% be \rm.
+  \textfont\bffam=\frtnrm \scriptfont\bffam=\tenrm
+   \scriptscriptfont\bffam=\sevenrm
+  \def\tt{\fam\ttfam\frtntt}%
+  \textfont\ttfam=\frtntt
+  \tt \ttglue=.5em plus.25em minus.15em
+  \def\msb{\fam\msbfam \frtnmsb}%
+  \textfont\msbfam=\frtnmsb \scriptfont\msbfam=\tenmsb
+            \scriptscriptfont\msbfam=\sevenmsb
+  \normalbaselineskip=17pt
+  \multiply\normalbaselineskip by \baselineskipmultiplier
+  \let\sc=\frtnsc
+  \let\big=\frtnbig
+  \setbox\strutbox=\hbox{\vrule height11.9pt depth4.9pt width\z@}%
+  \normalbaselines\rm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%   Fourteen-point (mostly boldface) fonts
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\font\frtnb=cmbx12 scaled\magstep1
+\font\frtnbmi=cmmib10 scaled\magstep2
+\font\frtnbit=cmbxti10 scaled\magstep2
+\font\frtnbsl=cmbxsl10 scaled\magstep2
+\font\frtnbsy=cmbsy10 scaled\magstep2
+\font\frtnsy=cmsy10 scaled\magstep2
+\font\frtnrm=cmr12 scaled\magstep1
+\font\frtntt=cmtt10 scaled\magstep2
+\font\frtnsc=cmcsc10 scaled\magstep2
+\font\frtnex=cmex10 scaled\magstep2
+\font\frtnmsb=msbm10 scaled\magstep2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%   More boldface fonts
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\font\tenbmi=cmmib10
+\font\sevenbmi=cmmib7
+\font\tenbsy=cmbsy9
+\font\sevenbsy=cmbsy7
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%   New \footnote macro, called \ftnote, taken from TeXbook macros.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\newinsert\footins
+\def\ftnote#1{\edef\@sf{\spacefactor\the\spacefactor}#1\@sf
+      \insert\footins\bgroup\eightpoint
+      \interlinepenalty100 \let\par=\endgraf
+        \leftskip=\z@skip \rightskip=\z@skip
+        \splittopskip=10pt plus 1pt minus 1pt \floatingpenalty=20000
+        %\smallskip\item{#1}\bgroup\strut\aftergroup\@foot\let\next}
+        \smallskip #1 \bgroup\strut\aftergroup\@foot\let\next}
+\skip\footins=12pt plus 2pt minus 4pt % space added when footnote is present
+%\count\footins=1000 % footnote magnification factor (1 to 1)
+\dimen\footins=30pc % maximum footnotes per page
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%   Automatic footnote numbering to use with \ftnote.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcount\ftnoteno
+\def\Fnote{\global\advance\ftnoteno by 1 \ftnote{$^{\number\ftnoteno}$}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%   Use of \ftnote with an automatically numbered item.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\proclftnote#1#2 {\hskip-.7em\ftnote{{\rm #1}}{#2}\enspace}
+      %% For some reason, an extra space creeps in without gobbling it via
+      %the argument to the macro.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\input amssym.def \input amssym.tex        
+
+% Note that among other things, asmsym.def defines a macro \frak, which
+% selects a variable size Euler font. This is used as any other font
+% change.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Some big fonts.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\font\ig=cmr10 scaled\magstep2
+\font\igg=cmr10 scaled\magstep3
+\font\igb=cmbx12 scaled\magstep1
+\font\iggb=cmbx10 scaled \magstep3
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Construction for making sans serif math symbols.
+%% Use as \def\Prob{\mathss{Prob}}
+%% This is obsolete.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\font\ss=cmss10
+%\font\eightss=cmss8
+%%\font\sixss=cmss8.263   %at 8 truept
+%\font\sixss=cmss8 at 6pt
+%
+%\def\mathss#1{{\mathchoice{{\hbox{\ss #1}}}{{\hbox{\ss
+  %#1}}}{{\hbox{\eightss #1}}}{{\hbox{\sixss #1}}}}}
+\def\mathss#1{{\ss #1}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Here are some formatting macros.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\head#1#2{\headline{\eightpoint \ss \frenchspacing
+ {\ifnum\pageno=1 \underbar{\raise2pt \line {#1 \hfill #2}}\else\hfil \fi}}}
+
+\def\firstheader{\eightpoint\ss\underbar{\raise2pt\line 
+    {\hfil Version of \versiondate}}}
+
+\def\title#1{\centerline{\fourteenpointbold #1}}
+
+\def\author#1{\bigskip\centerline{\sc by #1}}
+
+\long\def\abstract#1{\vskip.6in\begingroup\ninepoint\narrower\narrower
+ \noindent{\bf Abstract.} #1\bigskip\endgroup}
+
+\def\bottomIII#1#2#3{{\eightpoint\parindent=0pt\parskip=2pt\footnote{}
+ {{\it 2010 Mathematics Subject Classification.}
+ #1}\footnote{}{{\it Key words and phrases.} #2}\footnote{}{#3}}}
+
+\def\bottomII#1#2#3{{\eightpoint\parindent=0pt\parskip=2pt\footnote{}
+ {{\it 2000 Mathematics Subject Classification.}
+ #1}\footnote{}{{\it Key words and phrases.} #2}\footnote{}{#3}}}
+
+\def\bottom#1#2#3{{\eightpoint\parindent=0pt\parskip=2pt\footnote{}
+ {{\it 1991 Mathematics Subject Classification.}
+ #1}\footnote{}{{\it Key words and phrases.} #2}\footnote{}{#3}}}
+
+\def\proclaimfont{\sc}
+\outer\def\proclaim #1. #2\par{\medbreak \noindent \begingroup
+ \proclaimfont #1. \endgroup
+ \begingroup\it #2\par \endgroup
+ \ifdim \lastskip <\medskipamount \removelastskip \penalty
+ 55\medskip \fi}  
+ % The \par must go inside the group or it will sometimes cause an extra
+ % skip at the top of a page.
+ % Note that \sc makes more space than \rm for the number.
+
+\def\msnote#1{\ifproofmode {\bf[** #1 **]}\else\relax\fi}
+\long\def\comment#1{\relax}
+
+\def\itemrm#1{\item{{\rm #1}}}
+\def\itemitemrm#1{\itemitem{{\rm #1}}}
+\def\beginitems{\begingroup\parindent=25pt}
+\def\enditems{\vskip0pt\endgroup\noindent}
+
+\def\beginbulletitems{\begingroup\parindent=25pt}
+\def\bullitem{\item{$\bullet$}}
+\def\endbulletitems{\smallbreak\endgroup}
+
+\def\beginbullets{\begingroup\everypar={$\bullet$\enspace}}
+\def\endbullets{\smallbreak\endgroup}
+
+\def\technical{\medbreak\begingroup\eightpoint\narrower\noindent}
+\def\endtechnical{\smallbreak\endgroup\noindent}
+
+\def\beginreferences{\vskip0pt plus.3\vsize \penalty -150 \vskip0pt
+ plus-.3\vsize \bigskip\bigskip \vskip \parskip
+ \begingroup\baselineskip=12pt\frenchspacing
+   \multiply\baselineskip by \baselineskipmultiplier
+   \centerline{\bf REFERENCES}
+   \vskip12pt\parindent=0pt
+   \def\and{{\rm and }}
+   \def\rrf##1 (##2){{\sc ##1}\ (##2).}
+   \everypar={\hangindent=.8cm\hangafter=1\rrf }}
+\def\endreferences{\bigskip\bigskip\endgroup}
+
+\def\ibid{{\vrule width 1.25cm height 0.33pt depth 0.33pt}} %Unused.
+\def\bib#1{[{\bf #1}]}  %%Unused.
+
+\def\myaddress{\hfill\hbox{\vbox{\hsize2.31in  %\eightpoint
+ \sc \parskip=0pt \baselineskip=12pt
+ \multiply\baselineskip by \baselineskipmultiplier
+Department of Mathematics\par
+831 E. 3rd St.\par
+Indiana University\par
+Bloomington, IN 47405-7106}}}
+
+\def\dfn#1{{\bfi #1\/}}   % font to use for defined terms
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Here are some abbreviations for common math items.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\proof{\medbreak\noindent{\it Proof.\enspace}}
+\def\qed{\hfill \vrule height7.5pt width4.17pt depth0pt}
+\def\Qed{\relax \ifmmode  \eqno \qed
+          \else \hglue3pt \qed \medbreak \fi} 
+     %% See p. 240 of the TeXBook for this use of \relax.
+\def\AQed{& \qed}  %% Aligned \qed for use in \eqalignno.
+%\def\Qed\relax\ifmmode \qquad \qed \else \hglue3pt \qed \medbreak \fi}
+           %% It is best not to use \Qed in mathmode so that it is right
+           %% justified.
+\long\def\remark{\noindent{\sc Remark.\enspace}}
+\long\def\Remark#1\par{\medbreak\remark #1 \medbreak}
+   %% To have more than one paragraph in a single remark, separate them
+   %% by \vskip\parskip instead of by blank lines.
+\def\example{\noindent{\sc Example:\enspace}}
+\outer\def\Example#1{\medbreak\example #1 \medbreak}
+\def\Question#1\par{\medbreak \noindent {\bf Question.} \enspace #1 \medbreak}
+\def\Conjecture#1\par{\medbreak \noindent {\bf Conjecture.} \enspace #1 \medbreak}
+\def\solution{\noindent{\sc Solution:\enspace}}
+\def\note{\noindent{\sc Note:\enspace}}
+\def\definition{\noindent{\sc Definition.\enspace}}
+\def\notation{\noindent{\sc Notation.\enspace}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Here are some symbols used in math.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\esssup{\mathop{\rm ess\, sup}}
+\def\essinf{\mathop{\rm ess\, inf}}
+\def\implies{\quad\Longrightarrow\quad}  % meant for displays
+\def\st{\, ; \;}  %% "such that" in sets
+\def\buldot{{\scriptscriptstyle\bullet}}  %% Bullet dot, a medium-size dot.
+\def\cbuldot{{\raise.25ex\hbox{$\scriptscriptstyle\bullet$}}}
+                                        %% Centered bullet dot.
+%[
+\def\OC#1{(#1]}        %% These allow for half-open intervals
+\def\CO#1{[#1)}        %% while not leaving unmatched parentheses.
+%]
+\def\all#1{\forall #1\enspace}
+\def\texists#1{\exists #1\enspace}
+\def\Var{{\rm Var}}
+\def\xor{\mathbin{\triangle}}  
+
+\def\I#1{{\bf 1}_{#1}}
+\def\II#1{\I{\{#1\}}}
+\def\III#1{\I{[#1]}}
+\def\N{{\Bbb N}}
+\def\Q{{\Bbb Q}}
+\def\R{{\Bbb R}}
+\def\C{{\Bbb C}}
+\def\Z{{\Bbb Z}}
+
+\def\CHI{\mathchoice%
+{\raise2pt\hbox{$\chi$}}%
+{\raise2pt\hbox{$\chi$}}%
+{\raise1.3pt\hbox{$\scriptstyle\chi$}}%
+{\raise0.8pt\hbox{$\scriptscriptstyle\chi$}}}   %% A raised \chi.
+
+\def\smalloplus{\raise1pt\hbox{$\,\scriptstyle \oplus\;$}}
+
+
+%%%%
+% proba symbols:
+
+\let\oldP=\P  % paragraph symbol
+\def\P{\mathop{\hbox{}{\bf P}}\nolimits\mathopen{}}
+\def\E{\mathop{\hbox{}{\bf E}}\nolimits\mathopen{}}
+%\def\P{\mathop{\kern0pt{\bf P}}\nolimits}
+%\def\E{\mathop{\kern0pt{\bf E}}\nolimits}
+% The above automatically solve spacing issues that the below encounter.
+% This is based on the spacing between math atoms, as explained in Chap. 18
+% of the TeXbook (chart on p. 170). If a \mathop consists of only one
+% character, then it gets lowered (Rule 13 of App. G; see
+% http://tex.stackexchange.com/questions/41261/mathop-shifts-the-baseline-declaremathoperator-doesnt/41267#41267
+% ), so we add a \kern0pt to prevent that. In fact, \hbox{} is better in
+% that it does not change the location of the superscript. I think this is
+% because of Rule 18a of App. G. If we used \smash, then an accent on top
+% (such as \tilde) would not be placed properly.
+%\def\P{{\bf P}}
+%\def\E{{\bf E}}
+
+\def\Psub_#1{\P_{\! #1}}
+\def\Pleft#1{\P\mkern-1mu\left[#1\right]}
+\def\Psubleft#1#2{\Psub_{#1}\mkern-1mu\left[#2\right]}
+\def\Pmedbig#1{\P\medbigl[#1\medbigr]}
+\def\Psubmedbig_#1#2{\Psub_{#1}\mkern-1mu\medbigl[#2\medbigr]}
+\def\Pmeddbig#1{\P\meddbigl[#1\meddbigr]}
+\def\Psubmeddbig_#1#2{\Psub_{#1}\mkern-1mu\meddbigl[#2\meddbigr]}
+\def\Pbig#1{\P\mkern-1.5mu\bigl[#1\bigr]}
+\def\Psubbig_#1#2{\Psub_{#1}\mkern-1.5mu\bigl[#2\bigr]}
+\def\Pbigg#1{\P\mkern-1.5mu\biggl[#1\biggr]}
+\def\Psubbigg_#1#2{\Psub_{#1}\mkern-1.5mu\biggl[#2\biggr]}
+\def\PBig#1{\P\mkern-.5mu\Bigl[#1\Bigr]}
+\def\Eleft#1{\E\mkern-2mu\left[#1\right]}
+\def\Esubleft#1#2{\E_{#1}\mkern-2mu\left[#2\right]}
+\def\Emedbig#1{\E\medbigl[#1\medbigr]}
+\def\Esubmedbig_#1#2{\E_{#1}\medbigl[#2\medbigr]}
+\def\Emeddbig#1{\E\meddbigl[#1\meddbigr]}
+\def\Esubmeddbig_#1#2{\E_{#1}\meddbigl[#2\meddbigr]}
+\def\Ebig#1{\E\mkern-1.5mu\bigl[#1\bigr]}
+\def\Esubbig_#1#2{\E_{#1}\mkern-1.5mu\bigl[#2\bigr]}
+\def\EsubBig_#1#2{\E_{#1}\mkern-1.5mu\Bigl[#2\Bigr]}
+\def\Esupbig^#1#2{\E^{#1}\mkern-1.5mu\bigl[#2\bigr]}
+\def\EsupBig^#1#2{\E^{#1}\mkern-1.5mu\Bigl[#2\Bigr]}
+\def\Ebigg#1{\E\mkern-1.5mu\biggl[#1\biggr]}
+\def\Esubbigg_#1#2{\E_{#1}\mkern-1.5mu\biggl[#2\biggr]}
+\def\EBig#1{\E\mkern-1.5mu\Bigl[#1\Bigr]}
+
+%%%%
+
+\def\Seq#1{\langle #1 \rangle}    %% For sequences.
+\def\Seqmedbig#1{\medbigl\langle #1 \medbigr\rangle}    %% For sequences.
+\def\Seqmeddbig#1{\meddbigl\langle #1 \meddbigr\rangle}    %% For sequences.
+\def\Seqbig#1{\bigl\langle #1 \bigr\rangle}    %% For sequences.
+\def\SeqBig#1{\Bigl\langle #1 \Bigr\rangle}    %% For sequences.
+\def\flr#1{\lfloor #1 \rfloor}   %% for integer part (floor).
+\def\ceil#1{\lceil #1 \rceil}   %% for ceiling.
+\def\restrict{\mathord{\upharpoonright}}   %% for restriction
+
+\def\hboxit#1{\leavevmode\hbox{\vrule\vtop{\vbox{\hrule\kern1pt
+      \hbox{\vphantom{\tt/}\thinspace\raise1pt\hbox{#1}\thinspace}}
+      \hrule}\vrule}} % modified from \cstok
+\def\vboxit#1{\leavevmode\hbox{\vrule\vtop{\vbox{\hrule\kern1pt
+      \hbox{\vphantom{\tt/}\thinspace\raise1pt\vbox{#1}\thinspace}}
+      \hrule}\vrule}} % modified from \cstok
+\def\thickboxit#1{\centerline
+ {\vbox{\hrule height5pt\kern-3pt\hbox{\vrule width5pt\kern-3pt
+ \vbox{\kern-3pt \vbox{#1}}\kern-3pt\vrule width5pt}\kern-3pt\hrule height5pt}}}
+\def\colorhrule{\Melon{\hrule height5pt}}
+\def\colorvrule{\Melon{\vrule width5pt}}
+\def\colorthickboxit#1{\centerline
+ {\vbox{\colorhrule \kern-3pt\hbox{\colorvrule \kern-3pt
+ \vbox{\kern-3pt \vbox{#1}}\kern-3pt\colorvrule}\kern-3pt\colorhrule}}}
+
+\def\switchemptyset{\let\@ldemptyset=\emptyset \let\@ldvarnothing=\varnothing
+                    \let\emptyset=\@ldvarnothing \let\varnothing=\@ldemptyset}
+\switchemptyset  %% This is the usual preference.
+\def\switchphi{\let\@ldphi=\phi \let\@ldvarphi=\varphi
+               \let\phi=\@ldvarphi \let\varphi=\@ldphi}
+
+\def\signum{\mathop{\rm sgn}}
+\def\compl{^{\rm c}}  % complement
+
+% The following centers : in mathmode by making : active in mathmode.
+\mathchardef\ordinarycolon\mathcode`\:
+\mathcode`\:=\string"8000
+\begingroup \catcode`\:=\active
+  \gdef:{\mathrel{\mathop\ordinarycolon}}
+\endgroup
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Some math tweaks.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% for displayed fractions in text, the normal size is too small and the
+% display size is too large; use as \textfrac#1#2 for {#1 \over #2}
+
+\def\bottomstrut{\vrule height2.5pt depth2.5pt width0pt}%
+\def\topstrut{\vrule height7.5pt depth0.5pt width0pt}%
+\def\textfrac#1#2{\hbox{\smallersize {$\textstyle \bottomstrut #1 \over
+      \topstrut \textstyle #2 $}}}
+
+% to have slanted fractions in text, use this from the TeXBook:
+
+\def\slantfrac#1#2{\leavevmode\kern.1em
+  \raise.5ex\hbox{\the\scriptfont0 #1}\kern-.1em
+  /\kern-.15em\lower.25ex\hbox{\the\scriptfont0 #2}}
+
+% in math, use this:
+
+\def\slantmathfrac#1#2{\kern.1em
+  \raise.5ex\hbox{$\scriptstyle #1$}\kern-.1em
+  /\kern-.1em\lower.5ex\hbox{$\scriptstyle #2$}}
+
+% Sometimes the sqrt is too large; the following is adjustable.
+% Use as \sqrt{\updown{8}{3}{stuff}}
+
+\def\updown#1#2#3{\vrule width0pt height #1 pt depth #2 pt \smash{#3}}
+
+% \overline that takes into account the slant:
+% (The accents package for LaTeX does this and somewhat more, it seems.)
+% From the TeXbook, p. 375:
+{\catcode`p=12 \catcode`t=12 \gdef\\#1pt{#1}}
+\let\getfactor=\\
+\def\kslant#1{\kern\expandafter\getfactor\the\fontdimen1#1\ht0}
+\def\kmslant#1{\kern-\expandafter\getfactor\the\fontdimen1#1\ht0}
+\def\semikslant#1{\ht0=.5\ht0 \kern\expandafter\getfactor\the\fontdimen1#1\ht0 \ht0=2\ht0}
+\def\semikmslant#1{\ht0=.5\ht0 \kern-\expandafter\getfactor\the\fontdimen1#1\ht0 \ht0=2\ht0}
+%
+% Inspired by the TeXbook, p. 359 on \skew:
+\def\overlinesl#1{\mathchoice
+   {\setbox0=\hbox{$\displaystyle #1$}\kslant{\textfont1}%
+   \displaystyle\overline{\kmslant{\textfont1}\box0}}
+   {\setbox0=\hbox{$\textstyle #1$}\kslant{\textfont1}%
+   \textstyle\overline{\kmslant{\textfont1}\box0}}
+   {\setbox0=\hbox{$\scriptstyle #1$}\kslant{\textfont1}%
+   \scriptstyle\overline{\kmslant{\textfont1}\box0\kern-\scriptspace}}
+   {\setbox0=\hbox{$\scriptscriptstyle #1$}\kslant{\textfont1}%
+   \scriptscriptstyle\overline{\kmslant{\textfont1}\box0\kern-\scriptspace}}}
+         % I don't know why using \kslant{\scriptfont1} does not work.
+% The following corrects it by only half the amount.
+\def\overlinesemisl#1{\mathchoice
+   {\setbox0=\hbox{$\displaystyle #1$}\semikslant{\textfont1}%
+   \displaystyle\overline{\semikmslant{\textfont1}\box0}}
+   {\setbox0=\hbox{$\textstyle #1$}\semikslant{\textfont1}%
+   \textstyle\overline{\semikmslant{\textfont1}\box0}}
+   {\setbox0=\hbox{$\scriptstyle #1$}\semikslant{\textfont1}%
+   \scriptstyle\overline{\semikmslant{\textfont1}\box0\kern-\scriptspace}}
+   {\setbox0=\hbox{$\scriptscriptstyle #1$}\semikslant{\textfont1}%
+   \scriptscriptstyle\overline{\semikmslant{\textfont1}\box0\kern-\scriptspace}}}
+% Same for underline:
+\def\underlinesl#1{\mathchoice
+   {\setbox0=\hbox{$\displaystyle #1$}%
+   \displaystyle\underline{\copy0\kmslant{\textfont1}}\kslant{\textfont1}}
+   {\setbox0=\hbox{$\textstyle #1$}%
+   \textstyle\underline{\copy0\kmslant{\textfont1}}\kslant{\textfont1}}
+   {\setbox0=\hbox{$\scriptstyle #1$}%
+   \scriptstyle\underline
+      {\copy0\kmslant{\textfont1}\kern-\scriptspace}\kslant{\textfont1}}
+   {\setbox0=\hbox{$\scriptscriptstyle #1$}%
+   \scriptscriptstyle\underline
+      {\copy0\kmslant{\textfont1}\kern-\scriptspace}\kslant{\textfont1}}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Fill out a line that is too small or too big via scaling in pdf:
+% Use as \pdfjustifyline{the material of the line}.
+% For a display, \pdfjustifyline{$\displaystyle the material of the line$}.
+% This works only with dvipdfmx.
+
+\newcount\scalecount
+\def\scale#1#2#3{{\setbox0
+   =\hbox{\special{pdf: bt xscale #1 yscale #2 }#3\special{pdf:
+   et}}\wd0=#1\wd0 \ht0=#2\ht0 \dp0=#2\dp0 \box0 }}
+\def\pdfjustifyline#1{\setbox0=\hbox{#1}\quotient{\hsize}{\wd0}%
+   \line{\specialscale{\box0}}}
+% It seems to work only if I put in a \number in the \special or two
+% \number's with explicit decimal points.
+\def\specialscale#1{\special{pdf: bt xscale \number\scalecount 
+   }\special{pdf: bt xscale .001 }#1\special{pdf: et }\special{pdf: et }}
+\def\quotient#1#2{\dimen1=#1 \dimen2=#2 \count1=\dimen1 \count2=\dimen2
+    \scalecount=\count1 
+    \divide\count2 by 1000
+    \divide\scalecount by \count2 }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%  Restore the catcode value for @ that was previously saved.
+\catcode`\@=\csname saveatsymbolcode\endcsname

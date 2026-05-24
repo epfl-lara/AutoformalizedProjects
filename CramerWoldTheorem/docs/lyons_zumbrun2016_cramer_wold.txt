@@ -1,0 +1,227 @@
+                                                                                                                                Version of 22 April 2017
+
+
+
+
+                                                    A Calculus Proof of the Cramér–Wold Theorem
+
+                                                                       by Russell Lyons and Kevin Zumbrun
+
+
+
+
+arXiv:1607.03206v2 [math.PR] 24 Apr 2017
+                                                     Abstract. We present a short, elementary proof not involving Fourier transforms
+                                                     of the theorem of Cramér and Wold that a Borel probability measure is determined
+                                                     by its values on half-spaces.
+
+
+
+
+                                                                                     §1. Introduction.
+                                                In this note, we give a brief and elementary proof, not involving Fourier transforms, of a
+                                           theorem of Cramér and Wold.
+                                                The fundamental theorem of Cramér and Wold (1936) states that a Borel probability
+                                           measure on Euclidean space is determined by the values it assigns to all half-spaces (equivalently,
+                                           by its projections to lines through the origin). This theorem is proved easily with the aid of
+                                           Fourier analysis. However, generations of probabilists have learned from the editions of the
+                                           textbook of Billingsley (1995) that despite the elementary statement of the theorem, no proof
+                                           was known that did not use Fourier transforms. That changed with the publication of Walther
+                                           (1997), who used Gaussians. Walther’s proof depends on a nice idea, but its implementation
+                                           uses 1 12 pages of calculations. See Section 8.7 of Pollard (2002) for another presentation of
+                                           Walther’s proof. By contrast, our proof uses only natural constructions and avoids calculations.
+                                                A brief and somewhat inaccurate outline of our proof is the following. Using Crofton’s
+                                           measure on half-spaces, we show that knowledge of µ(S) for all half-spaces S determines the
+                                           µ-average distance fµ (x) to every point, x. We then show that a suitable power of the Laplacian
+                                           applied to fµ yields a constant times µ. Thus, integral geometry combined with differentiation
+                                           recovers µ.
+
+
+
+
+                                           2000 Mathematics Subject Classification. Primary 60E10. Secondary 44A12, 53C65.
+                                           Key words and phrases. Distributions of probability measures, Radon transform, integral geometry.
+                                           Research partially supported by NSF grants DMS-1007244 and DMS-1400555.
+
+                                                                                                1
+                                             §2. Proof.
+       Let S be the set of closed half-spaces S ⊂ Rn .
+
+The Cramér–Wold Theorem. Let µ and ν be Borel probability measures on Rn such that
+µ(S) = ν(S) for all S ∈ S . Then µ = ν.
+
+Proof. Let σ be the (infinite) Borel measure on S that is invariant under isometries, normalized
+so that
+                                                     
+                                     σ {0 ∈ S, x ∈
+                                                 / S} = kxk/2                               (2.1)
+
+for kxk = 1. The measure σ goes back to Crofton (1868) (in two dimensions); it can be
+constructed as follows. (See Theorem 5.1.1 of Schneider and Weil (2008) for a generalization.)
+Let Ωn−1 denote hypersurface area measure on the unit sphere Sn−1 ⊂ Rn , and let λ denote
+Lebesgue measure on R. Write ϕ: Sn−1 × R → S for the map
+
+                                 ϕ(ω, p) := x ∈ Rn ; hω, xi ≥ p .
+                                           
+
+
+Then σ := αn · ϕ∗ (Ωn−1 × λ) for some constant αn whose value does not concern us. It is clear
+that σ is invariant under rotations about the origin and under reflections in hyperplanes that
+pass through the origin. Translation invariance amounts to the property that for y ∈ Rn , the
+pushforward by ϕy (ω, p) := ϕ(ω, p) − y is the same measure. But since
+
+               ϕ(ω, p) − y = x − y ∈ Rn ; hω, xi ≥ p = x ∈ Rn ; hω, x + yi ≥ p
+                                                        
+
+                           = x ∈ Rn ; hω, xi ≥ p − hω, yi = ϕ ω, p − hω, yi ,
+                                                                          
+
+
+isometry invariance of λ gives this property. The isometry invariance of σ implies that σ {0 ∈
+         
+S, x ∈
+     / S} is a function of kxk alone; additivity for collinear segments shows that it is a linear
+function. Thus, we may choose αn so that (2.1) holds.
+       From (2.1) and isometry invariance, we have
+                                      Z
+                                kxk =     |1S (0) − 1S (x)|2 dσ(S) .
+                                         S
+
+
+Integrating with respect to a signed measure µ on Rn with compact support, we obtain
+ Z                Z Z                                    Z h                       i
+                                          2
+                                                                            
+     kxk dµ(x) =         |1S (0) − 1S (x)| dµ(x) dσ(S) =    1S (0) 1 − 2µ(S) + µ(S) dσ(S) .
+  Rn                 S   Rn                                  S
+
+
+The choice of 0 was arbitrary, so making another choice and subtracting, we get
+            Z                            Z h
+                                                                     i
+                 ky − xk − kxk dµ(x) =        1S (y) − 1S (0) 1 − 2µ(S) dσ(S) .
+                Rn                            S
+
+
+By taking a limit, we see that this equation holds for every finite signed measure, µ.
+
+                                                  2
+    Define                                   Z
+                                                                   
+                                 fµ (y) :=            ky − xk − kxk dµ(x) .
+                                                 Rn
+We have shown that the function S 7→ µ(S) determines fµ . It remains to show that fµ
+determines µ.
+    The idea is that if n = 2m − 1 is odd, then ∆m fµ = cm µ for some constant cm , using the
+fundamental solution of the Laplacian, ∆. This then establishes the Cramér–Wold theorem
+in odd dimensions. But since an even dimension embeds in the next higher dimension, the
+Cramér–Wold theorem follows in even dimensions as well. That is, we may identify a measure
+µ on R2m with a measure µ′ on R2m × {0} ⊂ R2m+1 . The function S 7→ µ(S) on half-spaces
+S ⊂ R2m determines the values µ′ (S ′ ) for half-spaces S ′ ⊂ R2m+1 . Since this determines µ′ ,
+the theorem follows for µ.
+    We now show that ∆m fµ = cm µ in an appropriate sense for µ on R2m−1 . Recall Green’s
+second identity, which says that for a bounded domain D ⊂ Rn with C 1 boundary ∂D having
+outward unit normal n and two functions φ, ψ ∈ C 2 (D ), we have
+                        Z                   Z
+                           (φ∆ψ − ψ∆φ) =        (φ∇n ψ − ψ∇n φ) .
+                             D                            ∂D
+
+Recall also that if F : Rn → R is such that F (x) = G kxk depends only on r := kxk, then
+                                                         
+
+                                                                n−1 ′
+                                   (∆F )(x) = G′′ (r) +            G (r) .
+                                                                 r
+In particular, ∆r k = k(k + n − 2)r k−2 . If the support of ψ lies in the interior of a ball B(0, R)
+and φ(x) = r k with k > −n + 2, then letting D be B(0, R) \ B(0, ǫ) with ǫ → 0 shows that
+R           R                                        R
+  R n φ∆ψ =  R n ψ∆φ. Similarly, if k = −n + 2, then  Rn φ∆ψ = βn−1 ψ(0), where βn−1 is the
+surface area of Sn−1 .
+    To show that fµ determines g dµ for all g ∈ Cc∞ (R2m−1 ), we now prove that with
+                                 R
+
+cm := 2(−2π)m−1 (2m − 2)!!, where !! denotes the double factorial, we have
+                       Z              Z
+                                   −1
+                           g dµ = cm          fµ (y)(∆m g)(y) dλ(y) ,
+                                                  R2m−1
+
+where now λ denotes Lebesgue measure on R2m−1 . Fubini’s theorem yields
+    Z                             Z     Z
+                   m
+                                                ky − xk − kxk (∆m g)(y) dλ(y) dµ(x) .
+                                                              
+           fµ (y)(∆ g)(y) dλ(y) =
+      R2m−1                                  R2m−1     R2m−1
+
+Applying the preceding Green formulas (translated to x) repeatedly to the inner integral, we
+obtain
+     Z                                                    Z
+                 ky − xk − kxk (∆m g)(y) dλ(y) =                      ∆m−1
+                                                                                       
+                                                                       y   ky − xk − kxk ∆g(y) dλ(y)
+         R2m−1                                                R2m−1
+                                                       = cm g(x) ,
+
+as desired.
+
+                                                          3
+    Our inversion formula µ = c−1 m
+                               m ∆ fµ in R
+                                          2m−1
+                                               is similar to a well-known inversion formula
+for the Radon transform due to Radon (1917) and John (1955), p. 13: If f ∈ Cc1 (Rn ), then
+                  R
+writing J(ω, p) := hω,xi=p f (x) dx for the integral of f on a hyperplane perpendicular to ω ∈
+Sn−1 , we have
+                    (1        1−n
+                              (−∆x )(n−1)/2 Sn−1 J(ω, hω, xi) dΩn−1 (ω)
+                                            R
+                     2 (2π)                                               if n is odd
+          f (x) =                               R dJ(ω,p)
+                     −(2π)−n (−∆x )(n−2)/2 Sn−1 R p−hω,xi
+                                           R
+                                                           dΩn−1 (ω)      if n is even.
+Apparently it was not realized until pointed out by Rényi (1952) that the theorem of Cramér
+and Wold (1936) generalized the injectivity results of Radon, John, and others.
+                                    R
+    The injectivity of the map µ 7→ Rn kxk dµ(x) for probability measures µ with finite first
+moment holds in other spaces as well. On metric spaces of negative type, it is equivalent to
+strong negative type. See Remark 3.4 of Lyons (2013) for details and references. That paper
+also shows its relevance to statistics.
+
+
+                                          REFERENCES
+
+Billingsley, P. (1995). Probability and Measure. Wiley Series in Probability and Mathemat-
+     ical Statistics. John Wiley, New York, third edition.
+Cramér, H. and Wold, H. (1936). Some theorems on distribution functions. Journal of the
+     London Mathematical Society, s1–11(4), 290–294.
+Crofton, M.W. (1868). On the theory of local probability, applied to straight lines drawn
+     at random in a plane; the methods used being also extended to the proof of certain new
+     theorems in the integral calculus. Philos. Trans. Royal Soc. London, 158, 181–199.
+John, F. (1955). Plane Waves and Spherical Means Applied to Partial Differential Equations.
+     Interscience Publishers, New York-London.
+Lyons, R. (2013). Distance covariance in metric spaces. Ann. Probab., 41(5), 3284–3305.
+Pollard, D. (2002). A User’s Guide to Measure Theoretic Probability, volume 8 of Cam-
+     bridge Series in Statistical and Probabilistic Mathematics. Cambridge University Press,
+     Cambridge.
+Radon, J. (1917). Über die Bestimmung von Funktionen durch ihre Integralwerte längs
+     gewisser Mannigfaltigkeiten. Ber. Verh. Sächs. Akad. Wiss. Leipzig, Math. Nat. kl., 69,
+     262–277.
+Rényi, A. (1952). On projections of probability distributions. Acta Math. Sci. Hungar., 3,
+     131–142.
+Schneider, R. and Weil, W. (2008). Stochastic and Integral Geometry. Probability and its
+     Applications (New York). Springer-Verlag, Berlin.
+Walther, G. (1997). On a conjecture concerning a theorem of Cramér and Wold. J. Multi-
+     variate Anal., 63(2), 313–319. Addendum, J. Multivariate Anal. 67(2) (1998), 431.
+
+Department of Mathematics, 831 E. 3rd St., Indiana University, Bloomington, IN 47405-7106
+rdlyons@indiana.edu
+http://pages.iu.edu/~rdlyons/
+kzumbrun@indiana.edu
+http://pages.iu.edu/~kzumbrun/
+
+
+                                               4
+
