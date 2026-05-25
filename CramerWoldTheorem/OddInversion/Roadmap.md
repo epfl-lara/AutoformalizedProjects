@@ -22,15 +22,16 @@ The paper writes odd dimensions as `d = 2q - 1` and proves
 The Lean theorem writes odd dimensions as `d = 2m + 1`, so `q = m + 1`.  Any
 formal Laplacian recovery lemma should therefore use `Δ^(m + 1)`, not `Δ^m`.
 
-## Proposed Lean Decomposition
+## Completed Lean Decomposition
 
-1. Pure Fourier/Riesz multiplier blocker:
+1. Pure Fourier/Riesz multiplier theorem:
 
    ```lean
    normKernel_fourier_multiplier_power_eq_constDistribution
    ```
 
-   This is now the only `sorry` in `Target.lean`.  It states that
+   This is now proved from the completed fundamental-solution identity.  It
+   states that
    `(‖ξ‖²)^(m+1) • 𝓕(‖x‖)` is a nonzero constant distribution.
 
 2. Origin radial fundamental-solution wrapper:
@@ -39,7 +40,7 @@ formal Laplacian recovery lemma should therefore use `Δ^(m + 1)`, not `Δ^m`.
    norm_iterated_laplacian_pairing_at_zero
    ```
 
-   This is now a proved wrapper from the Fourier/Riesz multiplier identity:
+   This is a proved wrapper from the Fourier/Riesz multiplier identity:
    pairing `y ↦ ‖y‖` with `Δ^(m+1) φ` recovers a nonzero constant multiple of
    `φ 0`.
 
@@ -142,6 +143,12 @@ helpers, but the advisor again found no current Mathlib route to the radial
 Riesz/fundamental-solution identity.  Re-running broad search on this target is
 unlikely to help until the norm distribution and its Laplacian identity are
 formalized.
+
+The blocker was closed by adding the missing infrastructure in
+`PhysLeanBridge.lean`, `Transport.lean`, and `FundamentalSolution.lean`: a real
+distributional radial-power Laplacian route through PhysLean, complexification
+to Mathlib tempered distributions, and transport from `Physlib.Space` to
+`OddSpace`.
 
 `prove-20260524T153407Z` timed out on the isolated Fourier/Riesz target after
 searching Mathlib and the local project.  It did not find a packaged Fourier

@@ -1,4 +1,4 @@
-import CramerWoldTheorem.Basic
+import OddInversion.FundamentalSolution
 
 /-!
 Proof-focused subproject for replacing
@@ -6,7 +6,7 @@ Proof-focused subproject for replacing
 
 This file is intentionally not imported by `CramerWoldTheorem.Main`.  It gives a
 small proof queue for the odd-dimensional inversion fact without adding another
-axiom to the main development.
+unproved constant to the main development.
 -/
 
 open MeasureTheory
@@ -15,18 +15,6 @@ open scoped BigOperators ENNReal FourierTransform Laplacian LineDeriv SchwartzMa
 noncomputable section
 
 namespace CramerWoldTheorem.OddInversion
-
-/-- The positive odd Euclidean space used by the current `Inversion.lean` axiom. -/
-abbrev OddSpace (m : ℕ) := RealEuclideanSpace (2 * m + 1)
-
-/--
-The centered distance kernel whose `μ`-integral is `averageDistance μ y`.
-
-For source dimension `d = 2 * q - 1`, the paper applies `Δ ^ q`.  In this
-Lean reindexing `d = 2 * m + 1`, so the expected recovery power is `m + 1`.
--/
-def centeredDistanceKernel (m : ℕ) (x y : OddSpace m) : ℝ :=
-  dist y x - dist (0 : OddSpace m) x
 
 /-- Definitional rewrite exposing `averageDistance` as the centered-distance kernel integral. -/
 private theorem averageDistance_eq_integral_centeredDistanceKernel
@@ -91,62 +79,6 @@ private lemma schwartz_integral_mul_iterated_laplacian_comm
               ((Laplacian.laplacian^[Nat.succ k]) φ) y * ψ y := by
                 simp [Function.iterate_succ_apply]
 
-/-- Basic integrability of the distance kernel against a Schwartz test function. -/
-private lemma dist_mul_schwartz_integrable
-    (m : ℕ) (x : OddSpace m) (ψ : 𝓢(OddSpace m, ℂ)) :
-    Integrable (fun y : OddSpace m => (dist y x : ℂ) * ψ y) := by
-  have hpow : Integrable (fun y : OddSpace m => ‖y‖ ^ (1 : ℕ) * ‖ψ y‖) := by
-    simpa using (SchwartzMap.integrable_pow_mul volume ψ 1)
-  have hlin : Integrable (fun y : OddSpace m => ‖y‖ * ‖ψ y‖) := by
-    simpa using hpow
-  have hnormψ : Integrable (fun y : OddSpace m => ‖ψ y‖) := by
-    simpa using (SchwartzMap.integrable (μ := volume) ψ).norm
-  have hconst : Integrable (fun y : OddSpace m => ‖x‖ * ‖ψ y‖) := by
-    simpa using hnormψ.const_mul ‖x‖
-  have hdom : Integrable (fun y : OddSpace m => (‖y‖ + ‖x‖) * ‖ψ y‖) := by
-    simpa [add_mul] using hlin.add hconst
-  refine hdom.mono' ?_ ?_
-  · have hcont : Continuous (fun y : OddSpace m => (dist y x : ℂ) * ψ y) := by
-      fun_prop
-    exact hcont.aestronglyMeasurable
-  · filter_upwards with y
-    have hdist : dist y x ≤ ‖y‖ + ‖x‖ := by
-      calc
-        dist y x = ‖y - x‖ := dist_eq_norm y x
-        _ ≤ ‖y‖ + ‖x‖ := by
-          simpa [sub_eq_add_neg, norm_neg, add_comm, add_left_comm, add_assoc] using
-            (norm_add_le y (-x))
-    have hcast : ‖(dist y x : ℂ)‖ = dist y x := by
-      simp [Real.norm_eq_abs, abs_of_nonneg dist_nonneg]
-    calc
-      ‖(dist y x : ℂ) * ψ y‖ = ‖(dist y x : ℂ)‖ * ‖ψ y‖ := by
-        exact norm_mul _ _
-      _ = dist y x * ‖ψ y‖ := by
-        rw [hcast]
-      _ ≤ (‖y‖ + ‖x‖) * ‖ψ y‖ := by
-        exact mul_le_mul_of_nonneg_right hdist (norm_nonneg (ψ y))
-
-/-- The actual distance-kernel integrand in the target theorem is integrable. -/
-private lemma dist_mul_iterated_laplacian_integrable
-    (m : ℕ) (x : OddSpace m) (φ : 𝓢(OddSpace m, ℂ)) :
-    Integrable (fun y : OddSpace m =>
-      (dist y x : ℂ) * ((Laplacian.laplacian^[m + 1]) φ) y) := by
-  exact dist_mul_schwartz_integrable m x ((Laplacian.laplacian^[m + 1]) φ)
-
-/-- Specialization of the distance-kernel integrability bound to the origin. -/
-private lemma norm_mul_schwartz_integrable
-    (m : ℕ) (ψ : 𝓢(OddSpace m, ℂ)) :
-    Integrable (fun y : OddSpace m => (‖y‖ : ℂ) * ψ y) := by
-  simpa [dist_eq_norm] using
-    (dist_mul_schwartz_integrable m (0 : OddSpace m) ψ)
-
-/-- The norm-kernel integrand in the origin theorem is integrable. -/
-private lemma norm_mul_iterated_laplacian_integrable
-    (m : ℕ) (φ : 𝓢(OddSpace m, ℂ)) :
-    Integrable (fun y : OddSpace m =>
-      (‖y‖ : ℂ) * ((Laplacian.laplacian^[m + 1]) φ) y) := by
-  exact norm_mul_schwartz_integrable m ((Laplacian.laplacian^[m + 1]) φ)
-
 /-- Iterating the distributional Laplacian amounts to moving the same iterate to
 Schwartz test functions. -/
 private lemma temperedDistribution_iterated_laplacian_apply_apply
@@ -167,88 +99,6 @@ private lemma temperedDistribution_iterated_laplacian_apply_apply
                 exact ih T (Laplacian.laplacian φ)
         _ = T ((Laplacian.laplacian^[Nat.succ k]) φ) := by
                 simp [Function.iterate_succ_apply]
-
-/-- The norm kernel `φ ↦ ∫ y, ‖y‖ * φ y` as a tempered distribution. -/
-private noncomputable def normKernelDistributionAtZero
-    (m : ℕ) : 𝓢'(OddSpace m, ℂ) := by
-  let μ : Measure (OddSpace m) := volume
-  let K : ℕ := μ.integrablePower
-  let S : Finset (ℕ × ℕ) := Finset.Iic (K + 1, 0)
-  let C : ℝ :=
-    2 ^ μ.integrablePower *
-      (∫ x : OddSpace m, (1 + ‖x‖) ^ (-(μ.integrablePower : ℝ)) ∂μ) *
-        (2 * 2 ^ (K + 1))
-  refine ContinuousLinearMap.toPointwiseConvergenceCLM ℂ (RingHom.id ℂ) _ _ ?_
-  refine SchwartzMap.mkCLMtoNormedSpace
-    (𝕜 := ℂ) (𝕜' := ℂ) (D := OddSpace m) (E := ℂ) (G := ℂ)
-    (σ := RingHom.id ℂ)
-    (fun φ : 𝓢(OddSpace m, ℂ) => ∫ y : OddSpace m, (‖y‖ : ℂ) * φ y) ?_ ?_ ?_
-  · intro φ ψ
-    calc
-      ∫ y : OddSpace m, (‖y‖ : ℂ) * (φ + ψ) y
-          = ∫ y : OddSpace m, (‖y‖ : ℂ) * φ y + (‖y‖ : ℂ) * ψ y := by
-              refine integral_congr_ae ?_
-              filter_upwards with y
-              simp [mul_add]
-      _ = (∫ y : OddSpace m, (‖y‖ : ℂ) * φ y) +
-            ∫ y : OddSpace m, (‖y‖ : ℂ) * ψ y := by
-              exact integral_add (norm_mul_schwartz_integrable m φ)
-                (norm_mul_schwartz_integrable m ψ)
-  · intro a φ
-    calc
-      ∫ y : OddSpace m, (‖y‖ : ℂ) * (a • φ) y
-          = ∫ y : OddSpace m, a • ((‖y‖ : ℂ) * φ y) := by
-              refine integral_congr_ae ?_
-              filter_upwards with y
-              simp [mul_left_comm]
-      _ = a • ∫ y : OddSpace m, (‖y‖ : ℂ) * φ y := by
-              exact integral_smul a (fun y : OddSpace m => (‖y‖ : ℂ) * φ y)
-  · refine ⟨S, C, ?_, ?_⟩
-    · dsimp [C]
-      positivity
-    · intro φ
-      let B : ℝ := S.sup (schwartzSeminormFamily ℂ (OddSpace m) ℂ) φ
-      have hC₁ : ∀ x : OddSpace m, ‖φ x‖ ≤ 2 ^ (K + 1) * B := by
-        intro x
-        have h := SchwartzMap.one_add_le_sup_seminorm_apply (𝕜 := ℂ) (m := (K + 1, 0))
-          (k := 0) (n := 0) (by omega) (by omega) φ x
-        simpa [S, B] using h
-      have hC₂ : ∀ x : OddSpace m,
-          ‖x‖ ^ (1 + μ.integrablePower) * ‖φ x‖ ≤ 2 ^ (K + 1) * B := by
-        intro x
-        have hpow : ‖x‖ ^ (K + 1) * ‖φ x‖ ≤ 2 ^ (K + 1) * B := by
-          have h := SchwartzMap.one_add_le_sup_seminorm_apply (𝕜 := ℂ) (m := (K + 1, 0))
-            (k := K + 1) (n := 0) (by omega) (by omega) φ x
-          have hle : ‖x‖ ^ (K + 1) * ‖φ x‖ ≤
-              (1 + ‖x‖) ^ (K + 1) * ‖φ x‖ := by
-            gcongr
-            exact le_add_of_nonneg_left zero_le_one
-          exact hle.trans (by simpa [S, B] using h)
-        simpa [K, Nat.add_comm, Nat.add_left_comm, Nat.add_assoc] using hpow
-      calc
-        ‖∫ y : OddSpace m, (‖y‖ : ℂ) * φ y‖
-            ≤ ∫ y : OddSpace m, ‖(‖y‖ : ℂ) * φ y‖ :=
-              norm_integral_le_integral_norm (fun y : OddSpace m => (‖y‖ : ℂ) * φ y)
-        _ = ∫ y : OddSpace m, ‖y‖ ^ (1 : ℕ) * ‖φ y‖ := by
-              refine integral_congr_ae ?_
-              filter_upwards with y
-              simp
-        _ ≤ 2 ^ μ.integrablePower *
-              (∫ x : OddSpace m, (1 + ‖x‖) ^ (-(μ.integrablePower : ℝ)) ∂μ) *
-                ((2 ^ (K + 1) * B) + (2 ^ (K + 1) * B)) := by
-              exact integral_pow_mul_le_of_le_of_pow_mul_le (μ := μ) (k := 1)
-                hC₁ hC₂
-        _ ≤ C * S.sup (schwartzSeminormFamily ℂ (OddSpace m) ℂ) φ := by
-              dsimp [C, B]
-              ring_nf
-              exact le_rfl
-
-private theorem normKernelDistributionAtZero_apply
-    (m : ℕ) (φ : 𝓢(OddSpace m, ℂ)) :
-    normKernelDistributionAtZero m φ =
-      ∫ y : OddSpace m, (‖y‖ : ℂ) * φ y := by
-  simp only [normKernelDistributionAtZero, ContinuousLinearMap.toPointwiseConvergenceCLM_apply]
-  rfl
 
 /--
 If the norm-kernel distribution has the expected iterated-Laplacian identity,
@@ -316,97 +166,6 @@ private theorem norm_iterated_laplacian_pairing_at_zero_of_fourier_laplacian_ide
               TemperedDistribution.fourier_delta_zero]
     _ = c • TemperedDistribution.delta (0 : OddSpace m) := by
             rw [FourierTransform.fourierInv_fourier_eq]
-
-/-- Fourier-side multiplication by `‖ξ‖²` on tempered distributions. -/
-private noncomputable def fourierNormSqMultiplier
-    (m : ℕ) : 𝓢'(OddSpace m, ℂ) →L[ℂ] 𝓢'(OddSpace m, ℂ) :=
-  TemperedDistribution.smulLeftCLM ℂ
-    (fun ξ : OddSpace m => Complex.ofReal (‖ξ‖ ^ 2))
-
-/-- A single distributional Laplacian becomes multiplication by `-(2π)^2 ‖ξ‖²`
-after Fourier transform. -/
-private lemma fourier_laplacian_eq_smulLeftCLM_normSq
-    (m : ℕ) (T : 𝓢'(OddSpace m, ℂ)) :
-    𝓕 (Laplacian.laplacian T) =
-      ((-(2 * Real.pi) ^ 2 : ℝ) : ℂ) •
-        fourierNormSqMultiplier m (𝓕 T) := by
-  rw [TemperedDistribution.laplacian_eq_fourierMultiplierCLM T]
-  rw [← Complex.coe_smul (-(2 * Real.pi) ^ 2)]
-  rw [FourierTransform.fourier_smul]
-  rw [TemperedDistribution.fourierMultiplierCLM_apply]
-  rw [FourierTransform.fourier_fourierInv_eq]
-  rfl
-
-/-- Iterated version of `fourier_laplacian_eq_smulLeftCLM_normSq`. -/
-private lemma fourier_iterated_laplacian_eq_iterated_smulLeftCLM_normSq
-    (m k : ℕ) (T : 𝓢'(OddSpace m, ℂ)) :
-    𝓕 ((Laplacian.laplacian^[k]) T) =
-      ((-(2 * Real.pi) ^ 2 : ℝ) : ℂ) ^ k •
-        (((fourierNormSqMultiplier m)^[k]) (𝓕 T)) := by
-  let a : ℂ := ((-(2 * Real.pi) ^ 2 : ℝ) : ℂ)
-  let M : 𝓢'(OddSpace m, ℂ) →L[ℂ] 𝓢'(OddSpace m, ℂ) :=
-    fourierNormSqMultiplier m
-  change 𝓕 ((Laplacian.laplacian^[k]) T) = a ^ k • ((M^[k]) (𝓕 T))
-  induction k with
-  | zero =>
-      simp [M]
-  | succ k ih =>
-      calc
-        𝓕 ((Laplacian.laplacian^[Nat.succ k]) T)
-            = 𝓕 (Laplacian.laplacian ((Laplacian.laplacian^[k]) T)) := by
-                simp [Function.iterate_succ_apply']
-        _ = a • M (𝓕 ((Laplacian.laplacian^[k]) T)) := by
-                simpa [a, M] using
-                  fourier_laplacian_eq_smulLeftCLM_normSq m
-                    ((Laplacian.laplacian^[k]) T)
-        _ = a • M (a ^ k • ((M^[k]) (𝓕 T))) := by
-                rw [ih]
-        _ = a ^ Nat.succ k • ((M^[Nat.succ k]) (𝓕 T)) := by
-                simp [Function.iterate_succ_apply', pow_succ, mul_smul, mul_comm]
-
-/-- Collapse the iterated Fourier-side `‖ξ‖²` multipliers into one multiplier. -/
-private lemma iterated_fourierNormSqMultiplier_eq_smulLeftCLM_pow
-    (m k : ℕ) (T : 𝓢'(OddSpace m, ℂ)) :
-    ((fourierNormSqMultiplier m)^[k]) T =
-      TemperedDistribution.smulLeftCLM ℂ
-        (fun ξ : OddSpace m => (Complex.ofReal (‖ξ‖ ^ 2)) ^ k) T := by
-  induction k with
-  | zero =>
-      simp [fourierNormSqMultiplier]
-  | succ k ih =>
-      calc
-        ((fourierNormSqMultiplier m)^[Nat.succ k]) T
-            = fourierNormSqMultiplier m (((fourierNormSqMultiplier m)^[k]) T) := by
-                simp [Function.iterate_succ_apply']
-        _ = fourierNormSqMultiplier m
-              (TemperedDistribution.smulLeftCLM ℂ
-                (fun ξ : OddSpace m => (Complex.ofReal (‖ξ‖ ^ 2)) ^ k) T) := by
-                rw [ih]
-        _ = TemperedDistribution.smulLeftCLM ℂ
-              ((fun ξ : OddSpace m => (Complex.ofReal (‖ξ‖ ^ 2)) ^ k) *
-                fun ξ : OddSpace m => Complex.ofReal (‖ξ‖ ^ 2)) T := by
-                change TemperedDistribution.smulLeftCLM ℂ
-                    (fun ξ : OddSpace m => Complex.ofReal (‖ξ‖ ^ 2))
-                    (TemperedDistribution.smulLeftCLM ℂ
-                      (fun ξ : OddSpace m => (Complex.ofReal (‖ξ‖ ^ 2)) ^ k) T) =
-                  TemperedDistribution.smulLeftCLM ℂ
-                    ((fun ξ : OddSpace m => (Complex.ofReal (‖ξ‖ ^ 2)) ^ k) *
-                      fun ξ : OddSpace m => Complex.ofReal (‖ξ‖ ^ 2)) T
-                exact TemperedDistribution.smulLeftCLM_smulLeftCLM_apply
-                  (F := ℂ)
-                  (g₁ := fun ξ : OddSpace m => (Complex.ofReal (‖ξ‖ ^ 2)) ^ k)
-                  (g₂ := fun ξ : OddSpace m => Complex.ofReal (‖ξ‖ ^ 2))
-                  (by fun_prop) (by fun_prop) T
-        _ = TemperedDistribution.smulLeftCLM ℂ
-              (fun ξ : OddSpace m => (Complex.ofReal (‖ξ‖ ^ 2)) ^ Nat.succ k) T := by
-                have hfun :
-                    ((fun ξ : OddSpace m => (Complex.ofReal (‖ξ‖ ^ 2)) ^ k) *
-                        fun ξ : OddSpace m => Complex.ofReal (‖ξ‖ ^ 2)) =
-                      (fun ξ : OddSpace m =>
-                        (Complex.ofReal (‖ξ‖ ^ 2)) ^ Nat.succ k) := by
-                  funext ξ
-                  simp [Pi.mul_apply, pow_succ]
-                rw [hfun]
 
 /--
 Multiplier-form Fourier target.  This is often the most Mathlib-compatible
@@ -597,11 +356,11 @@ private theorem normKernel_fourier_multiplier_power_eq_constDistribution
         (fun ξ : OddSpace m => (Complex.ofReal (‖ξ‖ ^ 2)) ^ (m + 1))
         (𝓕 (normKernelDistributionAtZero m)) =
           c • ((volume : Measure (OddSpace m)).toTemperedDistribution) := by
-  sorry
+  exact normKernel_fourier_multiplier_power_eq_constDistribution_core m
 
 /--
-Radial fundamental-solution pairing, now reduced to the pure Fourier/Riesz
-multiplier blocker above.  In dimension `2 * m + 1`, pairing `‖x‖` against the
+Radial fundamental-solution pairing, reduced to the Fourier/Riesz multiplier
+theorem above.  In dimension `2 * m + 1`, pairing `‖x‖` against the
 `(m + 1)`-fold Laplacian of a Schwartz test recovers a nonzero multiple of
 evaluation at the origin.
 -/
@@ -615,31 +374,11 @@ private theorem norm_iterated_laplacian_pairing_at_zero
   exact norm_iterated_laplacian_pairing_at_zero_of_fourier_multiplier_power_identity
     m (normKernel_fourier_multiplier_power_eq_constDistribution m)
 
-/-- Distributional packaging of the radial pairing identity. -/
-private theorem normKernel_distributional_laplacian_power_eq_delta
-    (m : ℕ) :
-    ∃ c : ℂ, c ≠ 0 ∧
-      ((Laplacian.laplacian^[m + 1]) (normKernelDistributionAtZero m) =
-        c • TemperedDistribution.delta (0 : OddSpace m)) := by
-  rcases norm_iterated_laplacian_pairing_at_zero m with ⟨c, hc, hpair⟩
-  refine ⟨c, hc, ?_⟩
-  ext φ
-  calc
-    ((Laplacian.laplacian^[m + 1]) (normKernelDistributionAtZero m)) φ
-        = normKernelDistributionAtZero m ((Laplacian.laplacian^[m + 1]) φ) := by
-            exact temperedDistribution_iterated_laplacian_apply_apply
-              m (m + 1) (normKernelDistributionAtZero m) φ
-    _ = ∫ y : OddSpace m,
-          (‖y‖ : ℂ) * ((Laplacian.laplacian^[m + 1]) φ) y := by
-            exact normKernelDistributionAtZero_apply m ((Laplacian.laplacian^[m + 1]) φ)
-    _ = c * φ 0 := hpair φ
-    _ = (c • TemperedDistribution.delta (0 : OddSpace m)) φ := by simp
-
 /--
 Direct distributional form of the missing radial fundamental-solution theorem.
 
-The norm-kernel distribution itself is now formalized; only the PDE identity
-`Δ^(m+1) ‖x‖ = c_m δ₀` remains.
+The norm-kernel distributional PDE identity `Δ^(m+1) ‖x‖ = c_m δ₀`, packaged
+with its representing integral.
 -/
 private theorem normKernel_distributional_fundamental_solution_at_zero
     (m : ℕ) :
