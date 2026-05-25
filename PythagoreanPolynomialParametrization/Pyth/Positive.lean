@@ -39,21 +39,90 @@ noncomputable def h_pos_param : RatPoly 4 :=
 **Prover notes:** Similar to f_param_intValued. For any integer tuple (x,y,z,w),
 f_pos_param evaluates to ((x+(1-w)²x)((y+(1+w)z)²-y²))/2. Show this is always an integer. -/
 theorem f_pos_param_intValued : IsIntValued f_pos_param := by
-  sorry
+  intro v
+  let x : ℤ := v (0 : Fin 4)
+  let y : ℤ := v (1 : Fin 4)
+  let z : ℤ := v (2 : Fin 4)
+  let w : ℤ := v (3 : Fin 4)
+  let A : ℤ := y + ((1 : ℤ) + w) * z
+  let B : ℤ := y
+  let Cc : ℤ := x + ((1 : ℤ) - w) ^ 2 * x
+  have hpar : PaperParityCondition A B Cc := by
+    rcases Int.even_or_odd w with hw | hw
+    · left
+      rcases hw with ⟨t, ht⟩
+      refine ⟨x * (1 - 2 * t + 2 * t ^ 2), ?_⟩
+      dsimp [Cc]
+      rw [ht]
+      ring
+    · right
+      rcases hw with ⟨t, ht⟩
+      refine ⟨z * (t + 1), ?_⟩
+      dsimp [A, B]
+      rw [ht]
+      ring
+  rcases (TMap_integral_iff_parity A B Cc).mpr hpar with ⟨fx, gy, hz, hT⟩
+  refine ⟨fx, ?_⟩
+  have hfcoord : (Cc : ℚ) * ((A : ℚ) ^ 2 - (B : ℚ) ^ 2) / 2 = (fx : ℚ) := by
+    simpa [TMap] using congrArg Prod.fst hT
+  rw [← hfcoord]
+  simp [f_pos_param, c_pos_param, a_pos_param, b_pos_param, x_var, y_var, z_var, w_var,
+    A, B, Cc]
+  ring
 
 /-- g_pos_param is integer-valued.
 
 **Prover notes:** For any integer tuple (x,y,z,w), g_pos_param evaluates to
 (x+(1-w)²x)(y+(1+w)z)y, which is clearly an integer product of integers. -/
 theorem g_pos_param_intValued : IsIntValued g_pos_param := by
-  sorry
+  intro v
+  let x : ℤ := v (0 : Fin 4)
+  let y : ℤ := v (1 : Fin 4)
+  let z : ℤ := v (2 : Fin 4)
+  let w : ℤ := v (3 : Fin 4)
+  let A : ℤ := y + ((1 : ℤ) + w) * z
+  let B : ℤ := y
+  let Cc : ℤ := x + ((1 : ℤ) - w) ^ 2 * x
+  refine ⟨Cc * A * B, ?_⟩
+  simp [g_pos_param, c_pos_param, a_pos_param, b_pos_param, x_var, y_var, z_var, w_var,
+    A, B, Cc]
+  ring
 
 /-- h_pos_param is integer-valued.
 
 **Prover notes:** Similar to h_param_intValued. For any integer tuple (x,y,z,w),
 h_pos_param evaluates to ((x+(1-w)²x)((y+(1+w)z)²+y²))/2. Show this is always an integer. -/
 theorem h_pos_param_intValued : IsIntValued h_pos_param := by
-  sorry
+  intro v
+  let x : ℤ := v (0 : Fin 4)
+  let y : ℤ := v (1 : Fin 4)
+  let z : ℤ := v (2 : Fin 4)
+  let w : ℤ := v (3 : Fin 4)
+  let A : ℤ := y + ((1 : ℤ) + w) * z
+  let B : ℤ := y
+  let Cc : ℤ := x + ((1 : ℤ) - w) ^ 2 * x
+  have hpar : PaperParityCondition A B Cc := by
+    rcases Int.even_or_odd w with hw | hw
+    · left
+      rcases hw with ⟨t, ht⟩
+      refine ⟨x * (1 - 2 * t + 2 * t ^ 2), ?_⟩
+      dsimp [Cc]
+      rw [ht]
+      ring
+    · right
+      rcases hw with ⟨t, ht⟩
+      refine ⟨z * (t + 1), ?_⟩
+      dsimp [A, B]
+      rw [ht]
+      ring
+  rcases (TMap_integral_iff_parity A B Cc).mpr hpar with ⟨fx, gy, hz, hT⟩
+  refine ⟨hz, ?_⟩
+  have hhcoord : (Cc : ℚ) * ((A : ℚ) ^ 2 + (B : ℚ) ^ 2) / 2 = (hz : ℚ) := by
+    simpa [TMap] using congrArg (fun p : ℚ × ℚ × ℚ => p.2.2) hT
+  rw [← hhcoord]
+  simp [h_pos_param, c_pos_param, a_pos_param, b_pos_param, x_var, y_var, z_var, w_var,
+    A, B, Cc]
+  ring
 
 /-- Construct a 4-tuple input for polynomial evaluation from individual components. -/
 def mkRatPolyInput4 (x' y' z' w' : ℤ) : Fin 4 → ℤ := fun i =>
@@ -79,7 +148,157 @@ theorem positive_triples_parametrization :
         ratPolyEval f_pos_param (mkRatPolyInput4 x' y' z' w') = (x : ℚ) ∧
         ratPolyEval g_pos_param (mkRatPolyInput4 x' y' z' w') = (y : ℚ) ∧
         ratPolyEval h_pos_param (mkRatPolyInput4 x' y' z' w') = (z : ℚ)} := by
-  sorry
+  have hPositiveRange (x y z : ℤ) :
+      (0 < x ∧ 0 < y ∧ 0 < z ∧ IsPythagoreanTriple x y z) ↔
+        ∃ a b c : ℤ, PositiveTParameters a b c ∧
+          TMap a b c = ((x : ℚ), (y : ℚ), (z : ℚ)) := by
+    constructor
+    · rintro ⟨hxpos, hypos, hzpos, hpy⟩
+      rcases (pythagorean_iff_mem_TMap_range x y z).mp hpy with ⟨a, b, c, hT⟩
+      have hxcoord : (c : ℚ) * ((a : ℚ) ^ 2 - (b : ℚ) ^ 2) / 2 = (x : ℚ) := by
+        simpa [TMap] using congrArg Prod.fst hT
+      have hycoord : (c : ℚ) * (a : ℚ) * (b : ℚ) = (y : ℚ) := by
+        simpa [TMap] using congrArg (fun p : ℚ × ℚ × ℚ => p.2.1) hT
+      have hzcoord : (c : ℚ) * ((a : ℚ) ^ 2 + (b : ℚ) ^ 2) / 2 = (z : ℚ) := by
+        simpa [TMap] using congrArg (fun p : ℚ × ℚ × ℚ => p.2.2) hT
+      have hzqpos : (0 : ℚ) < (z : ℚ) := by exact_mod_cast hzpos
+      have hyqpos : (0 : ℚ) < (y : ℚ) := by exact_mod_cast hypos
+      have hxqpos : (0 : ℚ) < (x : ℚ) := by exact_mod_cast hxpos
+      have hsum_nonneg : (0 : ℚ) ≤ (a : ℚ) ^ 2 + (b : ℚ) ^ 2 := by
+        nlinarith [sq_nonneg (a : ℚ), sq_nonneg (b : ℚ)]
+      have hczprod_pos : (0 : ℚ) < (c : ℚ) * ((a : ℚ) ^ 2 + (b : ℚ) ^ 2) := by
+        nlinarith [hzcoord, hzqpos]
+      have hcqpos : (0 : ℚ) < (c : ℚ) :=
+        pos_of_mul_pos_right (by simpa [mul_comm] using hczprod_pos) hsum_nonneg
+      have hcpos : 0 < c := by exact_mod_cast hcqpos
+      have hycoord' : (c : ℚ) * ((a : ℚ) * (b : ℚ)) = (y : ℚ) := by
+        simpa [mul_assoc] using hycoord
+      have hcabprod_pos : (0 : ℚ) < (c : ℚ) * ((a : ℚ) * (b : ℚ)) := by
+        nlinarith [hycoord', hyqpos]
+      have habqpos : (0 : ℚ) < (a : ℚ) * (b : ℚ) :=
+        pos_of_mul_pos_right hcabprod_pos (le_of_lt hcqpos)
+      have habpos : 0 < a * b := by exact_mod_cast habqpos
+      have ha_ne : a ≠ 0 := by
+        intro ha
+        subst a
+        norm_num at habpos
+      have hb_ne : b ≠ 0 := by
+        intro hb
+        subst b
+        norm_num at habpos
+      have hapos : 0 < |a| := abs_pos.mpr ha_ne
+      have hbpos : 0 < |b| := abs_pos.mpr hb_ne
+      have hcxprod_pos : (0 : ℚ) < (c : ℚ) * ((a : ℚ) ^ 2 - (b : ℚ) ^ 2) := by
+        nlinarith [hxcoord, hxqpos]
+      have hdiffqpos : (0 : ℚ) < (a : ℚ) ^ 2 - (b : ℚ) ^ 2 :=
+        pos_of_mul_pos_right hcxprod_pos (le_of_lt hcqpos)
+      have hsq_lt_q : (b : ℚ) ^ 2 < (a : ℚ) ^ 2 := by nlinarith
+      have hsq_lt_int : b ^ 2 < a ^ 2 := by exact_mod_cast hsq_lt_q
+      have hblta : |b| < |a| := by
+        rwa [abs_lt_iff_mul_self_lt, ← pow_two, ← pow_two]
+      have hprod_abs_int : |a| * |b| = a * b := by
+        rw [← abs_mul, abs_of_nonneg (le_of_lt habpos)]
+      have hprod_abs_q : ((|a| : ℤ) : ℚ) * ((|b| : ℤ) : ℚ) = (a : ℚ) * (b : ℚ) := by
+        exact_mod_cast hprod_abs_int
+      have hprod_abs_q' : |(a : ℚ)| * |(b : ℚ)| = (a : ℚ) * (b : ℚ) := by
+        simpa [Int.cast_abs] using hprod_abs_q
+      have hTabs : TMap (|a|) (|b|) c = ((x : ℚ), (y : ℚ), (z : ℚ)) := by
+        rw [← hT]
+        ext
+        · simp [TMap, Int.cast_abs]
+        · simp only [TMap, Int.cast_abs]
+          rw [mul_assoc, hprod_abs_q', ← mul_assoc]
+        · simp [TMap, Int.cast_abs]
+      have hpar : PaperParityCondition (|a|) (|b|) c := by
+        exact (TMap_integral_iff_parity (|a|) (|b|) c).mp ⟨x, y, z, hTabs⟩
+      refine ⟨|a|, |b|, c, ?_, hTabs⟩
+      exact ⟨hapos, hbpos, hcpos, hblta, hpar⟩
+    · rintro ⟨a, b, c, hpos, hT⟩
+      rcases hpos with ⟨hapos, hbpos, hcpos, hblta, hpar⟩
+      have hxcoord : (c : ℚ) * ((a : ℚ) ^ 2 - (b : ℚ) ^ 2) / 2 = (x : ℚ) := by
+        simpa [TMap] using congrArg Prod.fst hT
+      have hycoord : (c : ℚ) * (a : ℚ) * (b : ℚ) = (y : ℚ) := by
+        simpa [TMap] using congrArg (fun p : ℚ × ℚ × ℚ => p.2.1) hT
+      have hzcoord : (c : ℚ) * ((a : ℚ) ^ 2 + (b : ℚ) ^ 2) / 2 = (z : ℚ) := by
+        simpa [TMap] using congrArg (fun p : ℚ × ℚ × ℚ => p.2.2) hT
+      have hcqpos : (0 : ℚ) < (c : ℚ) := by exact_mod_cast hcpos
+      have haqpos : (0 : ℚ) < (a : ℚ) := by exact_mod_cast hapos
+      have hbqpos : (0 : ℚ) < (b : ℚ) := by exact_mod_cast hbpos
+      have hbaq : (b : ℚ) < (a : ℚ) := by exact_mod_cast hblta
+      have hdiffqpos : (0 : ℚ) < (a : ℚ) ^ 2 - (b : ℚ) ^ 2 := by
+        nlinarith
+      have hxqpos : (0 : ℚ) < (x : ℚ) := by
+        rw [← hxcoord]
+        positivity
+      have hyqpos : (0 : ℚ) < (y : ℚ) := by
+        rw [← hycoord]
+        positivity
+      have hzqpos : (0 : ℚ) < (z : ℚ) := by
+        rw [← hzcoord]
+        positivity
+      have hxpos : 0 < x := by exact_mod_cast hxqpos
+      have hypos : 0 < y := by exact_mod_cast hyqpos
+      have hzpos : 0 < z := by exact_mod_cast hzqpos
+      have hpy : IsPythagoreanTriple x y z := by
+        exact (pythagorean_iff_mem_TMap_range x y z).mpr ⟨a, b, c, hT⟩
+      exact ⟨hxpos, hypos, hzpos, hpy⟩
+  refine ⟨f_pos_param_intValued, g_pos_param_intValued, h_pos_param_intValued, ?_⟩
+  ext p
+  rcases p with ⟨x, y, z⟩
+  simp only [positivePythagoreanTriples, exists_and_left, Set.mem_setOf_eq]
+  rw [hPositiveRange x y z]
+  constructor
+  · rintro ⟨a, b, c, hpos, hT⟩
+    rcases (positive_T_parameters_parametrized a b c).mp hpos with
+      ⟨x', y', z', w', hxpos, hypos, hzpos, hwnonneg, ha, hb, hc⟩
+    refine ⟨x', hxpos, y', hypos, z', hzpos, w', hwnonneg, ?_, ?_, ?_⟩
+    · have hxcoord : (c : ℚ) * ((a : ℚ) ^ 2 - (b : ℚ) ^ 2) / 2 = (x : ℚ) := by
+        simpa [TMap] using congrArg Prod.fst hT
+      rw [← hxcoord]
+      rw [ha, hb, hc]
+      simp [ratPolyEval, f_pos_param, c_pos_param, a_pos_param, b_pos_param, x_var, y_var,
+        z_var, w_var, mkRatPolyInput4]
+      ring_nf
+    · have hycoord : (c : ℚ) * (a : ℚ) * (b : ℚ) = (y : ℚ) := by
+        simpa [TMap] using congrArg (fun p : ℚ × ℚ × ℚ => p.2.1) hT
+      rw [← hycoord]
+      rw [ha, hb, hc]
+      simp [ratPolyEval, g_pos_param, c_pos_param, a_pos_param, b_pos_param, x_var, y_var,
+        z_var, w_var, mkRatPolyInput4]
+    · have hzcoord : (c : ℚ) * ((a : ℚ) ^ 2 + (b : ℚ) ^ 2) / 2 = (z : ℚ) := by
+        simpa [TMap] using congrArg (fun p : ℚ × ℚ × ℚ => p.2.2) hT
+      rw [← hzcoord]
+      rw [ha, hb, hc]
+      simp [ratPolyEval, h_pos_param, c_pos_param, a_pos_param, b_pos_param, x_var, y_var,
+        z_var, w_var, mkRatPolyInput4]
+      ring_nf
+  · rintro ⟨x', hxpos, y', hypos, z', hzpos, w', hwnonneg, hf, hg, hh⟩
+    let a : ℤ := y' + ((1 : ℤ) + w') * z'
+    let b : ℤ := y'
+    let c : ℤ := x' + ((1 : ℤ) - w') ^ 2 * x'
+    have hpos : PositiveTParameters a b c := by
+      exact (positive_T_parameters_parametrized a b c).mpr
+        ⟨x', y', z', w', hxpos, hypos, hzpos, hwnonneg, rfl, rfl, rfl⟩
+    have hxcoord : (c : ℚ) * ((a : ℚ) ^ 2 - (b : ℚ) ^ 2) / 2 = (x : ℚ) := by
+      rw [← hf]
+      simp [ratPolyEval, f_pos_param, c_pos_param, a_pos_param, b_pos_param, x_var, y_var,
+        z_var, w_var, mkRatPolyInput4, a, b, c]
+      ring_nf
+    have hycoord : (c : ℚ) * (a : ℚ) * (b : ℚ) = (y : ℚ) := by
+      rw [← hg]
+      simp [ratPolyEval, g_pos_param, c_pos_param, a_pos_param, b_pos_param, x_var, y_var,
+        z_var, w_var, mkRatPolyInput4, a, b, c]
+    have hzcoord : (c : ℚ) * ((a : ℚ) ^ 2 + (b : ℚ) ^ 2) / 2 = (z : ℚ) := by
+      rw [← hh]
+      simp [ratPolyEval, h_pos_param, c_pos_param, a_pos_param, b_pos_param, x_var, y_var,
+        z_var, w_var, mkRatPolyInput4, a, b, c]
+      ring_nf
+    have hT : TMap a b c = ((x : ℚ), (y : ℚ), (z : ℚ)) := by
+      ext
+      · simpa [TMap] using hxcoord
+      · simpa [TMap] using hycoord
+      · simpa [TMap] using hzcoord
+    exact ⟨a, b, c, hpos, hT⟩
 
 /-! ## 16-parameter parametrization via four-square theorem -/
 
@@ -125,18 +344,9 @@ In the paper: ((x_sub+(1-w_sub)²x_sub)((y_sub+(1+w_sub)z_sub)²+y_sub²))/2 -/
 noncomputable def h_16_param : RatPoly 16 :=
   C (1 / 2 : ℚ) * c_16_param * (a_16_param ^ 2 + b_16_param ^ 2)
 
-/-- There exists a parametrization of positive Pythagorean triples by a single triple of
-integer-valued polynomials in 16 variables (using Lagrange's four-square theorem).
-
-**Source statement:** From the 4-variable parametrization of positive PTs, a parametrization
-with integer parameters can be obtained by replacing w by w₁²+w₂²+w₃²+w₄² and x, y, z by
-x₁²+x₂²+x₃²+x₄²+1, y₁²+y₂²+y₃²+y₄²+1, and z₁²+z₂²+z₃²+z₄²+1, respectively.
-
-**Source proof sketch:** By Lagrange's four-square theorem, every non-negative integer is a
-sum of four squares, and every positive integer is of the form (sum of four squares)+1.
-Therefore the restricted parameters (x,y,z > 0 and w ≥ 0) in the 4-variable parametrization
-can be replaced by unrestricted integer parameters via these substitutions, yielding a
-parametrization with 16 integer parameters. -/
+/-- The positive-triple parametrization with unrestricted integer parameters, obtained
+from the four-variable positive parametrization by replacing the positive/nonnegative
+parameters with four-square expressions. -/
 theorem exists_16_param_parametrization :
     IsIntValued f_16_param ∧ IsIntValued g_16_param ∧ IsIntValued h_16_param ∧
     positivePythagoreanTriples =
@@ -144,4 +354,147 @@ theorem exists_16_param_parametrization :
         ratPolyEval f_16_param a = (x : ℚ) ∧
         ratPolyEval g_16_param a = (y : ℚ) ∧
         ratPolyEval h_16_param a = (z : ℚ)} := by
-  sorry
+  let lift16ToPosInput : (Fin 16 → ℤ) → Fin 4 → ℤ := fun a =>
+    mkRatPolyInput4
+      (a (0 : Fin 16) ^ 2 + a (1 : Fin 16) ^ 2 + a (2 : Fin 16) ^ 2 +
+        a (3 : Fin 16) ^ 2 + 1)
+      (a (4 : Fin 16) ^ 2 + a (5 : Fin 16) ^ 2 + a (6 : Fin 16) ^ 2 +
+        a (7 : Fin 16) ^ 2 + 1)
+      (a (8 : Fin 16) ^ 2 + a (9 : Fin 16) ^ 2 + a (10 : Fin 16) ^ 2 +
+        a (11 : Fin 16) ^ 2 + 1)
+      (a (12 : Fin 16) ^ 2 + a (13 : Fin 16) ^ 2 + a (14 : Fin 16) ^ 2 +
+        a (15 : Fin 16) ^ 2)
+  have hf_eval (a : Fin 16 → ℤ) :
+      ratPolyEval f_16_param a = ratPolyEval f_pos_param (lift16ToPosInput a) := by
+    simp [ratPolyEval, f_16_param, f_pos_param, c_16_param, a_16_param, b_16_param,
+      x_sub, y_sub, z_sub, w_sub, c_pos_param, a_pos_param, b_pos_param, x_var, y_var,
+      z_var, w_var, lift16ToPosInput, mkRatPolyInput4]
+  have hg_eval (a : Fin 16 → ℤ) :
+      ratPolyEval g_16_param a = ratPolyEval g_pos_param (lift16ToPosInput a) := by
+    simp [ratPolyEval, g_16_param, g_pos_param, c_16_param, a_16_param, b_16_param,
+      x_sub, y_sub, z_sub, w_sub, c_pos_param, a_pos_param, b_pos_param, x_var, y_var,
+      z_var, w_var, lift16ToPosInput, mkRatPolyInput4]
+  have hh_eval (a : Fin 16 → ℤ) :
+      ratPolyEval h_16_param a = ratPolyEval h_pos_param (lift16ToPosInput a) := by
+    simp [ratPolyEval, h_16_param, h_pos_param, c_16_param, a_16_param, b_16_param,
+      x_sub, y_sub, z_sub, w_sub, c_pos_param, a_pos_param, b_pos_param, x_var, y_var,
+      z_var, w_var, lift16ToPosInput, mkRatPolyInput4]
+  have hf16 : IsIntValued f_16_param := by
+    intro a
+    rcases f_pos_param_intValued (lift16ToPosInput a) with ⟨k, hk⟩
+    refine ⟨k, ?_⟩
+    change ratPolyEval f_16_param a = (k : ℚ)
+    have hk' : ratPolyEval f_pos_param (lift16ToPosInput a) = (k : ℚ) := by
+      simpa [ratPolyEval] using hk
+    exact (hf_eval a).trans hk'
+  have hg16 : IsIntValued g_16_param := by
+    intro a
+    rcases g_pos_param_intValued (lift16ToPosInput a) with ⟨k, hk⟩
+    refine ⟨k, ?_⟩
+    change ratPolyEval g_16_param a = (k : ℚ)
+    have hk' : ratPolyEval g_pos_param (lift16ToPosInput a) = (k : ℚ) := by
+      simpa [ratPolyEval] using hk
+    exact (hg_eval a).trans hk'
+  have hh16 : IsIntValued h_16_param := by
+    intro a
+    rcases h_pos_param_intValued (lift16ToPosInput a) with ⟨k, hk⟩
+    refine ⟨k, ?_⟩
+    change ratPolyEval h_16_param a = (k : ℚ)
+    have hk' : ratPolyEval h_pos_param (lift16ToPosInput a) = (k : ℚ) := by
+      simpa [ratPolyEval] using hk
+    exact (hh_eval a).trans hk'
+  rcases positive_triples_parametrization with ⟨_, _, _, hpos4⟩
+  refine ⟨hf16, hg16, hh16, ?_⟩
+  rw [hpos4]
+  ext p
+  rcases p with ⟨x, y, z⟩
+  constructor
+  · rintro ⟨x', y', z', w', hxpos, hypos, hzpos, hwnonneg, hf, hg, hh⟩
+    rcases (int_positive_iff_four_squares_add_one x').mp hxpos with
+      ⟨x0, x1, x2, x3, hxsum⟩
+    rcases (int_positive_iff_four_squares_add_one y').mp hypos with
+      ⟨y0, y1, y2, y3, hysum⟩
+    rcases (int_positive_iff_four_squares_add_one z').mp hzpos with
+      ⟨z0, z1, z2, z3, hzsum⟩
+    rcases (int_nonneg_iff_four_squares w').mp hwnonneg with
+      ⟨w0, w1, w2, w3, hwsum⟩
+    let a : Fin 16 → ℤ := fun i =>
+      if i = (0 : Fin 16) then x0 else
+      if i = (1 : Fin 16) then x1 else
+      if i = (2 : Fin 16) then x2 else
+      if i = (3 : Fin 16) then x3 else
+      if i = (4 : Fin 16) then y0 else
+      if i = (5 : Fin 16) then y1 else
+      if i = (6 : Fin 16) then y2 else
+      if i = (7 : Fin 16) then y3 else
+      if i = (8 : Fin 16) then z0 else
+      if i = (9 : Fin 16) then z1 else
+      if i = (10 : Fin 16) then z2 else
+      if i = (11 : Fin 16) then z3 else
+      if i = (12 : Fin 16) then w0 else
+      if i = (13 : Fin 16) then w1 else
+      if i = (14 : Fin 16) then w2 else w3
+    have hinput : lift16ToPosInput a = mkRatPolyInput4 x' y' z' w' := by
+      funext i
+      fin_cases i <;> simp [lift16ToPosInput, mkRatPolyInput4, a, hxsum, hysum, hzsum,
+        hwsum]
+    refine ⟨a, ?_, ?_, ?_⟩
+    · calc
+        ratPolyEval f_16_param a = ratPolyEval f_pos_param (lift16ToPosInput a) :=
+          hf_eval a
+        _ = ratPolyEval f_pos_param (mkRatPolyInput4 x' y' z' w') := by rw [hinput]
+        _ = (x : ℚ) := hf
+    · calc
+        ratPolyEval g_16_param a = ratPolyEval g_pos_param (lift16ToPosInput a) :=
+          hg_eval a
+        _ = ratPolyEval g_pos_param (mkRatPolyInput4 x' y' z' w') := by rw [hinput]
+        _ = (y : ℚ) := hg
+    · calc
+        ratPolyEval h_16_param a = ratPolyEval h_pos_param (lift16ToPosInput a) :=
+          hh_eval a
+        _ = ratPolyEval h_pos_param (mkRatPolyInput4 x' y' z' w') := by rw [hinput]
+        _ = (z : ℚ) := hh
+  · rintro ⟨a, hf, hg, hh⟩
+    let x' : ℤ := a (0 : Fin 16) ^ 2 + a (1 : Fin 16) ^ 2 + a (2 : Fin 16) ^ 2 +
+      a (3 : Fin 16) ^ 2 + 1
+    let y' : ℤ := a (4 : Fin 16) ^ 2 + a (5 : Fin 16) ^ 2 + a (6 : Fin 16) ^ 2 +
+      a (7 : Fin 16) ^ 2 + 1
+    let z' : ℤ := a (8 : Fin 16) ^ 2 + a (9 : Fin 16) ^ 2 + a (10 : Fin 16) ^ 2 +
+      a (11 : Fin 16) ^ 2 + 1
+    let w' : ℤ := a (12 : Fin 16) ^ 2 + a (13 : Fin 16) ^ 2 + a (14 : Fin 16) ^ 2 +
+      a (15 : Fin 16) ^ 2
+    have hxpos : 0 < x' := by
+      dsimp [x']
+      nlinarith [sq_nonneg (a (0 : Fin 16)), sq_nonneg (a (1 : Fin 16)),
+        sq_nonneg (a (2 : Fin 16)), sq_nonneg (a (3 : Fin 16))]
+    have hypos : 0 < y' := by
+      dsimp [y']
+      nlinarith [sq_nonneg (a (4 : Fin 16)), sq_nonneg (a (5 : Fin 16)),
+        sq_nonneg (a (6 : Fin 16)), sq_nonneg (a (7 : Fin 16))]
+    have hzpos : 0 < z' := by
+      dsimp [z']
+      nlinarith [sq_nonneg (a (8 : Fin 16)), sq_nonneg (a (9 : Fin 16)),
+        sq_nonneg (a (10 : Fin 16)), sq_nonneg (a (11 : Fin 16))]
+    have hwnonneg : 0 ≤ w' := by
+      dsimp [w']
+      nlinarith [sq_nonneg (a (12 : Fin 16)), sq_nonneg (a (13 : Fin 16)),
+        sq_nonneg (a (14 : Fin 16)), sq_nonneg (a (15 : Fin 16))]
+    have hinput : lift16ToPosInput a = mkRatPolyInput4 x' y' z' w' := by
+      funext i
+      fin_cases i <;> simp [lift16ToPosInput, mkRatPolyInput4, x', y', z', w']
+    refine ⟨x', y', z', w', hxpos, hypos, hzpos, hwnonneg, ?_, ?_, ?_⟩
+    · calc
+        ratPolyEval f_pos_param (mkRatPolyInput4 x' y' z' w') =
+            ratPolyEval f_pos_param (lift16ToPosInput a) := by rw [hinput]
+        _ = ratPolyEval f_16_param a := (hf_eval a).symm
+        _ = (x : ℚ) := hf
+    · calc
+        ratPolyEval g_pos_param (mkRatPolyInput4 x' y' z' w') =
+            ratPolyEval g_pos_param (lift16ToPosInput a) := by rw [hinput]
+        _ = ratPolyEval g_16_param a := (hg_eval a).symm
+        _ = (y : ℚ) := hg
+    · calc
+        ratPolyEval h_pos_param (mkRatPolyInput4 x' y' z' w') =
+            ratPolyEval h_pos_param (lift16ToPosInput a) := by rw [hinput]
+        _ = ratPolyEval h_16_param a := (hh_eval a).symm
+        _ = (z : ℚ) := hh

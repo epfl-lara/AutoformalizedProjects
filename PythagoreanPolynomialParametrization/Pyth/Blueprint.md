@@ -2,18 +2,18 @@
 
 - Source: `docs/pyth.tex`
 - Target Lean entry file: `Pyth/Main.lean`
-- Status: source-backed theorem skeleton with auxiliary placeholders for externally cited and explanatory claims
+- Status: source-backed Lean development with all Lean declarations proved
 
 ## Current Rating
 
 - Statement/source coverage: 9/10. The main theorem, obstruction, positive remark, 16-parameter follow-on, general finite-family definitions, cited finite-cover theorem, and non-UFD motivation are represented.
-- Proof completeness: skeleton status; declarations may contain `sorry` proof obligations.
-- Model-readiness: 8/10. Externally cited and motivational placeholders are isolated in `Pyth/Explanatory.lean`.
+- Proof completeness: theorem declarations are proved; no project-local `sorry`, `admit`, or custom axiom remains.
+- Model-readiness: 8/10. Externally cited and motivational material is isolated in `Pyth/Explanatory.lean`.
 
 ## Known Scope Gaps
 
-- The full irreducible-factorization proof behind the non-UFD discussion (`pyth.tex:179-189`) is intentionally not developed. This is acceptable for this formalization because the paper uses the paragraph only as motivation for why integer-valued polynomial rings behave differently from `ℤ[x]`; it is not used in the obstruction proof or in the construction of the Pythagorean-triple parametrization. The file now records the displayed identity, integer-valuedness of the binomial polynomial, and the non-UFD claim as source placeholders.
-- The externally cited finite-cover theorem (`pyth.tex:138-141`) is recorded as a placeholder in `Pyth/Explanatory.lean`; the cited Frisch proof is outside this paper.
+- The full literature-level factorization discussion behind the non-UFD paragraph (`pyth.tex:179-189`) is intentionally not developed beyond the displayed identity, integer-valuedness of the binomial polynomial, and the stated non-UFD result. This is acceptable for this formalization because the paper uses the paragraph only as motivation for why integer-valued polynomial rings behave differently from `ℤ[x]`; it is not used in the obstruction proof or in the construction of the Pythagorean-triple parametrization.
+- The externally cited finite-cover theorem (`pyth.tex:138-141`) is proved locally in `Pyth/Explanatory.lean` by clearing denominators and splitting integer inputs into finitely many residue classes.
 
 ## Planner Checklist
 
@@ -28,7 +28,7 @@
 - [x] Resolve all construction stubs before proof handoff.
 - [x] Reorganize Lean files into smaller model-facing proof targets.
 - [x] Run independent statement/source verification review after the split.
-- [x] Mark stable theorem/lemma/example `sorry` declarations ready for a user-started prove workflow. (Only check after independent review approves every source entry.)
+- [x] Verify the externally cited theorem and all proof targets after independent review approves every source entry.
 
 ## Import Plan
 
@@ -60,8 +60,8 @@ Non-gating modules or namespaces to search while proving. Do not force these int
 - Integer-coefficient obstruction: `Pyth/Obstructions.lean`
 - Four-variable integer-valued parametrization: `Pyth/IntegerValued.lean`
 - Positive and 16-parameter parametrizations: `Pyth/Positive.lean`
-- Externally cited and explanatory skeletons: `Pyth/Explanatory.lean`
-- Auxiliary proof obligations: 4 `sorry` declarations in `Pyth/Explanatory.lean`.
+- Externally cited and explanatory statements: `Pyth/Explanatory.lean`
+- Auxiliary assumptions: none.
 
 ## Definitions (before theorems)
 
@@ -132,8 +132,8 @@ Non-gating modules or namespaces to search while proving. Do not force these int
 - Lean declaration: `single_intValued_parametrization_yields_finite_intPoly_parametrization`
 - File: `Pyth/Explanatory.lean`
 - Formal statement review: The source says any set of integer tuples parametrized by a single integer-valued tuple is parametrizable by finitely many integer-coefficient tuples. The Lean statement uses the general `Fin k → ℤ` predicates and keeps the same number of variables `n`.
-- Scope changes: recorded as a `sorry` placeholder because the proof is cited from external work and is not used by the paper's main proof.
-- Statement verification status: parses as a source placeholder.
+- Scope changes: although the proof is cited from external work and is not used by the paper's main proof, the Lean file proves the statement constructively by clearing denominators and using finitely many residue classes modulo the common denominator.
+- Statement verification status: checks in `Pyth/Explanatory.lean`.
 
 ### line-179
 
@@ -142,8 +142,8 @@ Non-gating modules or namespaces to search while proving. Do not force these int
 - Lean declarations: `IntValuedSubring`, `IntegerValuedPoly`, `fallingFactorialRatPoly`, `binomialRatPoly`, `binomialRatPoly_intValued`, `fallingFactorial_eq_factorial_mul_binomialRatPoly`, `integerValued_polynomial_ring_not_uniqueFactorization`
 - Files: `Pyth/Basic.lean`, `Pyth/Explanatory.lean`
 - Formal statement review: The source says `Int(ℤ)` lacks unique factorization and gives the displayed identity `x(x-1)…(x-k+1)=k! * (x choose k)`. The Lean file records the ring/type needed to state the non-UFD claim, the displayed polynomials, the identity, and integer-valuedness of the binomial polynomial.
-- Scope changes: the detailed irreducibility and factor-count proof is intentionally out of scope for the Pythagorean parametrization results. The paper does not use this proof later and points readers to separate references for factorization properties of integer-valued polynomial rings, so these claims are recorded as `sorry` placeholders rather than treated as blocking obligations.
-- Statement verification status: parses as source placeholders.
+- Scope changes: the detailed source discussion of factorization behavior is intentionally out of scope for the Pythagorean parametrization results. The paper does not use this proof later and points readers to separate references for factorization properties of integer-valued polynomial rings; the Lean file nevertheless proves the displayed identity, integer-valuedness statement, and stated non-UFD theorem.
+- Statement verification status: checks in `Pyth/Explanatory.lean`.
 
 ### line-98
 

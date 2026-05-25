@@ -10,7 +10,7 @@ import Pyth.Explanatory
 This directory sets up source-backed Lean statements for results from Frisch and
 Vaserstein's paper "Parametrization of Pythagorean triples by a single triple of
 polynomials". Externally cited or explanatory source claims are recorded separately
-as auxiliary `sorry` placeholders.
+from the main parametrization proofs.
 
 ## File layout
 
