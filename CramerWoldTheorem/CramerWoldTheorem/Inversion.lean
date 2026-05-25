@@ -1,4 +1,5 @@
 import CramerWoldTheorem.Halfspaces
+import OddInversion.Target
 
 open MeasureTheory
 open scoped BigOperators ENNReal
@@ -31,13 +32,7 @@ the source paper, including the test-function identity
 `∫ g dμ = c_m⁻¹ ∫ f_μ(y) (Δ^m g)(y) dy` and separation of measures by compactly
 supported smooth test functions.
 -/
-/-
-Source-backed analytic endpoint not currently available from Mathlib/project
-imports. This axiom isolates the exact odd-dimensional Green/Laplacian
-inversion consequence used below; replacing it by a proof is the remaining
-analytic formalization task.
--/
-axiom averageDistance_eq_odd_lintegral_of_boundedContinuous_nnreal
+theorem averageDistance_eq_odd_lintegral_of_boundedContinuous_nnreal
     (m : ℕ)
     (μ ν : Measure (RealEuclideanSpace (2 * m + 1)))
     [IsProbabilityMeasure μ] [IsProbabilityMeasure ν]
@@ -45,7 +40,9 @@ axiom averageDistance_eq_odd_lintegral_of_boundedContinuous_nnreal
       ∀ y : RealEuclideanSpace (2 * m + 1),
         averageDistance μ y = averageDistance ν y)
     (g : BoundedContinuousFunction (RealEuclideanSpace (2 * m + 1)) NNReal) :
-    ∫⁻ x, (g x : ENNReal) ∂μ = ∫⁻ x, (g x : ENNReal) ∂ν
+    ∫⁻ x, (g x : ENNReal) ∂μ = ∫⁻ x, (g x : ENNReal) ∂ν := by
+  exact OddInversion.averageDistance_eq_odd_lintegral_of_boundedContinuous_nnreal
+    m μ ν havg g
 
 theorem measure_eq_of_averageDistance_eq_odd_aux
     (m : ℕ)
