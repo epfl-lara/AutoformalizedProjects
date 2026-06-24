@@ -1,17 +1,13 @@
 # Odd-Dimensional Inversion Subproject
 
-Goal: replace the axiom
-`CramerWoldTheorem.averageDistance_eq_odd_lintegral_of_boundedContinuous_nnreal`
-with a theorem.
-
-This directory is deliberately not imported by `CramerWoldTheorem.Main`.  It is
-a proof workspace for the analytic endpoint behind `Inversion.lean`.
+This directory contains the completed proof workspace for the analytic endpoint
+behind `CramerWoldTheorem/Inversion.lean`.
 
 ## Files
 
-- `Target.lean`: Lean proof queue.  It restates the axiom as a theorem.  The
+- `Target.lean`: Lean proof queue for the measure-level endpoint. The
   measure-separation, Fubini, translation, algebraic wrapper, and
-  Fourier/Riesz multiplier steps are now proved.
+  Fourier/Riesz multiplier steps are proved here.
 - `FundamentalSolution.lean`: completed odd-dimensional fundamental-solution
   identity for the norm kernel.
 - `PhysLeanBridge.lean` and `Transport.lean`: bridge the PhysLean real
@@ -29,5 +25,5 @@ From the project root:
 lake env lean OddInversion/Target.lean
 ```
 
-The target file contains no `sorry` placeholders and no custom axioms.  The main
-project can import the completed theorem directly.
+The target file contains no `sorry` placeholders and no custom axioms. The main
+project imports the completed theorem through `CramerWoldTheorem/Inversion.lean`.

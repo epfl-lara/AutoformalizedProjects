@@ -1011,9 +1011,7 @@ theorem measure_eq_of_schwartz_integral_eq
   exact Measure.ext_of_integral_eq_on_compactlySupported
     (compactlySupported_integral_eq_of_schwartz_integral_eq m μ ν h)
 
-/--
-Subproject replacement for the current axiom's measure-level endpoint.
--/
+/-- Measure-level endpoint used by `CramerWoldTheorem/Inversion.lean`. -/
 theorem measure_eq_of_averageDistance_eq_odd
     (m : ℕ)
     (μ ν : Measure (OddSpace m))
@@ -1023,12 +1021,7 @@ theorem measure_eq_of_averageDistance_eq_odd
   exact measure_eq_of_schwartz_integral_eq m μ ν
     (schwartz_integral_eq_of_averageDistance_eq_odd m μ ν havg)
 
-/--
-The exact replacement theorem for the axiom in `Inversion.lean`.
-
-Once the two analytic targets above are proved, this theorem can be copied back
-to `Inversion.lean` in place of the axiom.
--/
+/-- Lintegral endpoint imported by `CramerWoldTheorem/Inversion.lean`. -/
 theorem averageDistance_eq_odd_lintegral_of_boundedContinuous_nnreal
     (m : ℕ)
     (μ ν : Measure (OddSpace m))

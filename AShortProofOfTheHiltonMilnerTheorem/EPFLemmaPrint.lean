@@ -1,8 +1,0 @@
-import AShortProofOfTheHiltonMilnerTheorem.Basic
-
-#print AShortProofOfTheHiltonMilnerTheorem.ground
-#print AShortProofOfTheHiltonMilnerTheorem.shiftedSet
-#print AShortProofOfTheHiltonMilnerTheorem.hiltonMilnerFamily
-#print AShortProofOfTheHiltonMilnerTheorem.IsHiltonMilnerFamily
-#print AShortProofOfTheHiltonMilnerTheorem.EmptyTotalIntersection
-#print AShortProofOfTheHiltonMilnerTheorem.DeletionEmptyTotalIntersection

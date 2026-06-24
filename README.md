@@ -1,18 +1,43 @@
-# Paper Level Autoformalizations
+# Paper-Level Autoformalizations
 
-Lean 4 projects for the autoformalization with EPFLemma framework. 
+Lean 4 formalization projects produced with the EPFLemma workflow. The `main`
+branch is reserved for projects that are ready to present publicly: each listed
+project builds and has no project-local `sorry`, `admit`, custom `axiom`, or
+`unsafe` in its Lean files.
 
-## Projects
+Work-in-progress formalizations are kept on separate draft pull requests instead
+of living on `main`.
 
-| Project | Lean target | Paper | Status |
+## Completed Projects
+
+| Project | Lake target | Source paper | Public status |
 | --- | --- | --- | --- |
-| `PythagoreanPolynomialParametrization` | `Pyth` | Frisch--Vaserstein, *Parametrization of Pythagorean triples by a single triple of polynomials* | Source-backed statement skeleton in `Pyth/`; legacy proof-complete function-model version hidden under `.version/`. |
-| `QuantizingPythagoreanTriples` | `Pythagore2` | Mathevet--Morier-Genoud--Ovsienko, *Quantizing Pythagorean triples* | Source-backed statement skeleton in `Pythagore2/`; q-rationals defined from continued fractions and q-matrix words; only the open unimodality conjecture remains an axiom. |
-| `AShortProofOfTheHiltonMilnerTheorem` | `AShortProofOfTheHiltonMilnerTheorem` | Bulavka--Woodroofe, *A short proof of the Hilton-Milner Theorem* | Source-backed statement skeleton for finite set families, shadows, shifting, the Hilton--Milner bound, and uniqueness bridge lemmas. |
-| `CramerWoldTheorem` | `CramerWoldTheorem` | Lyons--Zumbrun, *A Calculus Proof of the Cramer-Wold Theorem* | Builds with two source-backed analytic `sorry` targets for Crofton reconstruction and odd-dimensional Laplacian inversion; no custom axioms. |
+| `PythagoreanPolynomialParametrization` | `Pyth` | Sophie Frisch and Leonid Vaserstein, *Parametrization of Pythagorean triples by a single triple of polynomials* | Proof-complete source-backed formalization of the obstruction theorem, the integer-valued parametrization, and the positive/16-parameter variants. |
+| `CramerWoldTheorem` | `CramerWoldTheorem` | Russell Lyons and Kevin Zumbrun, *A Calculus Proof of the Cramer-Wold Theorem* | Proof-complete source-backed formalization of the half-space theorem, average-distance reconstruction, odd-dimensional inversion, and even-to-odd reduction. |
+
+## Work in Progress
+
+The unfinished formalizations are maintained as draft PR branches:
+
+| Project | Status on WIP branch |
+| --- | --- |
+| `AShortProofOfTheHiltonMilnerTheorem` | Source-backed Hilton-Milner theorem skeleton with remaining proof obligations. |
+| `QuantizingPythagoreanTriples` | Source-backed q-Pythagorean skeleton with remaining proof obligations and the source-stated open unimodality conjecture. |
 
 ## Checks
 
+Run all completed project builds:
+
 ```bash
 ./scripts/check-projects.sh
+```
+
+Or build an individual project from its directory:
+
+```bash
+cd PythagoreanPolynomialParametrization
+lake build Pyth
+
+cd ../CramerWoldTheorem
+lake build CramerWoldTheorem
 ```
