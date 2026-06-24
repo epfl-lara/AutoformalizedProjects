@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+title: "AutoformalizedProjects"
+message: "If you use this repository, please cite the repository and the source papers listed in README.md."
+type: software
+license: Apache-2.0
+repository-code: "https://github.com/epfl-lara/AutoformalizedProjects"
+date-released: 2026-06-24
+authors:
+  - name: "EPFL LARA"

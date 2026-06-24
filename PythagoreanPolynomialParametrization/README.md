@@ -1,33 +1,39 @@
 # Parametrization of Pythagorean Triples by Polynomials
 
-Lean 4 source-backed formalization setup for Sophie Frisch and Leonid Vaserstein,
+Lean 4 source-backed formalization of Sophie Frisch and Leonid Vaserstein,
 *Parametrization of Pythagorean triples by a single triple of polynomials*.
 
-The active formalization is the more faithful statement skeleton in:
+The active formalization is in:
 
 - `Pyth/`
 - `Pyth.lean`
 
-The older proof-complete function-model version is preserved unchanged under
-the hidden archive path:
-
-- `.version/proof_complete_function_model_20260428/`
-
-For new proof attempts, start from `Pyth/`; do not revive
-the weaker top-level function-model skeleton unless explicitly comparing
-against the archive.
-
 ## Status
 
 - `lake build Pyth` succeeds.
-- Current active version is a source-backed theorem skeleton with `sorry` proof
-  obligations.
-- Externally cited or explanatory source claims are recorded in
-  `Pyth/Explanatory.lean` as auxiliary skeletons.
-- It models the paper's rational polynomials as `MvPolynomial (Fin n) ℚ` where appropriate, rather than only as rational-valued functions.
+- The active Lean development has no project-local `sorry`, `admit`, custom
+  `axiom`, or `unsafe`.
+- It models the paper's rational polynomials as `MvPolynomial (Fin n) ℚ` where
+  appropriate, rather than only as rational-valued functions.
+- Externally cited and explanatory source claims are isolated in
+  `Pyth/Explanatory.lean`.
+
+## File Layout
+
+- `Pyth/Basic.lean`: Pythagorean triples, integer-valued polynomials, and
+  parametrization predicates.
+- `Pyth/SourceLemmas.lean`: source-level lemmas for the `T(a,b,c)` map,
+  parity conditions, positive parameters, and four-square substitutions.
+- `Pyth/Obstructions.lean`: no single integer-coefficient polynomial triple
+  parametrizes all Pythagorean triples.
+- `Pyth/IntegerValued.lean`: the explicit four-variable integer-valued
+  parametrization.
+- `Pyth/Positive.lean`: the positive-triple parametrization and the
+  16-parameter unrestricted variant.
+- `Pyth/Explanatory.lean`: reusable finite-family parametrization statements,
+  the cited finite-cover theorem, and integer-valued factorization notes.
 
 See:
 
 - `Pyth/Blueprint.md`
-- `TODO.md`
-- `EPFLemma.md`
+- `docs/pyth.tex`

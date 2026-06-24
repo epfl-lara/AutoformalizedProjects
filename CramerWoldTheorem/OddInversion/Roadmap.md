@@ -155,8 +155,8 @@ searching Mathlib and the local project.  It did not find a packaged Fourier
 transform of `‖x‖`, a Riesz kernel theorem, or a direct fundamental-solution
 identity.
 
-Do not use or import `CramerWoldTheorem.Inversion` in this subproject: that file
-contains the axiom this directory is meant to replace.
+This subproject is now imported by `CramerWoldTheorem.Inversion`; keep imports in
+that direction so the endpoint remains isolated and reusable.
 
 Current queue order:
 

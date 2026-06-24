@@ -7,7 +7,7 @@ noncomputable section
 
 namespace CramerWoldTheorem.OddInversion
 
-/-- The positive odd Euclidean space used by the current `Inversion.lean` axiom. -/
+/-- The positive odd Euclidean space used by the inversion endpoint. -/
 abbrev OddSpace (m : ℕ) := RealEuclideanSpace (2 * m + 1)
 
 /--

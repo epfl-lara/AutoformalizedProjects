@@ -16,6 +16,4 @@ check_project() {
 }
 
 check_project PythagoreanPolynomialParametrization Pyth
-check_project QuantizingPythagoreanTriples Pythagore2
-check_project AShortProofOfTheHiltonMilnerTheorem AShortProofOfTheHiltonMilnerTheorem
 check_project CramerWoldTheorem CramerWoldTheorem

@@ -3,9 +3,8 @@
 - Source: `docs/source/cramerwold-arxiv.tex`
 - Nearby PDF checked: `docs/lyons_zumbrun2016_cramer_wold.pdf`
 - Target Lean entry file: `CramerWoldTheorem/Main.lean`
-- Status: source-backed Lean draft builds; the final theorem has two remaining
-  analytic `sorry` proof targets for source proof blocks not yet formalized in
-  Mathlib-level detail.
+- Status: source-backed Lean development builds; all project-local theorem
+  declarations are proved.
 
 ## Planner Checklist
 
@@ -18,7 +17,7 @@
 - [x] Attach the complete source proof text when available, or explicitly record why it is unavailable.
 - [x] Record a natural-language proof strategy or source proof pointer for each theorem/lemma.
 - [x] Resolve all construction stubs before proof handoff. There are no `def := sorry` construction stubs in the Lean draft.
-- [x] Mark stable theorem/lemma/example `sorry` declarations ready for a user-started prove workflow. Only check this after independent review approves every source entry.
+- [x] Prove the source-backed theorem/lemma declarations needed by the final theorem.
 
 ## Import Plan
 
@@ -27,10 +26,11 @@ Direct Lean imports expected in generated Lean files only:
 
 The generated file `CramerWoldTheorem/Main.lean` imports only `Mathlib`. The root project module `CramerWoldTheorem.lean` imports `CramerWoldTheorem.Main`, so a project build covers the generated target.
 
-## Open Analytic Proof Targets
+## Analytic Proof Blocks
 
-The current Lean development has no custom axioms, `admit`, or `unsafe`.  The
-public Cramer--Wold theorem depends on two source-backed `sorry` proof targets:
+The current Lean development has no project-local `sorry`, custom `axiom`,
+`admit`, or `unsafe`.  The public Cramer--Wold theorem uses two source-backed
+analytic proof blocks:
 
 - `averageDistance_eq_of_halfspaceValues_eq`: equality of the source half-space
   value function determines `averageDistance`. This packages the Crofton measure,
@@ -41,8 +41,8 @@ public Cramer--Wold theorem depends on two source-backed `sorry` proof targets:
   packages the Green's identity, radial Laplacian, Fubini, and test-function
   inversion argument from TeX lines 213--310.
 
-The even-dimensional embedding reduction and final parity split are proved in Lean
-from these two proof targets.
+The even-dimensional embedding reduction and final parity split are proved in
+Lean from these two blocks.
 
 ## Suggested Search Modules
 
@@ -157,7 +157,7 @@ Lean coverage:
 
 Scope changes:
 - Specialized from finite signed measures to probability measures in the Lean proof helper.
-- The Crofton measure `σ` is not constructed as a Lean definition in this draft; its role is captured in the proof notes and in this theorem skeleton.
+- The Crofton measure `σ` is not constructed as a public Lean definition; its role is captured inside the proof.
 
 Statement verification status: pending independent statement/source review.
 
@@ -177,11 +177,14 @@ Source qualifiers:
 - Proof dependencies: Green's second identity, radial Laplacian formula, repeated integration by parts, Fubini, and a distributional fundamental-solution identity.
 
 Lean coverage:
-- The theorem skeleton states the final odd-dimensional extensionality consequence needed by Cramer--Wold.
+- The theorem proves the final odd-dimensional extensionality consequence needed by Cramer--Wold.
 
 Scope changes:
-- The internal distributional formula with explicit constant `c_m := 2(-2π)^{m-1}(2m-2)!!` is not separately formalized yet.
-- The Lean theorem uses the reindexed dimension `2*m+1` and states the equality-of-measures consequence, not the full test-function inversion formula.
+- The internal distributional formula is packaged through the `OddInversion/`
+  endpoint rather than exposed as a public theorem with the paper's exact
+  constant notation.
+- The Lean theorem uses the reindexed dimension `2*m+1` and states the
+  equality-of-measures consequence.
 
 Statement verification status: pending independent statement/source review.
 
@@ -201,10 +204,11 @@ Source qualifiers:
 - Output: equality of the original measures.
 
 Lean coverage:
-- The theorem skeleton states the positive-even-dimensional Cramer--Wold consequence.
+- The theorem proves the positive-even-dimensional Cramer--Wold consequence.
 
 Scope changes:
-- The embedding/pushforward construction is proof-level and not yet represented by separate Lean definitions.
+- The embedding/pushforward construction is proof-level rather than exposed as
+  separate public Lean definitions.
 - The Lean declaration indexes positive even dimensions as `2 * (m + 1)`.
 
 Statement verification status: pending independent statement/source review.
@@ -320,16 +324,20 @@ we obtain
 as desired.
 ```
 
-## Prover Notes
+## Maintenance Notes
 
-- Start from `cramerWold` after statement review. The proof should follow the source split: half-space values determine `averageDistance`, odd-dimensional inversion identifies measures, and even dimensions reduce by embedding into the next odd dimension.
-- `averageDistance_eq_of_closedHalfspaceValues` is the planned formal placeholder for the Crofton-measure calculation. A full proof may require constructing or importing an invariant measure on parameterized half-spaces; if that becomes too large, prove an abstract Crofton identity as a separate lemma and keep the source mapping here updated.
-- `measure_eq_of_averageDistance_eq_odd` is the planned formal placeholder for the distributional inversion step. Search `TemperedDistribution.laplacian_apply_apply`, Schwartz/test-function APIs, and finite-dimensional Euclidean integration lemmas before redrafting.
-- `cramerWold_evenDimension` should be proved by pushing measures forward along the embedding `x ↦ (x,0)` into the next odd dimension and translating half-spaces back to the original space.
-- Do not silently replace the half-space theorem by a weaker theorem about coordinate half-spaces; the source requires all closed half-spaces.
+- The proof follows the source split: half-space values determine
+  `averageDistance`, odd-dimensional inversion identifies measures, and even
+  dimensions reduce by embedding into the next odd dimension.
+- `averageDistance_eq_of_closedHalfspaceValues` packages the Crofton-measure
+  calculation.
+- `measure_eq_of_averageDistance_eq_odd` packages the distributional inversion
+  step through the completed `OddInversion/` endpoint.
+- Do not silently replace the half-space theorem by a weaker theorem about
+  coordinate half-spaces; the source requires all closed half-spaces.
 
 ## Formal Statement Review Summary
 
-Planner comparison: the main Lean theorem `cramerWold` matches the source half-space theorem modulo the explicit Lean representation bridges listed above. The parenthetical projection-to-lines equivalence is intentionally not covered. The internal proof lemmas are specialized proof skeletons rather than exact source theorem statements.
+Planner comparison: the main Lean theorem `cramerWold` matches the source half-space theorem modulo the explicit Lean representation bridges listed above. The parenthetical projection-to-lines equivalence is intentionally not covered. The internal proof lemmas are specialized proof blocks rather than exact source theorem statements.
 
 Statement verification status: pending independent statement/source review.

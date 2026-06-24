@@ -1,0 +1,6 @@
+AutoformalizedProjects
+Copyright 2026 EPFL LARA
+
+This repository contains Lean formalizations and supporting documentation for
+paper-level autoformalization projects. Source papers and third-party reference
+materials are credited in the project READMEs and documentation directories.
