@@ -1,6 +1,7 @@
 # Paper-Level Autoformalizations
 
-Lean 4 formalization projects produced with the EPFLemma workflow. The `main`
+Lean 4 formalization projects produced with the
+[LeanFlow](https://github.com/epfl-lara/LeanFlow) workflow. The `main`
 branch is reserved for projects that are ready to present publicly: each listed
 project builds and has no project-local `sorry`, `admit`, custom `axiom`, or
 `unsafe` in its Lean files.

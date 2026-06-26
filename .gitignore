@@ -1,9 +1,11 @@
 /.lake
+/.leanflow
 /.epflemma
 /.artifacts
 
-# Nested Lean/EPFLemma artifacts
+# Nested LeanFlow artifacts and legacy cache directories
 **/.lake
+**/.leanflow
 **/.epflemma
 **/.artifacts
 **/logs
