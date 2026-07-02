@@ -104,16 +104,13 @@ formal Laplacian recovery lemma should therefore use `Δ^(m + 1)`, not `Δ^m`.
 8. Measure separation target:
 
    ```lean
-   smooth_compactSupport_integral_eq_of_schwartz_integral_eq
-   compactlySupported_integral_eq_of_schwartz_integral_eq
    measure_eq_of_schwartz_integral_eq
    ```
 
-   This is proved.  The endpoint now avoids characteristic functions: smooth
-   compactly supported real tests are coerced to complex Schwartz maps using
-   `HasCompactSupport.toSchwartzMap`; arbitrary `C_c` tests are reached by
-   smooth compact-support approximation in `L¹(μ + ν)`; measure equality then
-   follows from `Measure.ext_of_integral_eq_on_compactlySupported`.
+   This is proved.  The endpoint now uses Physlib's finite-measure distribution
+   bridge: equality of all complex Schwartz integrals is turned into equality of
+   `Physlib.Distribution.ofFiniteMeasure ℂ`, and measure equality follows from
+   `Physlib.Distribution.ofFiniteMeasure_eq_iff`.
 
 9. Axiom replacement:
 
@@ -180,14 +177,13 @@ iterated_fourierNormSqMultiplier_eq_smulLeftCLM_pow
 normKernel_fourier_multiplier_power_eq_constDistribution_of_distributional_identity
 iterated_laplacian_succ_eq_smul_of_iterated_eq_smul
 normKernel_distributional_laplacian_power_eq_delta_of_riesz_step
-smooth_compactSupport_integral_eq_of_schwartz_integral_eq
-integral_norm_sub_le_of_eLpNorm_one_le
-compactlySupported_integral_eq_of_schwartz_integral_eq
+measure_eq_of_schwartz_integral_eq
 ```
 
 These handle basic integrability and moving iterated distributional Laplacians
 onto Schwartz test functions, plus the full Schwartz-to-measure separation
-endpoint.  They are infrastructure only; they do not prove the missing radial
+endpoint through Physlib's finite-measure distribution bridge.  They are
+infrastructure only; they do not prove the missing radial
 fundamental-solution identity.
 
 Smallest missing analytic lemma:
@@ -265,17 +261,16 @@ Start with these declarations:
 - `TemperedDistribution.laplacian_apply_apply`
 - `TemperedDistribution.laplacian_eq_fourierMultiplierCLM`
 - `SchwartzMap.laplacian_eq_fourierMultiplierCLM`
-- `HasCompactSupport.toSchwartzMap`
-- `HasCompactSupport.exist_eLpNorm_sub_le_of_continuous`
-- `MeasureTheory.Measure.ext_of_integral_eq_on_compactlySupported`
+- `Physlib.Distribution.ofFiniteMeasure`
+- `Physlib.Distribution.ofFiniteMeasure_apply`
+- `Physlib.Distribution.ofFiniteMeasure_eq_iff`
 
 Useful modules:
 
 - `Mathlib.Analysis.Distribution.TemperedDistribution`
 - `Mathlib.Analysis.Distribution.FourierMultiplier`
 - `Mathlib.Analysis.Distribution.TemperateGrowth`
-- `Mathlib.Analysis.Normed.Lp.SmoothApprox`
-- `Mathlib.MeasureTheory.Integral.RieszMarkovKakutani.Real`
+- `Physlib.Mathematics.Distribution.Basic`
 
 ## Recommended First Milestones
 
