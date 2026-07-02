@@ -20,7 +20,10 @@ lemma dist_mul_schwartz_integrable
   have hconst : Integrable (fun y : OddSpace m => ‖x‖ * ‖ψ y‖) := by
     simpa using hnormψ.const_mul ‖x‖
   have hdom : Integrable (fun y : OddSpace m => (‖y‖ + ‖x‖) * ‖ψ y‖) := by
-    simpa [add_mul] using hlin.add hconst
+    refine (hlin.add hconst).congr ?_
+    filter_upwards with y
+    simp only [Pi.add_apply]
+    ring_nf
   refine hdom.mono' ?_ ?_
   · have hcont : Continuous (fun y : OddSpace m => (dist y x : ℂ) * ψ y) := by
       fun_prop
@@ -102,7 +105,7 @@ noncomputable def normKernelDistributionAtZero
     · dsimp [C]
       positivity
     · intro φ
-      let B : ℝ := S.sup (schwartzSeminormFamily ℂ (OddSpace m) ℂ) φ
+      let B : ℝ := S.sup (fun m => SchwartzMap.seminorm ℂ m.1 m.2) φ
       have hC₁ : ∀ x : OddSpace m, ‖φ x‖ ≤ 2 ^ (K + 1) * B := by
         intro x
         have h := SchwartzMap.one_add_le_sup_seminorm_apply (𝕜 := ℂ) (m := (K + 1, 0))
@@ -134,7 +137,7 @@ noncomputable def normKernelDistributionAtZero
               exact integral_pow_mul_le_of_le_of_pow_mul_le (μ := μ) (k := 1)
                 hC₁ hC₂
         _ ≤ C * S.sup (schwartzSeminormFamily ℂ (OddSpace m) ℂ) φ := by
-              dsimp [C, B]
+              dsimp [C, B, schwartzSeminormFamily]
               ring_nf
               exact le_rfl
 

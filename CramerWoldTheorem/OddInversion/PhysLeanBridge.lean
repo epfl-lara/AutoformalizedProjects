@@ -1,4 +1,4 @@
-import Physlib.SpaceAndTime.Space.Norm
+import Physlib.SpaceAndTime.Space.Norm.Basic
 import Physlib.Mathematics.Distribution.PowMul
 import Mathlib.Analysis.Distribution.TemperedDistribution
 
@@ -231,6 +231,8 @@ private lemma radial_power_deriv_integral_by_parts
         fun_prop
       have hlim := tendsto_nhdsWithin_of_tendsto_nhds
         (s := Set.Ioi (0 : ℝ)) hcont.tendsto
+      change Filter.Tendsto (fun x : ℝ => x ^ p * η (x • n.1))
+        (𝓝[>] (0 : ℝ)) (𝓝 (0 : ℝ))
       simpa [Pi.mul_apply, hη'_apply, hp.ne'] using hlim
     · have hzero :
           Filter.Tendsto (fun x : ℝ => x ^ p * η' x) atTop (𝓝 (0 : ℝ)) := by
@@ -242,6 +244,7 @@ private lemma radial_power_deriv_integral_by_parts
             atTop_le_cocompact
         exact hsch.congr' (Eventually.of_forall (fun x => by
           rw [hmul_iter_apply p x]))
+      change Filter.Tendsto (fun x : ℝ => x ^ p * η (x • n.1)) atTop (𝓝 (0 : ℝ))
       simpa [hη'_apply, Pi.mul_apply] using hzero
   calc
     -∫ (x : ℝ) in Set.Ioi (0 : ℝ),
@@ -294,6 +297,8 @@ lemma distDiv_norm_zpow_smul_repr_self_eq_smul
           rw [MeasureTheory.integral_prod]
           convert Space.integrable_isDistBounded_inner_grad_schwartzMap_spherical
             (Space.IsDistBounded.zpow_smul_repr_self q (by omega)) η using 1
+          ext r
+          simp [F]
     _ = - ∫ n, (∫ (r : Set.Ioi (0 : ℝ)),
         r.1 ^ p * (_root_.deriv (fun a => η (a • n.1)) r.1)
         ∂(.comap Subtype.val volume))
@@ -400,6 +405,8 @@ lemma distDiv_norm_zpow_smul_repr_self_eq_smul
                 rw [MeasureTheory.integral_prod]
                 convert integrable_isDistBounded_mul_schwartzMap_spherical
                   (Space.IsDistBounded.pow q (by omega)) η using 1
+                ext r
+                simp
           _ = ∫ (n : ↑(Metric.sphere (0 : Space d.succ) 1)),
                 ∫ (r : Set.Ioi (0 : ℝ)),
                   r.1 ^ (p - 1) * η (r.1 • n.1)

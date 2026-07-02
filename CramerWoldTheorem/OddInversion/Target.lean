@@ -1,4 +1,10 @@
+/-
+Copyright (c) 2026 Lazar Milikic. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Lazar Milikic
+-/
 import OddInversion.FundamentalSolution
+import Physlib.Mathematics.Distribution.Basic
 
 /-!
 Proof-focused subproject for replacing
@@ -873,133 +879,6 @@ theorem schwartz_integral_eq_of_averageDistance_eq_odd
     simpa [w] using hformula
   exact schwartz_integral_eq_of_potential_formula m μ ν havg φ w c hformula'
 
-/--
-Smooth compactly supported real tests are covered by the Schwartz hypothesis:
-coerce the test to a complex-valued smooth compactly supported function, convert
-it to a Schwartz map, and then take real parts of the complex integral equality.
--/
-private theorem smooth_compactSupport_integral_eq_of_schwartz_integral_eq
-    (m : ℕ)
-    (μ ν : Measure (OddSpace m))
-    [IsProbabilityMeasure μ] [IsProbabilityMeasure ν]
-    (h :
-      ∀ φ : 𝓢(OddSpace m, ℂ),
-        ∫ x, φ x ∂μ = ∫ x, φ x ∂ν)
-    {f : OddSpace m → ℝ} (hcs : HasCompactSupport f)
-    (hsm : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) f) :
-    ∫ x, f x ∂μ = ∫ x, f x ∂ν := by
-  have hcsC : HasCompactSupport (fun x : OddSpace m => (f x : ℂ)) := by
-    simpa [Function.comp_def] using
-      hcs.comp_left (g := fun r : ℝ => (r : ℂ)) Complex.ofReal_zero
-  have hsmC :
-      ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞)
-        (fun x : OddSpace m => (f x : ℂ)) := by
-    exact Complex.ofRealCLM.contDiff.comp hsm
-  have hφ := h (hcsC.toSchwartzMap hsmC)
-  have hC :
-      ∫ x : OddSpace m, (f x : ℂ) ∂μ =
-        ∫ x : OddSpace m, (f x : ℂ) ∂ν := by
-    simpa using hφ
-  apply Complex.ofReal_injective
-  rw [← integral_complex_ofReal (μ := μ) (f := f),
-    ← integral_complex_ofReal (μ := ν) (f := f)]
-  exact hC
-
-/-- An `L¹(μ + ν)` approximation controls the integral error against `μ`. -/
-private lemma integral_norm_sub_le_of_eLpNorm_one_le
-    (m : ℕ) (μ ν : Measure (OddSpace m))
-    [IsProbabilityMeasure μ] [IsProbabilityMeasure ν]
-    (f g : OddSpace m → ℝ) (hfcs : HasCompactSupport f) (hfc : Continuous f)
-    (hgcs : HasCompactSupport g) (hgc : Continuous g) {ε : ℝ} (hε : 0 < ε)
-    (happrox : eLpNorm (f - g) 1 (μ + ν) ≤ ENNReal.ofReal ε) :
-    ∫ x, ‖f x - g x‖ ∂μ ≤ ε := by
-  let lam : Measure (OddSpace m) := μ + ν
-  have hf_mem : MemLp f 1 lam := hfc.memLp_of_hasCompactSupport hfcs
-  have hg_mem : MemLp g 1 lam := hgc.memLp_of_hasCompactSupport hgcs
-  have hfg_mem : MemLp (f - g) 1 lam := hf_mem.sub hg_mem
-  have h_int_lam : ∫ x, ‖f x - g x‖ ∂lam ≤ ε := by
-    have hLp := hfg_mem.eLpNorm_eq_integral_rpow_norm one_ne_zero ENNReal.one_ne_top
-    rw [show eLpNorm (f - g) 1 (μ + ν) = eLpNorm (f - g) 1 lam by rfl] at happrox
-    rw [hLp] at happrox
-    simpa [lam] using (ENNReal.ofReal_le_ofReal_iff hε.le).mp happrox
-  have hfi : Integrable (fun x : OddSpace m => ‖f x - g x‖) lam := by
-    simpa using hfg_mem.integrable_norm_rpow one_ne_zero ENNReal.one_ne_top
-  exact (integral_mono_measure (μ := μ) (ν := lam) (Measure.le_add_right le_rfl)
-    (ae_of_all _ fun x => norm_nonneg (f x - g x)) hfi).trans h_int_lam
-
-/--
-Second analytic target: extend equality from Schwartz tests to all compactly
-supported continuous real tests.
-
-The proof approximates `f : C_c(E, ℝ)` in `L¹(μ + ν)` by smooth compactly
-supported functions, uses the previous Schwartz bridge on the approximants, and
-lets the approximation error tend to zero.
--/
-private theorem compactlySupported_integral_eq_of_schwartz_integral_eq
-    (m : ℕ)
-    (μ ν : Measure (OddSpace m))
-    [IsProbabilityMeasure μ] [IsProbabilityMeasure ν]
-    (h :
-      ∀ φ : 𝓢(OddSpace m, ℂ),
-        ∫ x, φ x ∂μ = ∫ x, φ x ∂ν)
-    (f : CompactlySupportedContinuousMap (OddSpace m) ℝ) :
-    ∫ x, f x ∂μ = ∫ x, f x ∂ν := by
-  apply eq_of_forall_dist_le
-  intro ε hε
-  have hε₂ : 0 < ε / 2 := by positivity
-  obtain ⟨g, hgcs, hgsm, happrox⟩ :=
-    f.hasCompactSupport.exist_eLpNorm_sub_le_of_continuous
-      (μ := μ + ν) ENNReal.one_ne_top hε₂ f.continuous
-  have hgcont : Continuous g := hgsm.continuous
-  have hdist_mu :
-      dist (∫ x, f x ∂μ) (∫ x, g x ∂μ) ≤ ε / 2 := by
-    have hf_int : Integrable (fun x : OddSpace m => f x) μ :=
-      f.continuous.integrable_of_hasCompactSupport f.hasCompactSupport
-    have hg_int : Integrable g μ := hgcont.integrable_of_hasCompactSupport hgcs
-    calc
-      dist (∫ x, f x ∂μ) (∫ x, g x ∂μ)
-          = ‖∫ x : OddSpace m, f x - g x ∂μ‖ := by
-              rw [dist_eq_norm, ← integral_sub hf_int hg_int]
-      _ ≤ ∫ x : OddSpace m, ‖f x - g x‖ ∂μ :=
-              norm_integral_le_integral_norm (fun x : OddSpace m => f x - g x)
-      _ ≤ ε / 2 := by
-              exact integral_norm_sub_le_of_eLpNorm_one_le m μ ν (fun x => f x) g
-                f.hasCompactSupport f.continuous hgcs hgcont hε₂ happrox
-  have hdist_nu :
-      dist (∫ x, f x ∂ν) (∫ x, g x ∂ν) ≤ ε / 2 := by
-    have hf_int : Integrable (fun x : OddSpace m => f x) ν :=
-      f.continuous.integrable_of_hasCompactSupport f.hasCompactSupport
-    have hg_int : Integrable g ν := hgcont.integrable_of_hasCompactSupport hgcs
-    calc
-      dist (∫ x, f x ∂ν) (∫ x, g x ∂ν)
-          = ‖∫ x : OddSpace m, f x - g x ∂ν‖ := by
-              rw [dist_eq_norm, ← integral_sub hf_int hg_int]
-      _ ≤ ∫ x : OddSpace m, ‖f x - g x‖ ∂ν :=
-              norm_integral_le_integral_norm (fun x : OddSpace m => f x - g x)
-      _ ≤ ε / 2 := by
-              exact integral_norm_sub_le_of_eLpNorm_one_le m ν μ (fun x => f x) g
-                f.hasCompactSupport f.continuous hgcs hgcont hε₂
-                (by simpa [add_comm] using happrox)
-  have hg_eq : ∫ x, g x ∂μ = ∫ x, g x ∂ν :=
-    smooth_compactSupport_integral_eq_of_schwartz_integral_eq m μ ν h hgcs hgsm
-  have hdist_g : dist (∫ x, g x ∂μ) (∫ x, g x ∂ν) = 0 := by
-    rw [hg_eq, dist_self]
-  calc
-    dist (∫ x, f x ∂μ) (∫ x, f x ∂ν)
-        ≤ dist (∫ x, f x ∂μ) (∫ x, g x ∂μ) +
-            dist (∫ x, g x ∂μ) (∫ x, f x ∂ν) := dist_triangle _ _ _
-    _ ≤ dist (∫ x, f x ∂μ) (∫ x, g x ∂μ) +
-          (dist (∫ x, g x ∂μ) (∫ x, g x ∂ν) +
-            dist (∫ x, g x ∂ν) (∫ x, f x ∂ν)) := by
-            gcongr
-            exact dist_triangle _ _ _
-    _ = dist (∫ x, f x ∂μ) (∫ x, g x ∂μ) +
-          dist (∫ x, g x ∂ν) (∫ x, f x ∂ν) := by
-            rw [hdist_g, zero_add]
-    _ ≤ ε / 2 + ε / 2 := by
-            exact add_le_add hdist_mu (by simpa [dist_comm] using hdist_nu)
-    _ = ε := by ring
-
 theorem measure_eq_of_schwartz_integral_eq
     (m : ℕ)
     (μ ν : Measure (OddSpace m))
@@ -1008,8 +887,11 @@ theorem measure_eq_of_schwartz_integral_eq
       ∀ φ : 𝓢(OddSpace m, ℂ),
         ∫ x, φ x ∂μ = ∫ x, φ x ∂ν) :
     μ = ν := by
-  exact Measure.ext_of_integral_eq_on_compactlySupported
-    (compactlySupported_integral_eq_of_schwartz_integral_eq m μ ν h)
+  rw [← Physlib.Distribution.ofFiniteMeasure_eq_iff]
+  ext φ
+  rw [Physlib.Distribution.ofFiniteMeasure_apply,
+    Physlib.Distribution.ofFiniteMeasure_apply]
+  exact h φ
 
 /-- Measure-level endpoint used by `CramerWoldTheorem/Inversion.lean`. -/
 theorem measure_eq_of_averageDistance_eq_odd
