@@ -19,6 +19,18 @@ of living on `main`.
 
 ## Completed Projects
 
+### `IMO2026/GPT5.6`
+
+- Lake target: `IMO2026`
+- Source: Joseph Myers,
+  [`jsm28/IMOLean`](https://github.com/jsm28/IMOLean), based on the
+  [official IMO 2026 problems](https://www.imo-official.org/problems.aspx)
+- Status: proof-complete LeanFlow formalizations of Problems 1–6, produced with
+  `gpt-5.6-sol` through the Codex provider and verified together as one Lean
+  project.
+- Provenance and compact run evidence:
+  [`IMO2026/GPT5.6/README.md`](IMO2026/GPT5.6/README.md)
+
 ### `PythagoreanPolynomialParametrization`
 
 - Lake target: `Pyth`
@@ -66,4 +78,7 @@ lake build Pyth
 
 cd ../CramerWoldTheorem
 lake build CramerWoldTheorem
+
+cd ../IMO2026/GPT5.6
+lake build IMO2026
 ```

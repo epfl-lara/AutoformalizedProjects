@@ -17,3 +17,4 @@ check_project() {
 
 check_project PythagoreanPolynomialParametrization Pyth
 check_project CramerWoldTheorem CramerWoldTheorem
+check_project IMO2026/GPT5.6 IMO2026
