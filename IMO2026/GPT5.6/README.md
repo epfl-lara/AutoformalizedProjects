@@ -2,7 +2,7 @@
 
 This directory preserves the six proof-complete IMO 2026 formalizations
 produced with [LeanFlow](https://github.com/epfl-lara/LeanFlow) and
-`gpt-5.6-sol` through its Codex provider.
+`gpt-5.6-sol` at `xhigh` reasoning effort through its Codex provider.
 
 ## Status
 
@@ -45,14 +45,15 @@ accepted correction to the Problem 1 move definition in
 
 ## Method
 
-LeanFlow processed the problems one at a time with `gpt-5.6-sol` as both the
-main prover and the research model. The CLI provider was `codex`; persisted
-evidence identifies its resolved API route as `openai-codex`. Each problem was
-explored through a structured proof graph, with failed branches and reusable
-lemmas retained in workflow state. Lean and mathlib search, public repositories,
-papers, and general web research were available to the normal research
-workflow; these results are therefore research-assisted formalizations rather
-than claims of independent solution discovery.
+LeanFlow processed the problems one at a time with `gpt-5.6-sol` at `xhigh`
+reasoning effort as both the main prover and the research model. The CLI
+provider was `codex`; persisted evidence identifies its resolved API route as
+`openai-codex`. Each problem was explored through a structured proof graph,
+with failed branches and reusable lemmas retained in workflow state. Lean and
+mathlib search, public repositories, papers, and general web research were
+available to the normal research workflow; these results are therefore
+research-assisted formalizations rather than claims of independent solution
+discovery.
 
 Every completed declaration passed LeanFlow's deterministic placeholder and
 kernel checks. The six retained modules were then checked together with a clean
