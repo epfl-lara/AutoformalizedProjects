@@ -1,0 +1,25 @@
+import Mathlib.Geometry.Euclidean.Triangle
+import Mathlib.Geometry.Euclidean.Altitude
+open scoped EuclideanGeometry
+open EuclideanGeometry
+#check Triangle.altitudeFoot
+#check Triangle.altitudeFoot_mem_affineSpan_faceOpposite
+#check Triangle.altitudeFoot_mem_affineSpan
+#check sbtw_iff_mem_image_Ioo
+#check sbtw_iff_mem_segment
+#check EuclideanGeometry.sbtw_iff_mem_segment
+#check angle_eq_pi_div_two_iff
+#check angle_eq_pi_div_two_iff_of_mem_affineSpan
+#check EuclideanGeometry.angle_eq_pi_div_two_iff
+#check Triangle.angle_sum
+#check Triangle.angle_sum_eq_pi
+#check angle_pos_of_affineIndependent
+#check angle_pos
+#check angle_lt_pi
+#check AffineIndependent.mem_affineSpan_pair
+#check mem_affineSpan_pair
+#check mem_affineSpan_pair_iff
+#check lineMap_mem_affineSpan
+#check Sbtw
+#check Sbtw.mem_segment
+#check Sbtw.mem_affineSpan
