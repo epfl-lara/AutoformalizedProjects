@@ -31,6 +31,22 @@ of living on `main`.
 - Provenance and compact run evidence:
   [`IMO2026/GPT5.6/README.md`](IMO2026/GPT5.6/README.md)
 
+### `LeanIMOBench/GPT6-astra`
+
+- Lake target: `LeanIMOBench`
+- Source: IMO-LeanProofBench, the Lean half of IMO-Bench (Luong et al.,
+  *Towards Robust Mathematical Reasoning*), published as
+  `imobench/lean_proof_bench_v2.csv` in
+  [`google-deepmind/superhuman`](https://github.com/google-deepmind/superhuman)
+- Status: proof-complete formalizations of the eighteen benchmark problems that
+  LEAP ([arXiv:2606.03303](https://arxiv.org/abs/2606.03303)) does not publish
+  solutions for — twelve Geometry and six Combinatorics, twelve of them problems
+  composed for the benchmark and never published. Produced with LeanFlow with
+  `gpt-6-astra` (`xhigh` reasoning orchestrator, `low` reasoning prover) through
+  the Codex provider, and verified together as one Lean project. Every statement
+  is byte-identical to the published benchmark. Proof graphs are in
+  `LeanIMOBench/GPT6-astra/DAGS.md`.
+
 ### `PythagoreanPolynomialParametrization`
 
 - Lake target: `Pyth`
