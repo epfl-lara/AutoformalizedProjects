@@ -1,5 +1,5 @@
-import LeanFlowProofs.PBAdvanced027Normalization
-import LeanFlowProofs.PBAdvanced027Similarity
+import LeanFlowProofs.PBAdvanced027.Normalization
+import LeanFlowProofs.PBAdvanced027.Similarity
 import Mathlib
 
 theorem LeanFlowProofs.PBAdvanced027Aux.exterior_iff

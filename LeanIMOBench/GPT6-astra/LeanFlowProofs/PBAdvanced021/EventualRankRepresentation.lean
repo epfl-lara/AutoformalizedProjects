@@ -1,5 +1,5 @@
-import LeanFlowProofs.PB021EventualAlternation
-import LeanFlowProofs.PB021LargeOccurrenceRankCount
+import LeanFlowProofs.PBAdvanced021.EventualAlternation
+import LeanFlowProofs.PBAdvanced021.LargeOccurrenceRankCount
 import Mathlib
 
 theorem LeanFlow.pb021_eventual_rank_representation {c : ℕ → ℕ} {N B : ℕ} (hN : 0 < N) (hpos : ∀ i : ℕ, 0 < i → 0 < c i) (hNB : N ≤ B) (hinit : ∀ i : ℕ, 1 ≤ i → i ≤ N → c i ≤ B) (hrule : ∀ t : ℕ, N ≤ t → c (t + 1) = ((Finset.Icc 1 t).filter (fun i => c i = c t)).card) : ∃ t0 : ℕ, N ≤ t0 ∧ ∃ A : ℕ → Fin B → ℕ, ∃ x : ℕ → Fin B, (∀ n : ℕ, c (t0 + 2 * n) = (x n).val + 1) ∧ (∀ (n : ℕ) (i : Fin B), A (n + 1) i = A n i + (if i = x n then 1 else 0)) ∧ (∀ n : ℕ, (x (n + 1)).val + 1 = (Finset.univ.filter (fun j : Fin B => A (n + 1) (x n) ≤ A (n + 1) j)).card) := by   classical

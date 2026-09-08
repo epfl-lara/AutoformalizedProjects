@@ -1,9 +1,9 @@
-import LeanFlowProofs.PBBasic026AffineCertificate
-import LeanFlowProofs.PBBasic026ApexModel
-import LeanFlowProofs.PBBasic026CircleModel
-import LeanFlowProofs.PBBasic026CircumcenterModel
-import LeanFlowProofs.PBBasic026ContactFrame
-import LeanFlowProofs.PBBasic026ReflectionModel
+import LeanFlowProofs.PBBasic026.AffineCertificate
+import LeanFlowProofs.PBBasic026.ApexModel
+import LeanFlowProofs.PBBasic026.CircleModel
+import LeanFlowProofs.PBBasic026.CircumcenterModel
+import LeanFlowProofs.PBBasic026.ContactFrame
+import LeanFlowProofs.PBBasic026.ReflectionModel
 import Mathlib
 
 theorem LeanFlowProofs.PBBasic026_one_side

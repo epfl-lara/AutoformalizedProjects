@@ -1,6 +1,6 @@
-import LeanFlowProofs.PBAdvanced027Crossing
-import LeanFlowProofs.PBAdvanced027Descent
-import LeanFlowProofs.PBAdvanced027Exterior
+import LeanFlowProofs.PBAdvanced027.Crossing
+import LeanFlowProofs.PBAdvanced027.Descent
+import LeanFlowProofs.PBAdvanced027.Exterior
 import Mathlib
 
 /-

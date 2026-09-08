@@ -1,8 +1,8 @@
-import LeanFlowProofs.PB002CycleWitnesses
-import LeanFlowProofs.PB002EventualPeriodConfigurationBound
-import LeanFlowProofs.PB002LongIteratePumpable
-import LeanFlowProofs.PB002PeriodOfPumping
-import LeanFlowProofs.PB002SmallCommonMultiple120
+import LeanFlowProofs.PBAdvanced002.CycleWitnesses
+import LeanFlowProofs.PBAdvanced002.EventualPeriodConfigurationBound
+import LeanFlowProofs.PBAdvanced002.LongIteratePumpable
+import LeanFlowProofs.PBAdvanced002.PeriodOfPumping
+import LeanFlowProofs.PBAdvanced002.SmallCommonMultiple120
 import Mathlib
 
 /--

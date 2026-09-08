@@ -1,4 +1,4 @@
-import LeanFlowProofs.PBBasic026OneSide
+import LeanFlowProofs.PBBasic026.OneSide
 import Mathlib
 
 /-

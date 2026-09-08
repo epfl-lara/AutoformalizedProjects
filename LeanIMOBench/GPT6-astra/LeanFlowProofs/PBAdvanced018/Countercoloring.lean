@@ -1,8 +1,8 @@
-import LeanFlowProofs.PB018Confinement
-import LeanFlowProofs.PB018Pack124
-import LeanFlowProofs.PB018Parameters
-import LeanFlowProofs.PB018RectangleAtoms
-import LeanFlowProofs.PB018SmallCertificates
+import LeanFlowProofs.PBAdvanced018.Confinement
+import LeanFlowProofs.PBAdvanced018.Pack124
+import LeanFlowProofs.PBAdvanced018.Parameters
+import LeanFlowProofs.PBAdvanced018.RectangleAtoms
+import LeanFlowProofs.PBAdvanced018.SmallCertificates
 import Mathlib
 
 theorem LeanFlowProofs.PB018.countercoloring (n k : ℕ) (hn : 5 ≤ n) (hk : 1 ≤ k) (hbad : 3 * k + n + 2 * Nat.sqrt n + 3 < n ^ 2) : ∃ M : Fin n → Fin n → Fin k, (∀ i : Fin k, (Finset.univ.filter (fun x : Fin n × Fin n => M x.1 x.2 = i)).card = n ^ 2 / k ∨ (Finset.univ.filter (fun x : Fin n × Fin n => M x.1 x.2 = i)).card = n ^ 2 / k + 1) ∧ (∀ c : List (Fin n × Fin n), c.Nodup → c.Chain' (fun x y => abs ((x.2 : ℤ) - (y.2 : ℤ)) + abs ((x.1 : ℤ) - (y.1 : ℤ)) = 1 ∧ M x.1 x.2 ≠ M y.1 y.2) → c.length < n) := by classical

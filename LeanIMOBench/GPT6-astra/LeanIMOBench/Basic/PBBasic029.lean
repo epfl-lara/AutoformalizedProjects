@@ -1,4 +1,4 @@
-import LeanFlowProofs.PBBasic029PairCount
+import LeanFlowProofs.PBBasic029.PairCount
 import Mathlib
 
 /-

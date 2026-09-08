@@ -1,8 +1,8 @@
-import LeanFlowProofs.PBAdvanced005InterceptBranch
-import LeanFlowProofs.PBAdvanced005ObliqueGram
-import LeanFlowProofs.PBAdvanced005PartnerTransfer
-import LeanFlowProofs.PBAdvanced005PositiveConeInterior
-import LeanFlowProofs.PBAdvanced005SectorCoordinates
+import LeanFlowProofs.PBAdvanced005.InterceptBranch
+import LeanFlowProofs.PBAdvanced005.ObliqueGram
+import LeanFlowProofs.PBAdvanced005.PartnerTransfer
+import LeanFlowProofs.PBAdvanced005.PositiveConeInterior
+import LeanFlowProofs.PBAdvanced005.SectorCoordinates
 import Mathlib
 
 /-

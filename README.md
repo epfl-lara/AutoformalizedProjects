@@ -41,10 +41,11 @@ of living on `main`.
 - Status: proof-complete formalizations of the eighteen benchmark problems that
   LEAP ([arXiv:2606.03303](https://arxiv.org/abs/2606.03303)) does not publish
   solutions for — twelve Geometry and six Combinatorics, twelve of them problems
-  composed for the benchmark and never published. Produced with `gpt-6-astra`
-  through the Codex provider, with planning at `xhigh` and the prover at `low`
-  reasoning effort, and verified together as one Lean project. Every statement is
-  byte-identical to the published benchmark.
+  composed for the benchmark and never published. Produced with LeanFlow with
+  `gpt-6-astra` (`xhigh` reasoning orchestrator, `low` reasoning prover) through
+  the Codex provider, and verified together as one Lean project. Every statement
+  is byte-identical to the published benchmark. Proof graphs are in
+  `LeanIMOBench/GPT6-astra/DAGS.md`.
 
 ### `PythagoreanPolynomialParametrization`
 

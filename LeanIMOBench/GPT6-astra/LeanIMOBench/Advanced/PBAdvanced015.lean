@@ -1,12 +1,12 @@
-import LeanFlowProofs.PB015CircumcircleCoordinates
-import LeanFlowProofs.PB015CoordinateCollinear
-import LeanFlowProofs.PB015ExternalParameter
-import LeanFlowProofs.PB015InternalBisector
-import LeanFlowProofs.PB015Normalize
-import LeanFlowProofs.PB015OrthicEquations
-import LeanFlowProofs.PB015SecantCoordinates
-import LeanFlowProofs.PB015TangencyRelation
-import LeanFlowProofs.PB015TangentLineSq
+import LeanFlowProofs.PBAdvanced015.CircumcircleCoordinates
+import LeanFlowProofs.PBAdvanced015.CoordinateCollinear
+import LeanFlowProofs.PBAdvanced015.ExternalParameter
+import LeanFlowProofs.PBAdvanced015.InternalBisector
+import LeanFlowProofs.PBAdvanced015.Normalize
+import LeanFlowProofs.PBAdvanced015.OrthicEquations
+import LeanFlowProofs.PBAdvanced015.SecantCoordinates
+import LeanFlowProofs.PBAdvanced015.TangencyRelation
+import LeanFlowProofs.PBAdvanced015.TangentLineSq
 import Mathlib
 
 /-

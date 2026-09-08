@@ -1,4 +1,4 @@
-import LeanFlowProofs.PB016SideWeights
+import LeanFlowProofs.PBAdvanced016.SideWeights
 import Mathlib
 
 theorem LeanFlowProofs.PB016.weighted_frame

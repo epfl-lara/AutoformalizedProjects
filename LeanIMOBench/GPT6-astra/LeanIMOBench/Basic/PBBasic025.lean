@@ -1,7 +1,7 @@
-import LeanFlowProofs.PBBasic025AngleOfOrthogonalSpans
-import LeanFlowProofs.PBBasic025IncenterDisplacement
-import LeanFlowProofs.PBBasic025InnerProductCancellation
-import LeanFlowProofs.PBBasic025SegmentPlacement
+import LeanFlowProofs.PBBasic025.AngleOfOrthogonalSpans
+import LeanFlowProofs.PBBasic025.IncenterDisplacement
+import LeanFlowProofs.PBBasic025.InnerProductCancellation
+import LeanFlowProofs.PBBasic025.SegmentPlacement
 import Mathlib
 
 /-

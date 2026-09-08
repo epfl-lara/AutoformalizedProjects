@@ -1,6 +1,6 @@
-import LeanFlowProofs.PB002LiftMutualReachability
-import LeanFlowProofs.PB002LongIterateVisitsCycle
-import LeanFlowProofs.PB002ShortImageIterate
+import LeanFlowProofs.PBAdvanced002.LiftMutualReachability
+import LeanFlowProofs.PBAdvanced002.LongIterateVisitsCycle
+import LeanFlowProofs.PBAdvanced002.ShortImageIterate
 import Mathlib
 
 theorem LeanFlowPB002.long_iterate_pumpable {V : Type*} [Fintype V]

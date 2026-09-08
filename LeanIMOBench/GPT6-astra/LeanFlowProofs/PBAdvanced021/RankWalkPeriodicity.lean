@@ -1,7 +1,7 @@
-import LeanFlowProofs.PB021BoundedRankWalkPeriodicity
-import LeanFlowProofs.PB021RankWalkBoundedWidth
-import LeanFlowProofs.PB021RankWalkDefectData
-import LeanFlowProofs.PB021SortedPrefixDominance
+import LeanFlowProofs.PBAdvanced021.BoundedRankWalkPeriodicity
+import LeanFlowProofs.PBAdvanced021.RankWalkBoundedWidth
+import LeanFlowProofs.PBAdvanced021.RankWalkDefectData
+import LeanFlowProofs.PBAdvanced021.SortedPrefixDominance
 import Mathlib
 
 theorem LeanFlow.pb021_rank_walk_eventually_periodic {d : ℕ} (hd : 0 < d) (A : ℕ → Fin d → ℕ) (x : ℕ → Fin d) (hstep : ∀ (n : ℕ) (i : Fin d), A (n + 1) i = A n i + (if i = x n then 1 else 0)) (hrank : ∀ n : ℕ, (x (n + 1)).val + 1 = (Finset.univ.filter (fun j : Fin d => A (n + 1) (x n) ≤ A (n + 1) j)).card) : ∃ M P : ℕ, 0 < M ∧ 0 < P ∧ ∀ n : ℕ, M ≤ n → x n = x (n + P) := by 

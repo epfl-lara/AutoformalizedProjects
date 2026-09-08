@@ -1,4 +1,4 @@
-import LeanFlowProofs.PBBasic025HeightProducts
+import LeanFlowProofs.PBBasic025.HeightProducts
 import Mathlib
 
 theorem LeanFlowProofs.pbbasic025_incenterDisplacement

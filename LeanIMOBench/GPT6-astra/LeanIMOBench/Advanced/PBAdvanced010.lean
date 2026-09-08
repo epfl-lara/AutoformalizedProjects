@@ -1,9 +1,9 @@
-import LeanFlowProofs.PBAdvanced010CosphericalCoordinates
-import LeanFlowProofs.PBAdvanced010EqualPower
-import LeanFlowProofs.PBAdvanced010EulerParameters
-import LeanFlowProofs.PBAdvanced010Frame
-import LeanFlowProofs.PBAdvanced010RadicalAxis
-import LeanFlowProofs.PBAdvanced010SecantLocus
+import LeanFlowProofs.PBAdvanced010.CosphericalCoordinates
+import LeanFlowProofs.PBAdvanced010.EqualPower
+import LeanFlowProofs.PBAdvanced010.EulerParameters
+import LeanFlowProofs.PBAdvanced010.Frame
+import LeanFlowProofs.PBAdvanced010.RadicalAxis
+import LeanFlowProofs.PBAdvanced010.SecantLocus
 import Mathlib
 
 /-

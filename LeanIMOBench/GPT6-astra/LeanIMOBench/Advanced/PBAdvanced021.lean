@@ -1,5 +1,5 @@
-import LeanFlowProofs.PB021EventualRankRepresentation
-import LeanFlowProofs.PB021RankWalkPeriodicity
+import LeanFlowProofs.PBAdvanced021.EventualRankRepresentation
+import LeanFlowProofs.PBAdvanced021.RankWalkPeriodicity
 import Mathlib
 
 /-- The property that a sequence `c` of positive integers satisfies the recursive rule

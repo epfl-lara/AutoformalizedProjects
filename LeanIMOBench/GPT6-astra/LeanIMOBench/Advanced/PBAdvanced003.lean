@@ -1,7 +1,7 @@
-import LeanFlowProofs.PB003CoefficientCollinearity
-import LeanFlowProofs.PB003ForwardBisector
-import LeanFlowProofs.PB003NegativePowerSecant
-import LeanFlowProofs.PB003ScalarData
+import LeanFlowProofs.PBAdvanced003.CoefficientCollinearity
+import LeanFlowProofs.PBAdvanced003.ForwardBisector
+import LeanFlowProofs.PBAdvanced003.NegativePowerSecant
+import LeanFlowProofs.PBAdvanced003.ScalarData
 import Mathlib
 
 /-

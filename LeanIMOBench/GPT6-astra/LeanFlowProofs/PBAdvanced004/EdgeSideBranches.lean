@@ -1,4 +1,4 @@
-import LeanFlowProofs.PB004EdgeSides
+import LeanFlowProofs.PBAdvanced004.EdgeSides
 import Mathlib
 
 theorem LeanFlowProofs.PB004_edge_side_branches

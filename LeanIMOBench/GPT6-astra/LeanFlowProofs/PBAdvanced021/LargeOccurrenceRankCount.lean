@@ -1,4 +1,4 @@
-import LeanFlowProofs.PB021NoLargeLarge
+import LeanFlowProofs.PBAdvanced021.NoLargeLarge
 import Mathlib
 
 theorem LeanFlow.pb021_large_occurrence_rank_count {c : ℕ → ℕ} {N B : ℕ} (hN : 0 < N) (hpos : ∀ i : ℕ, 0 < i → 0 < c i) (hNB : N ≤ B) (hinit : ∀ i : ℕ, 1 ≤ i → i ≤ N → c i ≤ B) (hrule : ∀ t : ℕ, N ≤ t → c (t + 1) = ((Finset.Icc 1 t).filter (fun i => c i = c t)).card) : ∀ t y : ℕ, N ≤ t → B < y → ((Finset.Icc 1 t).filter (fun i => c i = y)).card = ((Finset.Icc 1 B).filter (fun j => y ≤ ((Finset.Ico 1 t).filter (fun i => c i = j)).card)).card := by 

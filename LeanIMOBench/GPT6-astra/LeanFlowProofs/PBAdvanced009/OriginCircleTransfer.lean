@@ -1,4 +1,4 @@
-import LeanFlowProofs.PB009CosphericalEquation
+import LeanFlowProofs.PBAdvanced009.CosphericalEquation
 import Mathlib
 
 theorem LeanFlowProofs.PB009.originCircleTransfer

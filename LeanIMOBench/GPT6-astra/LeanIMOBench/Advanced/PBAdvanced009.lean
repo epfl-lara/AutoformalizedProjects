@@ -1,9 +1,9 @@
-import LeanFlowProofs.PB009AHGSecondIntersection
-import LeanFlowProofs.PB009CosphericalEquation
-import LeanFlowProofs.PB009FirstCircleCertificates
-import LeanFlowProofs.PB009OriginCircleTransfer
-import LeanFlowProofs.PB009PencilCertificates
-import LeanFlowProofs.PB009ScalarCompletion
+import LeanFlowProofs.PBAdvanced009.AHGSecondIntersection
+import LeanFlowProofs.PBAdvanced009.CosphericalEquation
+import LeanFlowProofs.PBAdvanced009.FirstCircleCertificates
+import LeanFlowProofs.PBAdvanced009.OriginCircleTransfer
+import LeanFlowProofs.PBAdvanced009.PencilCertificates
+import LeanFlowProofs.PBAdvanced009.ScalarCompletion
 import Mathlib
 
 /-

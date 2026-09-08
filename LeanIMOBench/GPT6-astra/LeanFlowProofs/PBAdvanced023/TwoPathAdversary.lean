@@ -1,5 +1,5 @@
-import LeanFlowProofs.PB023GridCrossing
-import LeanFlowProofs.PB023SelectionExtension
+import LeanFlowProofs.PBAdvanced023.GridCrossing
+import LeanFlowProofs.PBAdvanced023.SelectionExtension
 import Mathlib
 
 theorem LeanFlow.PB023.twoPathAdversary (C : ℕ) (hC : 3 ≤ C) :

@@ -1,4 +1,4 @@
-import LeanFlowProofs.PB018GridCover
+import LeanFlowProofs.PBAdvanced018.GridCover
 import Mathlib
 
 theorem LeanFlowProofs.PB018.no_mono_path (n k : ℕ) (hn : 2 ≤ n) (M : Fin n → Fin n → Fin k) (hmono : ∀ y₀ y₁ x₀ x₁ : Fin n, y₁.val = y₀.val + 1 → x₁.val = x₀.val + 1 → ¬ (M y₀ x₀ = M y₀ x₁ ∧ M y₀ x₀ = M y₁ x₀ ∧ M y₀ x₀ = M y₁ x₁)) : ∃ c : List (Fin n × Fin n), c.Nodup ∧ c.length = n ∧ c.Chain' (fun a b => abs ((a.2 : ℤ) - (b.2 : ℤ)) + abs ((a.1 : ℤ) - (b.1 : ℤ)) = 1 ∧ M a.1 a.2 ≠ M b.1 b.2) := by classical

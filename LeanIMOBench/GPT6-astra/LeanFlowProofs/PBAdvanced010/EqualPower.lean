@@ -1,4 +1,4 @@
-import LeanFlowProofs.PBAdvanced010ObliqueInterpolation
+import LeanFlowProofs.PBAdvanced010.ObliqueInterpolation
 import Mathlib
 
 theorem LeanFlowProofs.PBAdvanced010.equalPower

@@ -1,5 +1,5 @@
-import LeanFlowProofs.PB021SortedIncrementIdentity
-import LeanFlowProofs.PB021SortedPrefixDominance
+import LeanFlowProofs.PBAdvanced021.SortedIncrementIdentity
+import LeanFlowProofs.PBAdvanced021.SortedPrefixDominance
 import Mathlib
 
 theorem LeanFlow.pb021_rank_walk_defect_data {d : ℕ} (A : ℕ → Fin d → ℕ) (x : ℕ → Fin d) (hstep : ∀ (n : ℕ) (i : Fin d), A (n + 1) i = A n i + (if i = x n then 1 else 0)) (hrank : ∀ n : ℕ, (x (n + 1)).val + 1 = (Finset.univ.filter (fun j : Fin d => A (n + 1) (x n) ≤ A (n + 1) j)).card) : ∃ s : ℕ → Fin d → ℕ, ∃ b : Fin d → ℤ, (∀ n : ℕ, Antitone (s n)) ∧ (∀ n : ℕ, ∃ e : Equiv.Perm (Fin d), ∀ i : Fin d, s n i = A n (e i)) ∧ (∀ (n : ℕ) (i : Fin d), (A n i : ℤ) + (if i = x n then (1 : ℤ) else 0) - (s n i : ℤ) = b i) ∧ (∀ K : ℕ, K ≤ d → (Finset.univ.filter (fun i : Fin d => i.val < K)).sum b ≤ 1) ∧ Finset.univ.sum b = 1 := by 

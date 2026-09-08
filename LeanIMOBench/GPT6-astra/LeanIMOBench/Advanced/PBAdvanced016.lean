@@ -1,8 +1,8 @@
-import LeanFlowProofs.PB016CrossedLines
-import LeanFlowProofs.PB016InitialCoordinates
-import LeanFlowProofs.PB016SecondIntersection
-import LeanFlowProofs.PB016WeightedCircle
-import LeanFlowProofs.PB016WeightedFrame
+import LeanFlowProofs.PBAdvanced016.CrossedLines
+import LeanFlowProofs.PBAdvanced016.InitialCoordinates
+import LeanFlowProofs.PBAdvanced016.SecondIntersection
+import LeanFlowProofs.PBAdvanced016.WeightedCircle
+import LeanFlowProofs.PBAdvanced016.WeightedFrame
 import Mathlib
 
 /-

@@ -1,5 +1,5 @@
-import LeanFlowProofs.PB021NoLargeLarge
-import LeanFlowProofs.PB021OccurrenceSuccessorsStrict
+import LeanFlowProofs.PBAdvanced021.NoLargeLarge
+import LeanFlowProofs.PBAdvanced021.OccurrenceSuccessorsStrict
 import Mathlib
 
 theorem LeanFlow.pb021_eventual_small_large_alternation {c : ℕ → ℕ} {N B : ℕ} (hN : 0 < N) (hpos : ∀ i : ℕ, 0 < i → 0 < c i) (hNB : N ≤ B) (hinit : ∀ i : ℕ, 1 ≤ i → i ≤ N → c i ≤ B) (hrule : ∀ t : ℕ, N ≤ t → c (t + 1) = ((Finset.Icc 1 t).filter (fun i => c i = c t)).card) : ∃ t0 : ℕ, N ≤ t0 ∧ ∀ n : ℕ, c (t0 + 2 * n) ≤ B ∧ B < c (t0 + 2 * n + 1) := by 

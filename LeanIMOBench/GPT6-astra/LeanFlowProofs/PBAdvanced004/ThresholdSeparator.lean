@@ -1,5 +1,5 @@
-import LeanFlowProofs.PB004EdgeSideBranches
-import LeanFlowProofs.PB004EdgeSides
+import LeanFlowProofs.PBAdvanced004.EdgeSideBranches
+import LeanFlowProofs.PBAdvanced004.EdgeSides
 import Mathlib
 
 theorem LeanFlowProofs.PB004_threshold_separator

@@ -1,5 +1,5 @@
-import LeanFlowProofs.PB018Countercoloring
-import LeanFlowProofs.PB018NoMonoPath
+import LeanFlowProofs.PBAdvanced018.Countercoloring
+import LeanFlowProofs.PBAdvanced018.NoMonoPath
 import Mathlib
 
 /-

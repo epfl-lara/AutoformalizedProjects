@@ -1,6 +1,6 @@
-import LeanFlowProofs.PB004EdgeSides
-import LeanFlowProofs.PB004NestedCuts
-import LeanFlowProofs.PB004ThresholdSeparator
+import LeanFlowProofs.PBAdvanced004.EdgeSides
+import LeanFlowProofs.PBAdvanced004.NestedCuts
+import LeanFlowProofs.PBAdvanced004.ThresholdSeparator
 import Mathlib
 
 /-

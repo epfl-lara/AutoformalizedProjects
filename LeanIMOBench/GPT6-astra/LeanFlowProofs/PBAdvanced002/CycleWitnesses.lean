@@ -1,4 +1,4 @@
-import LeanFlowProofs.PB002ShortImageIterate
+import LeanFlowProofs.PBAdvanced002.ShortImageIterate
 import Mathlib
 
 theorem LeanFlowPB002.cycle_witnesses {V : Type*} [Fintype V] (R : V → V → Prop) :

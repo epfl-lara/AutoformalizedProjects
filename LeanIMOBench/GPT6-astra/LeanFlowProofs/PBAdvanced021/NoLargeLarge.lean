@@ -1,4 +1,4 @@
-import LeanFlowProofs.PB021OccurrenceSuccessorsStrict
+import LeanFlowProofs.PBAdvanced021.OccurrenceSuccessorsStrict
 import Mathlib
 
 theorem LeanFlow.pb021_no_large_large {c : ℕ → ℕ} {N B : ℕ} (hN : 0 < N) (hpos : ∀ i : ℕ, 0 < i → 0 < c i) (hNB : N ≤ B) (hinit : ∀ i : ℕ, 1 ≤ i → i ≤ N → c i ≤ B) (hrule : ∀ t : ℕ, N ≤ t → c (t + 1) = ((Finset.Icc 1 t).filter (fun i => c i = c t)).card) : ∀ t : ℕ, N ≤ t → c t ≤ B ∨ c (t + 1) ≤ B := by classical

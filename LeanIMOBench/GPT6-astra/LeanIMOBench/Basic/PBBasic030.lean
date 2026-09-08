@@ -1,4 +1,4 @@
-import LeanFlowProofs.PBBasic030DiscriminantSwap
+import LeanFlowProofs.PBBasic030.DiscriminantSwap
 import Mathlib
 
 /-

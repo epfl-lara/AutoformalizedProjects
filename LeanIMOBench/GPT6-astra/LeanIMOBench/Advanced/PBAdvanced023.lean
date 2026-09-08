@@ -1,7 +1,7 @@
-import LeanFlowProofs.PB023BoundaryRecovery
-import LeanFlowProofs.PB023InteriorRoutes
-import LeanFlowProofs.PB023RowTwoSweep
-import LeanFlowProofs.PB023TwoPathAdversary
+import LeanFlowProofs.PBAdvanced023.BoundaryRecovery
+import LeanFlowProofs.PBAdvanced023.InteriorRoutes
+import LeanFlowProofs.PBAdvanced023.RowTwoSweep
+import LeanFlowProofs.PBAdvanced023.TwoPathAdversary
 import Mathlib
 
 /-

@@ -2,13 +2,15 @@
 
 Lean 4 proofs of the eighteen IMO-LeanProofBench problems that are **not**
 covered by LEAP's published solutions, produced with
-[LeanFlow](https://github.com/epfl-lara/LeanFlow) and `gpt-6-astra` through the
-Codex provider.
+**[LeanFlow](https://github.com/epfl-lara/LeanFlow) with `gpt-6-astra`
+(`xhigh` reasoning orchestrator, `low` reasoning prover)** through the Codex
+provider.
 
 ## Status
 
 - All 18 theorems are proved in `LeanIMOBench/Basic/` and
-  `LeanIMOBench/Advanced/`, supported by 107 helper lemmas in `LeanFlowProofs/`.
+  `LeanIMOBench/Advanced/`, supported by 107 helper lemmas grouped by problem
+  under `LeanFlowProofs/`.
 - Every problem statement is **byte-identical** to the published benchmark
   statement; only the `sorry` was replaced. This was checked against the frozen
   baseline before publication, not merely asserted.
@@ -20,6 +22,33 @@ Codex provider.
   `0df444a360eaa60ab8c11dca51a86af692955474`.
 
 `SHA256SUMS` records the exact modules retained from the campaign.
+
+## Layout
+
+```
+LeanIMOBench.lean                     imports all 18 benchmark theorems
+LeanIMOBench/
+  Basic/PBBasic0NN.lean               the 5 Basic-set theorems
+  Advanced/PBAdvancedNNN.lean         the 13 Advanced-set theorems
+LeanFlowProofs/
+  PBBasic025/SegmentPlacement.lean    helper lemmas, one directory per problem
+  PBAdvanced003/ForwardBisector.lean
+  ...
+DAGS.md                               the proof graph of every problem
+SHA256SUMS                            digests of the 125 retained modules
+```
+
+The benchmark theorems keep the module paths the benchmark itself uses
+(`LeanIMOBench.Advanced.PBAdvanced003`), so they line up with
+`lean_proof_bench_v2.csv` directly. Helper lemmas are grouped by the problem
+they belong to rather than sharing one flat directory: each problem's proof is
+then self-contained and readable on its own.
+
+[`DAGS.md`](DAGS.md) renders each problem's proof graph — the benchmark theorem
+at the root and the helper lemmas beneath it, with the dependency edges the
+orchestrator actually planned. The shapes vary a lot: `PB-Advanced-021` was
+decomposed into twelve nodes, while `PB-Basic-029` and `PB-Basic-030` were
+proved through a single helper each.
 
 ## Source
 
@@ -110,11 +139,11 @@ wall-clock time across two and then three parallel lanes.
 
 Each problem was proved in isolation: its own Lake project, its own frozen
 budget, no shared state with the other seventeen. LeanFlow ran in research mode
-with a top-down search order, and with the prover and the orchestrator at
-**different reasoning efforts** — planning, review and research at `xhigh`, the
-prover and negation passes at `low`. The orchestrator decomposes the target into
-named helper obligations, the cheap prover discharges them, and results are
-kernel-checked before being integrated.
+with a top-down search order, using **`gpt-6-astra` as both roles but at
+different reasoning efforts — `xhigh` for the orchestrator (planning, review and
+research) and `low` for the prover** (and its negation passes). The orchestrator
+decomposes the target into named helper obligations, the cheap prover discharges
+them, and results are kernel-checked before being integrated.
 
 That split shows up in the numbers. Helper lemmas are discharged cheaply, 6 to 33
 calls each; the expensive part is assembling them into the root theorem.

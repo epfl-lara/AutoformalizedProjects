@@ -1,4 +1,4 @@
-import LeanFlowProofs.PB002ComparableFamilyCommonOrbit
+import LeanFlowProofs.PBAdvanced002.ComparableFamilyCommonOrbit
 import Mathlib
 
 theorem LeanFlowPB002.eventual_period_configuration_bound
